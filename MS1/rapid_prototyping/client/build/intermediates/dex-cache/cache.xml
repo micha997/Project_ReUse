@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        is-multidex="true"
+        jar="/home/steve/AndroidStudioProjects/EIS1718/KlamottenVerteiler/app/build/intermediates/exploded-aar/com.android.support/animated-vector-drawable/25.3.1/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="47635644d0d5c103c1dd8360549eb9ba3225c7d3">
+        <dex dex="/home/steve/AndroidStudioProjects/EIS1718/KlamottenVerteiler/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-animated-vector-drawable-25.3.1_6a204cf4f8cc711c1fb07c2470da9fba0eb099fa/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/steve/AndroidStudioProjects/EIS1718/KlamottenVerteiler/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/25.3.1/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="150252b33b00274cc868578ade018fda0d43a3eb">
+        <dex dex="/home/steve/AndroidStudioProjects/EIS1718/KlamottenVerteiler/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-appcompat-v7-25.3.1_3f9c4bcba60341b351981bf2038570de770faf98/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/steve/printf/EISWS1718MichelOwtschinnikow/MS1/rapid_prototyping/client/app/build/intermediates/exploded-aar/com.android.support/support-media-compat/25.3.1/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="45f697922e6f072daa12f8a2995dc77ab03c11da">
+        <dex dex="/home/steve/printf/EISWS1718MichelOwtschinnikow/MS1/rapid_prototyping/client/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-media-compat-25.3.1_4aefbb8c8d342b9c33def213e249b6f6b3b26122/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/steve/AndroidStudioProjects/EIS1718/KlamottenVerteiler/app/build/intermediates/exploded-aar/com.android.support/support-fragment/25.3.1/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="4a26a1154d053ab11aaf4c3967c42a4d66390991">
+        <dex dex="/home/steve/AndroidStudioProjects/EIS1718/KlamottenVerteiler/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-fragment-25.3.1_7b82c3d6d09897558577b727f22f6491e21a83c6/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/steve/printf/EISWS1718MichelOwtschinnikow/MS1/rapid_prototyping/client/app/build/intermediates/exploded-aar/com.android.support/support-vector-drawable/25.3.1/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="efb8cb62d47d157c29d1521daac7eefd4cb881ee">
+        <dex dex="/home/steve/printf/EISWS1718MichelOwtschinnikow/MS1/rapid_prototyping/client/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-vector-drawable-25.3.1_4af1613a84b7d3a6831abad4b9fd8053e3f5c38f/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/steve/printf/EISWS1718MichelOwtschinnikow/MS1/rapid_prototyping/client/app/build/intermediates/incremental-classes/debug/instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="86666aba7c3e72e0667d1a375ea7b4db9063c4a3">
+        <dex dex="/home/steve/printf/EISWS1718MichelOwtschinnikow/MS1/rapid_prototyping/client/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run-bootstrap_b5a5324acc1637ef4658d0044390a95b092c78f1/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/steve/printf/EISWS1718MichelOwtschinnikow/MS1/rapid_prototyping/client/app/build/intermediates/exploded-aar/com.android.support/support-v4/25.3.1/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="d7c42c80f6509b9ea4db28ca7859ffae08ec5741">
+        <dex dex="/home/steve/printf/EISWS1718MichelOwtschinnikow/MS1/rapid_prototyping/client/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-v4-25.3.1_755f714611a0add7638859652acc466bfedeb560/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/steve/Android/Sdk/extras/android/m2repository/com/android/support/support-annotations/25.3.1/support-annotations-25.3.1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="bf8841d29fa39e077730e7a91222c2ce269fa7c9">
+        <dex dex="/home/steve/AndroidStudioProjects/EIS1718/KlamottenVerteiler/app/build/intermediates/transforms/dex/debug/folders/1000/10/support-annotations-25.3.1_7624a8d70314a82e2d83caaa7f1c6995c1903b7a/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/steve/AndroidStudioProjects/EIS1718/KlamottenVerteiler/app/build/intermediates/incremental-runtime-classes/debug/instant-run.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="8de50440b31de3e28ab0153ef73d388e81c14a2e">
+        <dex dex="/home/steve/AndroidStudioProjects/EIS1718/KlamottenVerteiler/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run_cbd679633125061fb039f4ea8805b3df9c1a483d/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/steve/AndroidStudioProjects/EIS1718/KlamottenVerteiler/app/build/intermediates/exploded-aar/com.android.support/support-media-compat/25.3.1/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="45f697922e6f072daa12f8a2995dc77ab03c11da">
+        <dex dex="/home/steve/AndroidStudioProjects/EIS1718/KlamottenVerteiler/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-media-compat-25.3.1_b003f903d2059c4f11e381a86e2e65436d17c144/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/steve/AndroidStudioProjects/EIS1718/KlamottenVerteiler/app/build/intermediates/exploded-aar/com.android.support/support-core-utils/25.3.1/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="6ef31f1555bb4cc513ec8d52711365a8b89f3600">
+        <dex dex="/home/steve/AndroidStudioProjects/EIS1718/KlamottenVerteiler/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-core-utils-25.3.1_0c328dfa63c58c18c0c54291c6ec6a67080d0cc3/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/steve/AndroidStudioProjects/EIS1718/KlamottenVerteiler/app/build/intermediates/incremental-classes/debug/instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="6fdccd3b0571d2b8ccbcc7f9dc3180d5599b77d6">
+        <dex dex="/home/steve/AndroidStudioProjects/EIS1718/KlamottenVerteiler/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run-bootstrap_fd07052eef7dce39f67d2b82db2e8781cab2ec37/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/steve/printf/EISWS1718MichelOwtschinnikow/MS1/rapid_prototyping/client/app/build/intermediates/exploded-aar/com.android.support/support-fragment/25.3.1/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="4a26a1154d053ab11aaf4c3967c42a4d66390991">
+        <dex dex="/home/steve/printf/EISWS1718MichelOwtschinnikow/MS1/rapid_prototyping/client/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-fragment-25.3.1_e0a2578af80d5e81f3a43c2ad61b172ba67b38e0/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/steve/printf/EISWS1718MichelOwtschinnikow/MS1/rapid_prototyping/client/app/build/intermediates/exploded-aar/com.android.support/support-core-ui/25.3.1/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="052f5f840f21174a3ecf6544130194e2652cbb73">
+        <dex dex="/home/steve/printf/EISWS1718MichelOwtschinnikow/MS1/rapid_prototyping/client/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-core-ui-25.3.1_4069ed537c32a75e2f150e5b1741394bb5bd744b/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/steve/printf/EISWS1718MichelOwtschinnikow/MS1/rapid_prototyping/client/app/build/intermediates/exploded-aar/com.android.support/support-core-utils/25.3.1/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="6ef31f1555bb4cc513ec8d52711365a8b89f3600">
+        <dex dex="/home/steve/printf/EISWS1718MichelOwtschinnikow/MS1/rapid_prototyping/client/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-core-utils-25.3.1_70b03bc67e8f332939126adb7329b5e8484883f0/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/steve/AndroidStudioProjects/EIS1718/KlamottenVerteiler/app/build/intermediates/exploded-aar/com.android.support/support-core-ui/25.3.1/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="052f5f840f21174a3ecf6544130194e2652cbb73">
+        <dex dex="/home/steve/AndroidStudioProjects/EIS1718/KlamottenVerteiler/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-core-ui-25.3.1_c135f3342a7ea19b30ea3792cd7a5ec5cd530e06/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/steve/printf/EISWS1718MichelOwtschinnikow/MS1/rapid_prototyping/client/app/build/intermediates/exploded-aar/com.android.support/support-compat/25.3.1/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="da27a32db6af8954ee8061537c7d476fcb1df46f">
+        <dex dex="/home/steve/printf/EISWS1718MichelOwtschinnikow/MS1/rapid_prototyping/client/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-compat-25.3.1_53eebd2bed8a0f06de1f0b1dbd35b6f1e9c0d533/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/steve/printf/EISWS1718MichelOwtschinnikow/MS1/rapid_prototyping/client/app/build/intermediates/incremental-runtime-classes/debug/instant-run.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="1f1dd74e9ea62d66c7ab89d41660fcef648c9676">
+        <dex dex="/home/steve/printf/EISWS1718MichelOwtschinnikow/MS1/rapid_prototyping/client/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run_968aaa6edb2ee7a1a9fc06a30ede04fa99f7b12e/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/steve/AndroidStudioProjects/EIS1718/KlamottenVerteiler/app/build/intermediates/exploded-aar/com.android.support/support-compat/25.3.1/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="da27a32db6af8954ee8061537c7d476fcb1df46f">
+        <dex dex="/home/steve/AndroidStudioProjects/EIS1718/KlamottenVerteiler/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-compat-25.3.1_1f4e7804ad4689e9110c718a51cfaef614bda866/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/steve/printf/EISWS1718MichelOwtschinnikow/MS1/rapid_prototyping/client/app/build/intermediates/exploded-aar/com.android.support/animated-vector-drawable/25.3.1/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="47635644d0d5c103c1dd8360549eb9ba3225c7d3">
+        <dex dex="/home/steve/printf/EISWS1718MichelOwtschinnikow/MS1/rapid_prototyping/client/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-animated-vector-drawable-25.3.1_96c7442da2a0e63d781fb10de872c37d10300322/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/steve/AndroidStudioProjects/EIS1718/KlamottenVerteiler/app/build/intermediates/exploded-aar/com.android.support/support-vector-drawable/25.3.1/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="efb8cb62d47d157c29d1521daac7eefd4cb881ee">
+        <dex dex="/home/steve/AndroidStudioProjects/EIS1718/KlamottenVerteiler/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-vector-drawable-25.3.1_499e133de95fbf0fa25cd44bf2309de2b2bfb7ff/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/steve/printf/EISWS1718MichelOwtschinnikow/MS1/rapid_prototyping/client/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/25.3.1/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="150252b33b00274cc868578ade018fda0d43a3eb">
+        <dex dex="/home/steve/printf/EISWS1718MichelOwtschinnikow/MS1/rapid_prototyping/client/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-appcompat-v7-25.3.1_813fc99fbbc8ab9d0b1c476adbe8dbf364073605/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/steve/AndroidStudioProjects/EIS1718/KlamottenVerteiler/app/build/intermediates/exploded-aar/com.android.support/support-v4/25.3.1/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="d7c42c80f6509b9ea4db28ca7859ffae08ec5741">
+        <dex dex="/home/steve/AndroidStudioProjects/EIS1718/KlamottenVerteiler/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-v4-25.3.1_e0f5e0bfe9dcfefd6f3992b4601c844c59b6f02c/classes.dex" />
+    </item>
+
+</items>
