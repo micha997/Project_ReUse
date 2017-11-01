@@ -3,7 +3,8 @@
 const express = require('express');
 const bodyParser = require('body-parser')
 const getIndex = require('./routes/getIndex');
-
+const postKlamotten = require('./routes/postKlamotten');
+const getAll = require('./routes/getAll');
 
 const getApp = function(database) {
   // check Database
@@ -16,6 +17,9 @@ const getApp = function(database) {
   //include Body Parser for JSON req
   app.use(bodyParser.json());
 
+  // define routes
+  app.get('/all', getAll(database));
+  app.post('/klamotten', postKlamotten(database));
   app.get('/', getIndex());
 
   return app;

@@ -36,6 +36,27 @@ const database = {
       //send results back to handler
       callback(null, mappings);
     })
+  },
+  addClothing(clothing, callback) {
+    if (!clothing) {
+      throw new Error ('Clothing is missing.');
+    }
+    if (!callback) {
+      throw new Error ('Callback is missing.');
+    }
+
+    clothing = JSON.parse(clothing);
+
+    const mapping = {
+      name: clothing["name"]
+    };
+    //write mapping to Database
+    this.mappings.insertOne(mapping, err => {
+      if (err) {
+        return callback(err);
+      }
+      callback(null);
+    });
   }
 
 };
