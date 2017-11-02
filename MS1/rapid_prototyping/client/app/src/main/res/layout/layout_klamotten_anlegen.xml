@@ -46,6 +46,12 @@
         android:id="@+id/etPosition" />
 
     <Button
+        android:text="Ort wählen"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnChooseLocation" />
+
+    <Button
         android:text="Einstellen"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

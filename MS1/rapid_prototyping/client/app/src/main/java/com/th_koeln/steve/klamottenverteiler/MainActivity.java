@@ -8,6 +8,7 @@ import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
     private Button btnKlamottenAnlegen;
+    private Button btnKlamottenSuchen;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,5 +24,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        btnKlamottenSuchen = (Button) findViewById(R.id.btnKlamottenSuchen);
+
+        btnKlamottenSuchen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent myIntent = new Intent(getApplicationContext(), KlamottenSuchen.class);
+                startActivity(myIntent);
+            }
+        });
     }
 }

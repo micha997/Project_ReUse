@@ -44,7 +44,7 @@ public class HttpsService extends IntentService {
     }
 
     private void sendJSON(String uri, String payload) throws KeyManagementException, NoSuchAlgorithmException {
-            // necessary for self signed certificate
+            // necessary for self signed certificate. WARNING: connection is not secure with this
             TrustManager[] trustAllCerts = new TrustManager[] {new X509TrustManager() {
                 public java.security.cert.X509Certificate[] getAcceptedIssuers() {
                     return null;
