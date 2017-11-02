@@ -44,11 +44,11 @@ const database = {
     if (!callback) {
       throw new Error ('Callback is missing.');
     }
-
     clothing = JSON.parse(clothing);
 
     const mapping = {
-      name: clothing["name"]
+      name: clothing["name"],
+      position: clothing["position"]
     };
     //write mapping to Database
     this.mappings.insertOne(mapping, err => {
