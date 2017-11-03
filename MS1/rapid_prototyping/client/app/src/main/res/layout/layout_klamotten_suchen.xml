@@ -9,6 +9,20 @@
         android:layout_height="wrap_content"
         android:id="@+id/btnSucheLocation" />
 
+    <TextView
+        android:text="Umkreis:"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView5" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:text="9999"
+        android:ems="10"
+        android:id="@+id/eTvicinity" />
+
     <Button
         android:text="Suchen"
         android:layout_width="match_parent"

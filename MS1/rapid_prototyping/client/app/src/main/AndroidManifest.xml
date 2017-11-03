@@ -10,7 +10,7 @@ package="com.th_koeln.steve.klamottenverteiler">
     <activity android:name=".KlamottenAnlegen" />
     <activity android:name=".map_results" />
     <activity android:name=".KlamottenSuchen" />
-    <service android:name=".services.HttpsService" />
+    <service android:name=".services.HttpsService"> </service>
     <activity android:name=".MainActivity">
         <intent-filter>
             <action android:name="android.intent.action.MAIN" />

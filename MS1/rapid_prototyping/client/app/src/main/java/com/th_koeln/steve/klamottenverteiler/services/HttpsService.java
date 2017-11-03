@@ -2,12 +2,13 @@ package com.th_koeln.steve.klamottenverteiler.services;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -27,88 +28,134 @@ public class HttpsService extends IntentService {
     public HttpsService() {
         super("name");
     }
+    private String response = null;
+    private int status=0;
+    private String method;
+    HttpsURLConnection connection = null;
+
 
     @Override
     protected void onHandleIntent(Intent intent) {
         String payload = intent.getStringExtra("payload");
         String uri = intent.getStringExtra("url");
+        method = intent.getStringExtra("method");
+
+
+        // necessary for self signed certificate. WARNING: connection is not secure with this
+        TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
+            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                return null;
+            }
+
+            public void checkClientTrusted(X509Certificate[] certs, String authType) {
+            }
+
+            public void checkServerTrusted(X509Certificate[] certs, String authType) {
+            }
+        }
+        };
+
+        // Install the all-trusting trust manager
+        SSLContext sc = null;
         try {
-            sendJSON(uri,payload);
-        } catch (KeyManagementException e) {
-            // send alertdialog by brodcast
+            sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
         } catch (NoSuchAlgorithmException e) {
-            // send alertdialog by brodcast
+            e.printStackTrace();
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
         }
 
 
+        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+
+        // Create all-trusting host name verifier
+        HostnameVerifier allHostsValid = new HostnameVerifier() {
+            public boolean verify(String hostname, SSLSession session) {
+                return true;
+            }
+        };
+        // Install the all-trusting host verifier
+        HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+
+        URL url = null;
+        try {
+            url = new URL(uri);
+
+
+            // define HTTP Method
+
+
+            if (method.equals("POST")) {
+                connection = (HttpsURLConnection) url.openConnection();
+                connection.setRequestMethod(method);
+                // http-req with body
+                connection.setDoOutput(true);
+                // http-req with res body
+                connection.setDoInput(true);
+                // define content-type for REQ and RES as JSON
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setRequestProperty("Accept", "application/json");
+                OutputStreamWriter streamWriter = new OutputStreamWriter(connection.getOutputStream());
+                //write payload
+                streamWriter.write(payload);
+                streamWriter.flush();
+                sendJSON(uri, payload);
+            } else if (method.equals("GET")) {
+
+                connection = (HttpsURLConnection) url.openConnection();
+                connection.setRequestMethod(method);
+                connection.setUseCaches(false);
+                connection.setAllowUserInteraction(false);
+                connection.connect();
+                sendJSON(uri, payload);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
+        }
     }
 
     private void sendJSON(String uri, String payload) throws KeyManagementException, NoSuchAlgorithmException {
-            // necessary for self signed certificate. WARNING: connection is not secure with this
-            TrustManager[] trustAllCerts = new TrustManager[] {new X509TrustManager() {
-                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                    return null;
-                }
-                public void checkClientTrusted(X509Certificate[] certs, String authType) {
-                }
-                public void checkServerTrusted(X509Certificate[] certs, String authType) {
-                }
-            }
-            };
 
-            // Install the all-trusting trust manager
-            SSLContext sc = SSLContext.getInstance("SSL");
-            sc.init(null, trustAllCerts, new java.security.SecureRandom());
-            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-
-            // Create all-trusting host name verifier
-            HostnameVerifier allHostsValid = new HostnameVerifier() {
-                public boolean verify(String hostname, SSLSession session) {
-                    return true;
-                }
-            };
-            // Install the all-trusting host verifier
-            HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
-
-
-        HttpsURLConnection connection = null;
         try {
-
-            URL url=new URL(uri);
-            connection = (HttpsURLConnection) url.openConnection();
-            connection.setDoOutput(true);
-            connection.setDoInput(true);
-            // define HTTP Method
-            connection.setRequestMethod("POST");
-            // define content-type for REQ and RES as JSON
-            connection.setRequestProperty("Content-Type", "application/json");
-            connection.setRequestProperty("Accept", "application/json");
-            OutputStreamWriter streamWriter = new OutputStreamWriter(connection.getOutputStream());
-            streamWriter.write(payload);
-            streamWriter.flush();
+            //container for response
             StringBuilder stringBuilder = new StringBuilder();
-            // if data connection is OK
-            if (connection.getResponseCode() == HttpURLConnection.HTTP_OK){
-                InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
-                BufferedReader bufferedReader = new BufferedReader(streamReader);
-                String response = null;
-                // read response
-                while ((response = bufferedReader.readLine()) != null) {
-                    stringBuilder.append(response + "\n");
-                }
-                bufferedReader.close();
+            // get Statuscode from Response
+            int status = connection.getResponseCode();
+            // analyse Status code
+            switch (status) {
+                case 200:
+                case 201:
+                    InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
+                    BufferedReader bufferedReader = new BufferedReader(streamReader);
 
-                Log.d("test", stringBuilder.toString());
-            } else {
+                    // read response and safe to String
+                    while ((response = bufferedReader.readLine()) != null) {
+                        stringBuilder.append(response + "\n");
+                    }
+                    bufferedReader.close();
+                    if (method.equals("GET")) {
+                        // send clothing JSON array to Google Map
+                        Intent intent = new Intent("clothing");
+                        intent.putExtra("clothing", stringBuilder.toString());
+                        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+                    }
+                    Log.d("test", stringBuilder.toString());
+                    break;
+                default:
                 Log.e("test", connection.getResponseMessage());
-                // send reponse + alertdialog by brodcast
+                    break;
             }
-        } catch (Exception exception){
+        } catch (Exception exception) {
             Log.e("test", exception.toString());
             // send reponse + alertdialog by brodcast
 
         } finally {
-            if (connection != null){
+            if (connection != null) {
                 connection.disconnect();
             }
         }

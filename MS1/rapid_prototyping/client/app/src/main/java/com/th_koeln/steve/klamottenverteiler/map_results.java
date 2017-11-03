@@ -9,28 +9,45 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class map_results extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    private SupportMapFragment mapFragment;
+
+    private String clothing_list;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map_results);
         // define map fragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+        mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         // initialize map system + view
         mapFragment.getMapAsync(this);
+        // get Elements to show in map
+        clothing_list = getIntent().getStringExtra("clothing_list");
     }
 
-
-    //add markers on map
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        // define map-element
         mMap = googleMap;
-        // define + place some Marker
-        LatLng dortmund = new LatLng(51.5, 7.45);
-        mMap.addMarker(new MarkerOptions().position(dortmund).title("Marker in Dortmund"));
+        try {
+            JSONArray jsonArray = new JSONArray(clothing_list);
+            // iterate result-JSONArray and Place Marker with extra information
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject row = jsonArray.getJSONObject(i);
+                mMap.addMarker(new MarkerOptions().position(new LatLng(row.getDouble("latitude"),
+                        row.getDouble("longitude"))).title(row.getString("name") + " in "+
+                        row.getString("city")).snippet("Größe: " + row.getString("groesse") + "\n"));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }
