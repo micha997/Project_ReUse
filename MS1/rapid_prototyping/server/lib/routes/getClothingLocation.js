@@ -16,7 +16,6 @@ const getClothingLocation = function (database) {
       if (err) {
         return res.status(500).end();
       }
-      console.log("ich sende jetzt 201");
       res.status(201).send(mappings);
     })
   };

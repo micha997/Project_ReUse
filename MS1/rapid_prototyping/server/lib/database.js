@@ -46,16 +46,20 @@ const database = {
       if (err) {
         return callback(err);
       }
-      var mappings_json = JSON.parse(JSON.stringify(mappings));
-
-      for(var i = 0; i < mappings_json.length; i++) {
-          var distance = calcDistance(mappings_json[i].latitude, mappings_json[i].longitude, latitude,longitude);
-          if (distance >= vicinity) {
-              var removed = mappings_json.splice(i, 1);
-          }
-
+      // container for elements in vicinity
+      var mappings_new = [];
+      // search for elements in vicinity + add distance
+      for (var i = 0; i < mappings.length; i++) {
+        // calc distance
+        var distance = calcDistance(mappings[i].latitude, mappings[i].longitude,latitude,longitude);
+        if (distance <= vicinity) {
+          // add distance
+          mappings[i].distance = distance;
+          mappings_new.push(mappings[i]);
+        }
       }
-      callback(null, mappings_json);
+
+      callback(null, mappings_new);
     })
   },
   addClothing(clothing, callback) {

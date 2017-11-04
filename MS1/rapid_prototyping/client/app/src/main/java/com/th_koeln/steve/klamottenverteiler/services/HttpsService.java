@@ -81,14 +81,11 @@ public class HttpsService extends IntentService {
         URL url = null;
         try {
             url = new URL(uri);
-
-
+            connection = (HttpsURLConnection) url.openConnection();
             // define HTTP Method
-
+            connection.setRequestMethod(method);
 
             if (method.equals("POST")) {
-                connection = (HttpsURLConnection) url.openConnection();
-                connection.setRequestMethod(method);
                 // http-req with body
                 connection.setDoOutput(true);
                 // http-req with res body
@@ -102,9 +99,6 @@ public class HttpsService extends IntentService {
                 streamWriter.flush();
                 sendJSON(uri, payload);
             } else if (method.equals("GET")) {
-
-                connection = (HttpsURLConnection) url.openConnection();
-                connection.setRequestMethod(method);
                 connection.setUseCaches(false);
                 connection.setAllowUserInteraction(false);
                 connection.connect();
