@@ -6,7 +6,7 @@ const getAll = function (database) {
   }
 
   return function (req, res)  {
-
+    console.log("hi");
     // call database
     database.getAll((err, mappings) => {
       res.setHeader("Content-Type", "application/json");
