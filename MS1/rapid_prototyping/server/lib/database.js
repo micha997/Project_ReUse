@@ -52,13 +52,15 @@ const database = {
       throw new Error ('vicinity is missing.');
     }
     // find all elements
-    this.mappings.find({}).toArray((err,mappings) => {
+    this.mappings.find({type: "clothing"}).toArray((err,mappings) => {
       if (err) {
         return callback(err);
       }
+
       // container for elements in vicinity
       var mappings_new = [];
       // search for elements in vicinity + add distance
+      console.log(mappings);
       for (var i = 0; i < mappings.length; i++) {
         // calc distance
         var distance = calcDistance(mappings[i].latitude, mappings[i].longitude,latitude,longitude);
@@ -68,6 +70,7 @@ const database = {
           mappings_new.push(mappings[i]);
         }
       }
+      console.log(mappings_new);
       callback(null, mappings_new);
     })
   },

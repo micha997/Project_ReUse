@@ -8,6 +8,7 @@ const app = getApp(database);
 
 
 // configuration for MongoDB USER: admin, PW: secret PORT: 27017
+//const mongoUrl = process.env.MONGO_URL || 'mongodb://admin:secret@localhost:27017/admin';
 const mongoUrl = process.env.MONGO_URL || 'mongodb://klamotten:v3rt31l3r@ds257245.mlab.com:57245/klamotten-verteiler';
 
 // Load HTTPS configuration
