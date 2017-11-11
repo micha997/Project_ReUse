@@ -1,6 +1,6 @@
 'use strict';
 
-const getClothingLocation = function (database) {
+const getAllClothingLocation = function (database) {
   if (!database) {
     throw new Error('Database is missing.');
   }
@@ -11,7 +11,7 @@ const getClothingLocation = function (database) {
     const longitude = req.params.longitude;
     const vicinity = req.params.vicinity;
     // call database
-    database.getClothingLocation(latitude, longitude, vicinity,(err, mappings) => {
+    database.getAllClothingLocation(latitude, longitude, vicinity,(err, mappings) => {
       res.setHeader("Content-Type", "application/json");
       if (err) {
         return res.status(500).end();
@@ -21,4 +21,4 @@ const getClothingLocation = function (database) {
   };
 };
 
-module.exports = getClothingLocation;
+module.exports = getAllClothingLocation;
