@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Klamotten Verteiler</string>
     <string name="title_activity_map_results">Map</string>
+    <string name="DOMAIN">http://eis-projekt.herokuapp.com</string>
 </resources>
