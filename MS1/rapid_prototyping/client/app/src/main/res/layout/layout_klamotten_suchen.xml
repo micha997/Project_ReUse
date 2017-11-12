@@ -28,4 +28,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/btnSuchen" />
+
+    <Button
+        android:id="@+id/btnSearchPrefer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Vorschlag" />
 </LinearLayout>
