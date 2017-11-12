@@ -10,52 +10,36 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.th_koeln.steve.klamottenverteiler.MainActivity">
 
-    <LinearLayout
+    <TextView
+        android:text="Klamotten Verteiler"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView"
+        android:textSize="30sp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:text="Klamotten eintragen"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true">
+        android:layout_below="@+id/textView"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="11dp"
+        android:layout_marginStart="11dp"
+        android:layout_marginTop="16dp"
+        android:id="@+id/btnKlamottenAnlegen" />
 
-        <TextView
-            android:text="Registrieren:"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/linearLayout"
-            android:layout_centerHorizontal="true"
-            android:id="@+id/tvRegister"
-            android:textSize="36sp" />
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/etEmailRegistration"
-            android:inputType="textEmailAddress"
-            android:text="dominosk@gmx.de"
-            android:hint="Bitte Email-Adresse eingeben:"
-            android:layout_margin="20dp"/>
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/etPasswordRegister"
-            android:inputType="textPassword"
-            android:hint="Bitte Passwort eingeben:"
-            android:layout_margin="20dp"/>
-
-
-
-        <Button
-            android:layout_margin="20dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Register"
-            android:id="@+id/btnRegister"/>
-        <TextView
-            android:textAlignment="center"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/tvGoLogin"
-            android:clickable="true"
-            android:text="Bereits registriert? Hier geht es zum LogIn."/>
-
-    </LinearLayout>
+    <Button
+        android:text="Klamotten suchen"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:id="@+id/btnKlamottenSuchen"
+        android:layout_below="@+id/btnKlamottenAnlegen"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignLeft="@+id/btnKlamottenAnlegen"
+        android:layout_alignStart="@+id/btnKlamottenAnlegen" />
 </RelativeLayout>

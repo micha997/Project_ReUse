@@ -16,7 +16,6 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.firebase.auth.FirebaseAuth;
 import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
 
 /**
@@ -25,7 +24,6 @@ import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
 public class KlamottenSuchen extends AppCompatActivity {
     private Button btnSuchenLocation;
     private Button btnSuchen;
-    private Button btnSearchPref;
     private EditText etVicinity;
 
     private double latitude;
@@ -40,7 +38,6 @@ public class KlamottenSuchen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_klamotten_suchen);
 
-        btnSearchPref = (Button) findViewById(R.id.btnSearchPrefer);
         btnSuchen = (Button) findViewById(R.id.btnSuchen);
         btnSuchenLocation = (Button) findViewById(R.id.btnSucheLocation);
         etVicinity = (EditText) findViewById(R.id.eTvicinity);
@@ -50,39 +47,16 @@ public class KlamottenSuchen extends AppCompatActivity {
                 new IntentFilter("clothing"));
 
         // search for clothing
-
-        btnSearchPref.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
-                FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-                String uId = firebaseAuth.getCurrentUser().getUid();
-                // get desired vicinity in km
-                vicinity = etVicinity.getText().toString();
-                // define parameters for Http-Service call
-                myIntent.putExtra("payload","");
-                myIntent.putExtra("method","GET");
-                myIntent.putExtra("from","SEARCHPREFCLOTHING");
-                myIntent.putExtra("url",getString(R.string.DOMAIN) +"/users/"+ uId + "/prefer/klamotten/"+ latitude + "/" + longitude + "/" + vicinity);
-                //call http service
-                startService(myIntent);
-
-            }
-        });
-
         btnSuchen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
-                FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-                String uId = firebaseAuth.getCurrentUser().getUid();
                 // get desired vicinity in km
                 vicinity = etVicinity.getText().toString();
                 // define parameters for Http-Service call
                 myIntent.putExtra("payload","");
                 myIntent.putExtra("method","GET");
-                myIntent.putExtra("from","SEARCH");
-                myIntent.putExtra("url",getString(R.string.DOMAIN) +"/klamotten/"+ latitude + "/" + longitude + "/" + vicinity + "/" + uId);
+                myIntent.putExtra("url","https://192.168.0.80:3000/all/"+ latitude + "/" + longitude + "/" + vicinity);
                 //call http service
                 startService(myIntent);
             }
@@ -114,7 +88,6 @@ public class KlamottenSuchen extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             // get clothing results from HTTP-Service
             String clothinglist = intent.getStringExtra("clothing");
-            String from = intent.getStringExtra("from");
             // send clothing results to Google Maps activity
             Intent myIntent = new Intent(getApplicationContext(),map_results.class);
             myIntent.putExtra("clothing_list", clothinglist);

@@ -4,7 +4,7 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:text="Art der Kleidung:"
+        android:text="Name der Kleidung:"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/textView2" />
@@ -13,8 +13,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textPersonName"
+        android:text="Name"
         android:ems="10"
-        android:id="@+id/etArt" />
+        android:id="@+id/etName" />
 
     <TextView
         android:text="Größe:"
@@ -26,11 +27,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textPersonName"
+        android:text="Größe"
         android:ems="10"
-        android:id="@+id/etSize" />
+        android:id="@+id/etGroesse" />
 
     <TextView
-        android:text="Farbe:"
+        android:text="Position:"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/textView4" />
@@ -39,47 +41,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textPersonName"
+        android:text="Position"
         android:ems="10"
-        android:id="@+id/etColour" />
-
-    <TextView
-        android:text="Stil"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView7" />
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:ems="10"
-        android:id="@+id/etStyle" />
-
-    <TextView
-        android:text="Geschlecht"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView9" />
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:ems="10"
-        android:id="@+id/etGender" />
-
-    <TextView
-        android:text="Alter:"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView11" />
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:ems="10"
-        android:id="@+id/etAge" />
+        android:id="@+id/etPosition" />
 
     <Button
         android:text="Ort wählen"
