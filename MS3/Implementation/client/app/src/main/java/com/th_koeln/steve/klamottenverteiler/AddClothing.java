@@ -1,12 +1,15 @@
 package com.th_koeln.steve.klamottenverteiler;
 
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -18,6 +21,13 @@ import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -25,7 +35,7 @@ import java.util.Locale;
  * Created by steve on 31.10.17.
  */
 
-public class KlamottenAnlegen extends AppCompatActivity {
+public class AddClothing extends AppCompatActivity {
 
     private static int PLACE_PICKER_REQUEST;
 
@@ -35,13 +45,20 @@ public class KlamottenAnlegen extends AppCompatActivity {
     private EditText etGender;
     private EditText etAge;
     private EditText etColour;
-
+    private EditText etFabric;
+    private EditText etNotes;
+    private EditText etBrand;
+    private ImageView imgImage;
+    private byte[] byteArray;
     private Button kleidungAnlegen;
     private Button btnChooseLocation;
+    private Button btnChoouseImage;
     private double latitude;
     private double longitude;
     private String city = null;
     private Geocoder geocoder;
+    private String result;
+    public static final int PICK_IMAGE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,10 +68,14 @@ public class KlamottenAnlegen extends AppCompatActivity {
         etArt = (EditText) findViewById(R.id.etArt);
         etStyle = (EditText) findViewById(R.id.etStyle);
         etGender = (EditText) findViewById(R.id.etGender);
-        etAge = (EditText) findViewById(R.id.etAge);
         etColour = (EditText) findViewById(R.id.etColour);
-
+        imgImage = (ImageView) findViewById(R.id.imgImage);
+        etNotes = (EditText) findViewById(R.id.etNotes);
+        etFabric = (EditText) findViewById(R.id.etFabric);
+        etBrand = (EditText) findViewById(R.id.etBrand);
         btnChooseLocation = (Button) findViewById(R.id.btnChooseLocation);
+        btnChoouseImage = (Button) findViewById(R.id.btnChooseImage);
+
         geocoder = new Geocoder(this, Locale.getDefault());
 
         btnChooseLocation.setOnClickListener(new View.OnClickListener() {
@@ -62,8 +83,8 @@ public class KlamottenAnlegen extends AppCompatActivity {
             public void onClick(View view) {
                 // start Place Picker
                 try {
-                    Intent intent = new PlacePicker.IntentBuilder().build(KlamottenAnlegen.this);
-                    startActivityForResult(intent, KlamottenAnlegen.PLACE_PICKER_REQUEST);
+                    Intent intent = new PlacePicker.IntentBuilder().build(AddClothing.this);
+                    startActivityForResult(intent, AddClothing.PLACE_PICKER_REQUEST);
                 } catch (GooglePlayServicesRepairableException e) {
                     e.printStackTrace();
                 } catch (GooglePlayServicesNotAvailableException e) {
@@ -75,6 +96,16 @@ public class KlamottenAnlegen extends AppCompatActivity {
         final String uiD= firebaseAuth.getCurrentUser().getUid();
         kleidungAnlegen = (Button) findViewById(R.id.btnKlamottenEinstellen);
 
+        btnChoouseImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
+            }
+        });
+
         kleidungAnlegen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -82,10 +113,10 @@ public class KlamottenAnlegen extends AppCompatActivity {
                 String art = etArt.getText().toString();
                 String style = etStyle.getText().toString();
                 String gender = etGender.getText().toString();
-                String age = etAge.getText().toString();
                 String colour = etColour.getText().toString();
-
-                size=calcSize(size,art);
+                String fabric = etFabric.getText().toString();
+                String notes = etNotes.getText().toString();
+                String brand = etBrand.getText().toString();
 
                 // build JSON object for clothing post
                 JSONObject kleidung = new JSONObject();
@@ -94,11 +125,14 @@ public class KlamottenAnlegen extends AppCompatActivity {
                     kleidung.put("art",art);
                     kleidung.put("style",style);
                     kleidung.put("gender",gender);
-                    kleidung.put("age",age);
-                    kleidung.put("colour", colour);
+                    kleidung.put("colours", colour);
+                    kleidung.put("brand", brand);
+                    kleidung.put("fabric", fabric);
+                    kleidung.put("notes", notes);
                     kleidung.put("longitude", longitude);
                     kleidung.put("latitude",latitude);
                     kleidung.put("city",city);
+                    kleidung.put("image",result);
                     kleidung.put("uId", uiD);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -116,76 +150,42 @@ public class KlamottenAnlegen extends AppCompatActivity {
             }
         });
     }
-    private String calcSize(String size, String art) {
-        ArrayList<String> sizes = new ArrayList<>();
-        sizes.add("XXS");
-        sizes.add("XS");
-        sizes.add("S");
-        sizes.add("M");
-        sizes.add("L");
-        sizes.add("XL");
-        sizes.add("XXL");
-        sizes.add("XXXL");
-        sizes.add("XXXXL");
 
-        if (sizes.contains(size)) {
-            return size;
-        }
-        int iSize=Integer.parseInt(size);
-        if (art.equals("trousers") ) {
-            if ( iSize <= 38) {
-                size= "XXS";
-            } else if (38 <= iSize && iSize <= 42) {
-                size= "XS";
-            } else if (42 < iSize && iSize <= 46) {
-                size= "S";
-            } else if (46 < iSize && iSize <= 50) {
-                size= "M";
-            } else if (50 < iSize && iSize <= 54) {
-                size= "L";
-            } else if (54 < iSize && iSize <= 58) {
-                return "XX";
-            } else if (58 < iSize && iSize <= 62) {
-                size= "XXL";
-            } else if (62 < iSize && iSize <= 66) {
-                size= "XXXL";
-            } else if (66 < iSize) {
-                size= "XXXXL";
-            } else {
-                size="Falsche Groesse";
-            }
-        }
-        return size;
-    }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == PLACE_PICKER_REQUEST) {
             if (resultCode == RESULT_OK) {
                 // get Place Picker location
-                Place place = PlacePicker.getPlace(getApplicationContext(), data );
+                Place place = PlacePicker.getPlace(getApplicationContext(), data);
                 latitude = place.getLatLng().latitude;
                 longitude = place.getLatLng().longitude;
-                /*// get city name
-                try {
-                    city = getNameOfCity(latitude,longitude);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }*/
 
 
             }
         }
-    }
+        if (requestCode == PICK_IMAGE) {
+            try {
+                InputStream inputStream = getApplicationContext().getContentResolver().openInputStream(data.getData());
+                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+                int nRead;
+                byte[] byteData = new byte[16384];
 
-/*    private String getNameOfCity(double lat, double lon) throws IOException {
-        //search for address with geo coder
-        List<Address> addresses = geocoder.getFromLocation(lat, lon, 1);
-        //extract city name
-        if (addresses != null && addresses.size() > 0) {
-            return addresses.get(0).getLocality();
+                while ((nRead = inputStream.read(byteData, 0, byteData.length)) != -1) {
+                    buffer.write(byteData, 0, nRead);
+                }
+                buffer.flush();
+
+                byte imageData[] = buffer.toByteArray();
+                inputStream.read(imageData);
+                result = Base64.encodeToString(imageData, Base64.DEFAULT);
+                imgImage.setImageBitmap(BitmapFactory.decodeByteArray(imageData, 0, imageData.length));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-        return null;
-    }*/
+    }
 
 }
 

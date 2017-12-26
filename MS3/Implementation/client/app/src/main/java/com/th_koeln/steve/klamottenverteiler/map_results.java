@@ -56,8 +56,7 @@ public class map_results extends FragmentActivity implements OnMapReadyCallback,
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject row = jsonArray.getJSONObject(i);
                 Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(row.getDouble("latitude"),
-                        row.getDouble("longitude"))).title(row.getString("art") + " in "+
-                        row.getString("city")).snippet("Größe: " + row.getString("size") + "\n" + "Distance: " + row.getString("distance")));
+                        row.getDouble("longitude"))).title(row.getString("art")).snippet("Größe: " + row.getString("size") + "\n" + "Distance: " + row.getString("distance")));
                 marker.setTag(row.getString("id"));
             }
         } catch (JSONException e) {
@@ -67,8 +66,17 @@ public class map_results extends FragmentActivity implements OnMapReadyCallback,
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        Object tag = marker.getTag();
-        String uId = FirebaseAuth.getInstance().getCurrentUser().getUid().toString();
+        Object cId = marker.getTag();
+        Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
+        myIntent.putExtra("method","GET");
+        myIntent.putExtra("from","SHOWDETAILS");
+        myIntent.putExtra("url",getString(R.string.DOMAIN) + "/clothing/" + cId);
+        startService(myIntent);
+
+        myIntent = new Intent(getApplicationContext(),ShowClothing.class);
+        startActivity(myIntent);
+        finish();
+        /*String uId = FirebaseAuth.getInstance().getCurrentUser().getUid().toString();
         JSONObject prefer = new JSONObject();
         try {
             prefer.put("prefer", tag.toString());
@@ -77,7 +85,7 @@ public class map_results extends FragmentActivity implements OnMapReadyCallback,
         }
         Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
         // define parameters for Service-Call
-        for(int i = 0; jsonArray.length() > i; i++)
+        /*for(int i = 0; jsonArray.length() > i; i++)
         {
             try {
                 JSONObject objects = jsonArray.getJSONObject(i);
@@ -90,13 +98,14 @@ public class map_results extends FragmentActivity implements OnMapReadyCallback,
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-        }
-        myIntent.putExtra("payload",prefer.toString());
+        }*/
+
+        /*myIntent.putExtra("payload",prefer.toString());
         myIntent.putExtra("method","POST");
         myIntent.putExtra("from","POSTPREFER");
         myIntent.putExtra("url",getString(R.string.DOMAIN) + "/users/" + uId + "/prefer");
         //call http service
-        startService(myIntent);
+        startService(myIntent);*/
         return false;
     }
 }

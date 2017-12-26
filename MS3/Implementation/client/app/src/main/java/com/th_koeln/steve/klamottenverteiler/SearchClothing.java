@@ -22,7 +22,7 @@ import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
 /**
  * Created by steve on 01.11.17.
  */
-public class KlamottenSuchen extends AppCompatActivity {
+public class SearchClothing extends AppCompatActivity {
     private Button btnSuchenLocation;
     private Button btnSuchen;
     private Button btnSearchPref;
@@ -95,8 +95,8 @@ public class KlamottenSuchen extends AppCompatActivity {
             public void onClick(View view) {
                 // start Place Picker Fragment to choose a location
                 try {
-                    Intent intent = new PlacePicker.IntentBuilder().build(KlamottenSuchen.this);
-                    startActivityForResult(intent, KlamottenSuchen.PLACE_PICKER_REQUEST);
+                    Intent intent = new PlacePicker.IntentBuilder().build(SearchClothing.this);
+                    startActivityForResult(intent, SearchClothing.PLACE_PICKER_REQUEST);
                 } catch (GooglePlayServicesRepairableException e) {
                     e.printStackTrace();
                 } catch (GooglePlayServicesNotAvailableException e) {
@@ -116,10 +116,10 @@ public class KlamottenSuchen extends AppCompatActivity {
             String clothinglist = intent.getStringExtra("clothing");
             String from = intent.getStringExtra("from");
             // send clothing results to Google Maps activity
+            finish();
             Intent myIntent = new Intent(getApplicationContext(),map_results.class);
             myIntent.putExtra("clothing_list", clothinglist);
             startActivity(myIntent);
-
         }
     };
 

@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scrollView1"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
-
+    <ImageView
+        android:id="@+id/imgImage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
     <TextView
         android:text="Art der Kleidung:"
         android:layout_width="match_parent"
@@ -62,24 +71,53 @@
         android:id="@+id/textView9" />
 
     <EditText
+        android:id="@+id/etGender"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textPersonName"
         android:ems="10"
-        android:id="@+id/etGender" />
+        android:inputType="textPersonName" />
 
     <TextView
-        android:text="Alter:"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/textView11" />
+        android:text="Stoff:" />
 
     <EditText
+        android:id="@+id/etFabric"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textPersonName"
         android:ems="10"
-        android:id="@+id/etAge" />
+        android:inputType="textPersonName" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Marke:" />
+
+    <EditText
+        android:id="@+id/etBrand"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPersonName" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Notes:" />
+
+    <EditText
+        android:id="@+id/etNotes"
+        android:layout_width="match_parent"
+        android:layout_height="83dp"
+        android:ems="10"
+        android:inputType="textPersonName" />
+
+    <Button
+        android:id="@+id/btnChooseImage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Foto" />
 
     <Button
         android:text="Ort wählen"
@@ -92,4 +130,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/btnKlamottenEinstellen" />
+
+
 </LinearLayout>
+</ScrollView>

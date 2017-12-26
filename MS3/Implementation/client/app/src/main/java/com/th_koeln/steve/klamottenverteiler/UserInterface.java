@@ -59,7 +59,7 @@ public class UserInterface extends AppCompatActivity {
         btnKlamottenAnlegen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent myIntent = new Intent(getApplicationContext(), KlamottenAnlegen.class);
+                Intent myIntent = new Intent(getApplicationContext(), AddClothing.class);
                 startActivity(myIntent);
             }
         });
@@ -67,7 +67,7 @@ public class UserInterface extends AppCompatActivity {
         btnKlamottenSuchen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent myIntent = new Intent(getApplicationContext(), KlamottenSuchen.class);
+                Intent myIntent = new Intent(getApplicationContext(), SearchClothing.class);
                 startActivity(myIntent);
             }
         });

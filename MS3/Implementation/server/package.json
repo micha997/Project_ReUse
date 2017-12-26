@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/micha997/EISWS1718MichelOwtschinnikow#readme",
   "dependencies": {
+    "body-parser": "^1.18.2",
     "express": "^4.16.2",
     "mongodb": "^2.2.33",
     "uuid": "^3.1.0"

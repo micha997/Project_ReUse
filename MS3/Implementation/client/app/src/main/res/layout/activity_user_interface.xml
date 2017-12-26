@@ -49,21 +49,20 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/btnShowPrefer"
+        android:layout_below="@+id/btnKlamottenSuchen"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="68dp"
+        android:layout_marginTop="116dp"
         android:text="Logout" />
 
     <Button
-        android:id="@+id/btnShowPrefer"
+        android:id="@+id/btnOutfit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_below="@+id/btnKlamottenSuchen"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="15dp"
-        android:layout_alignLeft="@+id/btnKlamottenAnlegen"
-        android:layout_alignStart="@+id/btnKlamottenAnlegen"
-        android:text="Zeige Vorlieben" />
+        android:layout_marginTop="11dp"
+        android:text="Outfit Suchen" />
+
 </RelativeLayout>

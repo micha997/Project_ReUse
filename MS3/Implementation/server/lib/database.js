@@ -24,8 +24,37 @@ const database = {
       callback(null);
     });
   },
+  getClothing(cId, callback) {
+    if (!cId) {
+      throw new Error ('id is missing.');
+    }
+    if (!callback) {
+      throw new Error ('Callback is missing.');
+    }
+    // find all elements
+    this.mappings.find({type: "clothing", id : cId}).toArray((err,mappings) => {
+      if (err) {
+        return callback(err);
+      }
+      //send results back to handler
+      callback(null, mappings);
+    })
+  },
   // send all DB-Values
   getAll(callback) {
+    if (!callback) {
+      throw new Error ('Callback is missing.');
+    }
+    // find all elements
+    this.mappings.find({}).toArray((err,mappings) => {
+      if (err) {
+        return callback(err);
+      }
+      //send results back to handler
+      callback(null, mappings);
+    })
+  },
+  getOutfit(callback) {
     if (!callback) {
       throw new Error ('Callback is missing.');
     }
@@ -60,6 +89,7 @@ const database = {
       // container for elements in vicinity
       var mappings_new = [];
       // search for elements in vicinity + add distance
+      delete mappings.image;
       console.log(mappings);
       for (var i = 0; i < mappings.length; i++) {
         // calc distance
@@ -92,9 +122,13 @@ const database = {
       color: clothing["colour"],
       style: clothing["style"],
       gender: clothing["gender"],
-      age: clothing["age"],
-      city: clothing["city"],
-      type: "clothing"
+      fabric: clothing["fabric"],
+      notes: clothing["notes"],
+      brand: clothing["brand"],
+      date: Date.now(),
+      uId: clothing["uId"],
+      type: "clothing",
+      image: clothing["image"]
     };
     //write mapping to Database
     this.mappings.insertOne(mapping, err => {

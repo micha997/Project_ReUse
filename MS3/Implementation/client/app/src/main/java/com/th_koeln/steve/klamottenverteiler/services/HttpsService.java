@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.th_koeln.steve.klamottenverteiler.ShowClothing;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -150,6 +152,11 @@ public class HttpsService extends IntentService {
                             intent = new Intent("clothing");
                             intent.putExtra("clothing", stringBuilder.toString());
                             intent.putExtra("from", "SEARCHPREFCLOTHING");
+                            break;
+                        case "SHOWDETAILS":
+                            intent = new Intent("showdetails");
+                            intent.putExtra("clothing", stringBuilder.toString());
+                            intent.putExtra("from", "SHOWDETAILS");
                             break;
                     }
                     LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);

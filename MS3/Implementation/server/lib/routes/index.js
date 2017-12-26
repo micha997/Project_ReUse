@@ -10,3 +10,5 @@ exports.postUserPrefer = require('./postUserPrefer');
 exports.postUser = require('./postUser');
 exports.getUserToken = require('./getUserToken');
 exports.getUserPrefer=require('./getUserPrefer');
+exports.getClothing=require('./getClothing');
+exports.getOutfit=require('./getOutfit');
