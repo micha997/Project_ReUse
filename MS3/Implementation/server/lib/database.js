@@ -40,6 +40,38 @@ const database = {
       callback(null, mappings);
     })
   },
+  getUserProfile(uId, callback) {
+    if (!uId) {
+      throw new Error ('id is missing.');
+    }
+    if (!callback) {
+      throw new Error ('Callback is missing.');
+    }
+    // find all elements
+    this.mappings.find({type: "userprofile", uId : uId}).toArray((err,mappings) => {
+      if (err) {
+        return callback(err);
+      }
+      //send results back to handler
+      callback(null, mappings);
+    })
+  },
+  getUserClothing(uId, callback) {
+    if (!uId) {
+      throw new Error ('id is missing.');
+    }
+    if (!callback) {
+      throw new Error ('Callback is missing.');
+    }
+    // find all elements
+    this.mappings.find({type: "clothing", uId : uId}).toArray((err,mappings) => {
+      if (err) {
+        return callback(err);
+      }
+      //send results back to handler
+      callback(null, mappings);
+    })
+  },
   // send all DB-Values
   getAll(callback) {
     if (!callback) {
