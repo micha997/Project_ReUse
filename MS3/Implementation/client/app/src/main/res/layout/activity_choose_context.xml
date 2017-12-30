@@ -8,6 +8,5 @@
         android:id="@+id/btnWinterOutfit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Button"
-        tools:text="Winter Outfit" />
+        android:text="Winter Outfit" />
 </LinearLayout>

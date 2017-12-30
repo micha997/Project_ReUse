@@ -89,7 +89,7 @@ public class HttpsService extends IntentService {
             // define HTTP Method
             connection.setRequestMethod(method);
 
-            if (method.equals("POST")) {
+            if (method.equals("POST") || method.equals("PUT")) {
                 // http-req with body
                 connection.setDoOutput(true);
                 // http-req with res body
@@ -158,6 +158,12 @@ public class HttpsService extends IntentService {
                             intent.putExtra("clothing", stringBuilder.toString());
                             intent.putExtra("from", "SHOWDETAILS");
                             break;
+                        case "PROFILE":
+                            intent = new Intent("profile");
+                            intent.putExtra("profile", stringBuilder.toString());
+                            intent.putExtra("from", "SEARCHPROFILE");
+                            break;
+
                     }
                     LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
                     Log.d("test", stringBuilder.toString());

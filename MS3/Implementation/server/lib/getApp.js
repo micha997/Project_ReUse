@@ -29,9 +29,11 @@ const getApp = function(database) {
 
   app.get('/user/:uId/clothing/', routes.getUserClothing(database));
   app.get('/user/:id', routes.getUserProfile(database));
+  app.put('/user/:uId', routes.putUserProfile(database));
   app.post('/users', routes.postUser(database));
 
-  app.get('/clothing/:uId', routes.getUserClothing(database));
+  app.get('/clothing/:cId', routes.getClothing(database));
+
   app.post('/klamotten', routes.postKlamotten(database));
   app.get('/klamotten/:latitude/:longitude/:vicinity/:uId', routes.getAllClothingLocation(database));
 

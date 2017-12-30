@@ -43,26 +43,45 @@
         android:layout_alignLeft="@+id/btnKlamottenAnlegen"
         android:layout_alignStart="@+id/btnKlamottenAnlegen" />
 
+
+
+    <Button
+        android:id="@+id/btnChooseContext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="11dp"
+        android:layout_marginStart="11dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/btnKlamottenSuchen"
+        android:layout_gravity="center_horizontal"
+
+        android:text="Outfit Suchen" />
+
+    <Button
+        android:id="@+id/btnEditProfile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="11dp"
+        android:layout_marginStart="11dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/btnChooseContext"
+        android:layout_gravity="center_horizontal"
+        android:text="Edit Profile" />
+
     <Button
         android:id="@+id/btnLogout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/btnKlamottenSuchen"
+        android:layout_alignLeft="@+id/btnChooseContext"
+        android:layout_alignParentBottom="true"
+        android:layout_alignStart="@+id/btnChooseContext"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="116dp"
+        android:layout_marginLeft="11dp"
+        android:layout_marginStart="11dp"
         android:text="Logout" />
-
-    <Button
-        android:id="@+id/btnOutfit"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/btnKlamottenSuchen"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="11dp"
-        android:text="Outfit Suchen" />
 
 </RelativeLayout>

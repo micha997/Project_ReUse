@@ -41,21 +41,41 @@ const database = {
     })
   },
   getUserProfile(uId, callback) {
-    if (!uId) {
-      throw new Error ('id is missing.');
+  if (!uId) {
+    throw new Error ('id is missing.');
+  }
+  if (!callback) {
+    throw new Error ('Callback is missing.');
+  }
+  // find all elements
+  this.mappings.findOne({type: "userprofile", uId : uId}, (err,mappings) => {
+    if (err) {
+      return callback(err);
     }
-    if (!callback) {
-      throw new Error ('Callback is missing.');
+    //send results back to handler
+    callback(null, mappings);
+  })
+},
+putUserProfile(uId, put, callback) {
+if (!uId) {
+  throw new Error ('id is missing.');
+}
+if (!callback) {
+  throw new Error ('Callback is missing.');
+}
+if (!callback) {
+  throw new Error ('put is missing.');
+}
+// find all elements
+
+this.mappings.update(
+    { type:"userprofile", uId: uId},
+    {
+      $set: { "gender": "m" },
     }
-    // find all elements
-    this.mappings.find({type: "userprofile", uId : uId}).toArray((err,mappings) => {
-      if (err) {
-        return callback(err);
-      }
-      //send results back to handler
-      callback(null, mappings);
-    })
-  },
+)
+},
+
   getUserClothing(uId, callback) {
     if (!uId) {
       throw new Error ('id is missing.');

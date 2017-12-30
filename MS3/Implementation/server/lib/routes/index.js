@@ -13,3 +13,4 @@ exports.getClothing=require('./getClothing');
 exports.getOutfit=require('./getOutfit');
 exports.getUserProfile=require('./getUserProfile');
 exports.getUserClothing=require('./getUserClothing');
+exports.putUserProfile=require('./putUserProfile')

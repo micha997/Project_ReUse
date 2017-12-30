@@ -13,7 +13,9 @@ public class UserInterface extends AppCompatActivity {
     private Button btnKlamottenAnlegen;
     private Button btnKlamottenSuchen;
     private Button btnLogout;
-    private Button btnShowPrefer;
+   // private Button btnShowPrefer;
+    private Button btnChooseContext;
+    private Button btnEditProfile;
     private FirebaseAuth firebaseAuth;
 
     @Override
@@ -25,18 +27,34 @@ public class UserInterface extends AppCompatActivity {
         if (firebaseAuth.getCurrentUser() == null) {
             startActivity(new Intent(this, Login.class));
         }
-        btnShowPrefer = (Button) findViewById(R.id.btnShowPrefer);
+        //btnShowPrefer = (Button) findViewById(R.id.btnShowPrefer);
         btnKlamottenAnlegen = (Button) findViewById(R.id.btnKlamottenAnlegen);
         btnKlamottenSuchen = (Button) findViewById(R.id.btnKlamottenSuchen);
         btnLogout = (Button) findViewById(R.id.btnLogout);
+        btnChooseContext = (Button) findViewById(R.id.btnChooseContext);
+        btnEditProfile = (Button) findViewById(R.id.btnEditProfile);
 
-        btnShowPrefer.setOnClickListener(new View.OnClickListener() {
+
+        btnEditProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent myIntent = new Intent(getApplicationContext(), ShowPrefer.class);
-                startActivity(myIntent);
+                startActivity(new Intent(getApplicationContext(), EditProfile.class));
             }
         });
+
+        btnChooseContext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(),ChooseContext.class));
+            }
+        });
+//        btnShowPrefer.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent myIntent = new Intent(getApplicationContext(), ShowPrefer.class);
+//                startActivity(myIntent);
+//            }
+//        });
 
         btnLogout.setOnClickListener(new View.OnClickListener() {
             @Override

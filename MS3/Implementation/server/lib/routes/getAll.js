@@ -15,6 +15,9 @@ const getAll = function (database) {
       console.log(mappings);
       res.status(201).send(mappings);
     })
+    /*for (var single_map in mappings) {
+        delete mappings[single_map].image;
+     }*/
   };
 };
 
