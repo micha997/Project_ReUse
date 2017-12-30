@@ -67,11 +67,11 @@ if (!callback) {
   throw new Error ('put is missing.');
 }
 // find all elements
-
+console.log(put);
 this.mappings.update(
     { type:"userprofile", uId: uId},
     {
-      $set: { "gender": "m" },
+      $set:  put ,
     }
 )
 },
