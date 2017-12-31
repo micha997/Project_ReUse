@@ -6,11 +6,11 @@ const putUserProfile = function (database) {
   }
 
   return function (req, res)  {
-    console.log("hi");
+
     database.putUserProfile(req.params.uId, req.body, err => {
       if (err) {
         console.log("Failed to edit Userprofile!");
-        return res.status(500).send("prefer could not be added to the database!");
+        return res.status(500).send("Userprofile could not be edited!");
       }
       console.log("Successfully edited Userprofile!");
     });

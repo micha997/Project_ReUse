@@ -32,7 +32,7 @@ const database = {
       throw new Error ('Callback is missing.');
     }
     // find all elements
-    this.mappings.find({type: "clothing", id : cId}).toArray((err,mappings) => {
+    this.mappings.findOne({type: "clothing", id: cId}, (err,mappings) => {
       if (err) {
         return callback(err);
       }
@@ -63,19 +63,37 @@ if (!uId) {
 if (!callback) {
   throw new Error ('Callback is missing.');
 }
-if (!callback) {
+if (!put) {
   throw new Error ('put is missing.');
 }
 // find all elements
-console.log(put);
+
 this.mappings.update(
     { type:"userprofile", uId: uId},
     {
-      $set:  put ,
+      $set: put ,
     }
 )
 },
-
+putClothing(cId, put, callback) {
+if (!cId) {
+  throw new Error ('id is missing.');
+}
+if (!callback) {
+  throw new Error ('Callback is missing.');
+}
+if (!put) {
+  throw new Error ('put is missing.');
+}
+// find all elements
+console.log("hi");
+this.mappings.update(
+    { type:"clothing", id: cId},
+    {
+      $set: put ,
+    }
+)
+},
   getUserClothing(uId, callback) {
     if (!uId) {
       throw new Error ('id is missing.');
@@ -99,6 +117,22 @@ this.mappings.update(
     }
     // find all elements
     this.mappings.find({}).toArray((err,mappings) => {
+      if (err) {
+        return callback(err);
+      }
+      //send results back to handler
+      callback(null, mappings);
+    })
+  },
+  getUserRating(uId, callback) {
+    if (!callback) {
+      throw new Error ('Callback is missing.');
+    }
+    if (!uId) {
+      throw new Error ('id is missing.');
+    }
+    // find all elements
+    this.mappings.findOne({type: "userprofile", uId: uId}, (err,mappings) => {
       if (err) {
         return callback(err);
       }
@@ -142,7 +176,7 @@ this.mappings.update(
       var mappings_new = [];
       // search for elements in vicinity + add distance
       delete mappings.image;
-      console.log(mappings);
+
       for (var i = 0; i < mappings.length; i++) {
         // calc distance
         var distance = calcDistance(mappings[i].latitude, mappings[i].longitude,latitude,longitude);
@@ -152,7 +186,6 @@ this.mappings.update(
           mappings_new.push(mappings[i]);
         }
       }
-      console.log(mappings_new);
       callback(null, mappings_new);
     })
   },
@@ -215,6 +248,60 @@ this.mappings.update(
       callback(null);
     });
   },
+  postMessage(id, message, callback) {
+    if (!id) {
+      throw new Error ('id is missing.');
+    }
+    if (!message) {
+      throw new Error ('message is missing.');
+    }
+    if (!callback) {
+      throw new Error ('Callback is missing.');
+    }
+    const mapping = {
+      id: uuidv4(),
+      type: "message",
+      from: message["from"],
+      to: message["from"],
+      message: message["message"],
+      attach: message["attach"],
+      time: message["time"]
+    };
+    //write mapping to Database
+    this.mappings.insertOne(mapping, err => {
+      if (err) {
+        return callback(err);
+      }
+      callback(null);
+    });
+  },
+  postUserRating(uId, rating, callback) {
+    if (!uId) {
+      throw new Error ('id is missing.');
+    }
+    if (!rating) {
+      throw new Error ('rating is missing.');
+    }
+    if (!callback) {
+      throw new Error ('Callback is missing.');
+    }
+    const mapping = {
+      id: uuidv4(),
+      type:"rating",
+      from: uId,
+      choice: rating["choice"],
+      comment: rating["comment"],
+      time: rating["time"]
+    };
+    //write mapping to Database
+    this.mappings.update(  { type: "userprofile", uId: uId  },
+   { $push: { rating: mapping } }, mapping, err => {
+      if (err) {
+        return callback(err);
+      }
+      callback(null);
+    });
+  },
   deleteUserToken(id, callback) {
     if (!callback) {
       throw new Error ('Callback is missing.');
@@ -224,6 +311,73 @@ this.mappings.update(
     }
     // find all elements
     this.mappings.remove({'uId':id, type: "token"}), err => {
+      if (err) {
+        return callback(err);
+      }
+      //send results back to handler
+      callback(null, mappings);
+    }
+  },
+  deleteConversation(uId, ouId, callback) {
+    if (!callback) {
+      throw new Error ('Callback is missing.');
+    }
+    if (!uId) {
+      throw new Error ('uId is missing.');
+    }
+    if (!ouId) {
+      throw new Error ('ouId is missing.');
+    }
+    // find all elements
+    this.mappings.remove({from: uId, to: ouId}), err => {
+      if (err) {
+        return callback(err);
+      }
+      //send results back to handler
+      callback(null, mappings);
+    }
+  },
+  deleteUserProfile(uId, callback) {
+    if (!callback) {
+      throw new Error ('Callback is missing.');
+    }
+    if (!id) {
+      throw new Error ('id is missing.');
+    }
+    // find all elements
+    this.mappings.remove({'uId':uId, type: "userprofile"}), err => {
+      if (err) {
+        return callback(err);
+      }
+      //send results back to handler
+      callback(null, mappings);
+    }
+  },
+  deleteUser(uId, callback) {
+    if (!callback) {
+      throw new Error ('Callback is missing.');
+    }
+    if (!id) {
+      throw new Error ('id is missing.');
+    }
+    // find all elements
+    this.mappings.remove({'uId':uId, type: "clothing"}), err => {
+      if (err) {
+        return callback(err);
+      }
+      //send results back to handler
+      callback(null, mappings);
+    }
+  },
+  deleteUserClothing(uId, callback) {
+    if (!callback) {
+      throw new Error ('Callback is missing.');
+    }
+    if (!id) {
+      throw new Error ('id is missing.');
+    }
+    // find all elements
+    this.mappings.remove({'uId':uId, type: "clothing"}), err => {
       if (err) {
         return callback(err);
       }
@@ -326,6 +480,25 @@ this.mappings.update(
     }
     // find all elements
     this.mappings.findOne({type: "userprofile"}, (err,mappings) => {
+      if (err) {
+        return callback(err);
+      }
+      //send results back to handler
+      callback(null, mappings);
+    })
+  },
+  getConversation(uId, ouId, callback) {
+    if (!callback) {
+      throw new Error ('Callback is missing.');
+    }
+    if (!uId) {
+      throw new Error ('uId is missing.');
+    }
+    if (!ouId) {
+      throw new Error ('ouId is missing.');
+    }
+    // find all elements
+    this.mappings.find({from: uId, to: ouId}).toArray((err,mappings) => {
       if (err) {
         return callback(err);
       }

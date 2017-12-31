@@ -13,6 +13,7 @@ public class UserInterface extends AppCompatActivity {
     private Button btnKlamottenAnlegen;
     private Button btnKlamottenSuchen;
     private Button btnLogout;
+    private Button btnMyClothing;
    // private Button btnShowPrefer;
     private Button btnChooseContext;
     private Button btnEditProfile;
@@ -33,7 +34,14 @@ public class UserInterface extends AppCompatActivity {
         btnLogout = (Button) findViewById(R.id.btnLogout);
         btnChooseContext = (Button) findViewById(R.id.btnChooseContext);
         btnEditProfile = (Button) findViewById(R.id.btnEditProfile);
+        btnMyClothing = (Button) findViewById(R.id.btnMyClothing);
 
+        btnMyClothing.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), MyClothing.class));
+            }
+        });
 
         btnEditProfile.setOnClickListener(new View.OnClickListener() {
             @Override

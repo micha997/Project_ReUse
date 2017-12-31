@@ -12,7 +12,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
@@ -25,71 +24,75 @@ import org.json.JSONObject;
  * Created by Frank on 30.12.2017.
  */
 
-public class EditProfile extends AppCompatActivity {
+public class EditClothing extends AppCompatActivity {
 
-    private EditText etGender;
-    private Button btnSendProfile;
 
+    private EditText txtFabric;
+    private Button btnPutClothing;
+    private String cId;
+
+    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit_profile);
+        setContentView(R.layout.activity_edit_clothing);
+        cId = getIntent().getStringExtra("cId");
 
         FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         final String uId = firebaseAuth.getCurrentUser().getUid();
 
-        etGender = (EditText) findViewById(R.id.editTextGender);
-        btnSendProfile = (Button) findViewById(R.id.btnSendProfile);
+        txtFabric = (EditText) findViewById(R.id.txtFabric);
+        btnPutClothing = (Button) findViewById(R.id.btnPutClothing);
 
-        btnSendProfile.setOnClickListener(new View.OnClickListener() {
+        btnPutClothing.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 JSONObject newProfile = new JSONObject();
                 try {
-                    newProfile.put("gender", etGender.getText().toString());
+                    newProfile.put("fabric", txtFabric.getText().toString());
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
                 // define http service call
                 Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
                 // define parameters for Service-Call
-                myIntent.putExtra("payload",newProfile.toString());
-                myIntent.putExtra("method","PUT");
-                myIntent.putExtra("from","PUTPROFILE");
-                myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId);
+                myIntent.putExtra("payload", newProfile.toString());
+                myIntent.putExtra("method", "PUT");
+                myIntent.putExtra("from", "PUTCLOTHING");
+                myIntent.putExtra("url", getString(R.string.DOMAIN) + "/clothing/" + cId);
                 //call http service
                 startService(myIntent);
             }
         });
 
+
         Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
-                new IntentFilter("profile"));
-        // get desired vicinity in km
-        // define parameters for Http-Service call
-        myIntent.putExtra("payload","");
-        myIntent.putExtra("method","GET");
-        myIntent.putExtra("from","PROFILE");
-        myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId);
+                new IntentFilter("editclothing"));
+
+        myIntent.putExtra("payload", "");
+        myIntent.putExtra("method", "GET");
+        myIntent.putExtra("from", "EDITCLOTHING");
+        myIntent.putExtra("url", getString(R.string.DOMAIN) + "/clothing/" + cId );
         //call http service
         startService(myIntent);
+
+
+
     }
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        // get clothing results from HTTP-Service
-        String profile = intent.getStringExtra("profile");
-        try {
-            JSONObject profileJson = new JSONObject(profile);
-            etGender.setText(profileJson.getString("gender"));
-            //... fill user profile interface
-        } catch (JSONException e) {
-            e.printStackTrace();
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // get clothing results from HTTP-Service
+            String clothing = intent.getStringExtra("clothing");
+
+            try {
+                JSONObject clothingJson=new JSONObject(clothing);
+                txtFabric.setText(clothingJson.getString("fabric"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
-
-    }
-};
-
-
+    };
 }

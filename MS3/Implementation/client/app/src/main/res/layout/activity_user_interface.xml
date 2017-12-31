@@ -35,11 +35,13 @@
         android:text="Klamotten suchen"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:id="@+id/btnKlamottenSuchen"
-        android:layout_below="@+id/btnKlamottenAnlegen"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
+        android:layout_marginLeft="11dp"
+        android:layout_marginStart="11dp"
+        android:layout_marginTop="16dp"
+        android:id="@+id/btnKlamottenSuchen"
+        android:layout_below="@+id/btnKlamottenAnlegen"
         android:layout_alignLeft="@+id/btnKlamottenAnlegen"
         android:layout_alignStart="@+id/btnKlamottenAnlegen" />
 
@@ -71,6 +73,19 @@
         android:layout_below="@+id/btnChooseContext"
         android:layout_gravity="center_horizontal"
         android:text="Edit Profile" />
+
+    <Button
+        android:id="@+id/btnMyClothing"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="11dp"
+        android:layout_marginStart="11dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/btnEditProfile"
+        android:layout_gravity="center_horizontal"
+        android:text="My Clothing" />
 
     <Button
         android:id="@+id/btnLogout"

@@ -26,13 +26,22 @@ const getApp = function(database) {
   app.get('/users/:id/token', routes.getUserToken(database));
   app.post('/users/:id/:token', routes.postUserToken(database));
   app.delete('/users/:id/token', routes.deleteUserToken(database));
-
+  app.post('/user/:uId/messages/',routes.postMessage(database));
+  app.get('/user/:uId/messages/:ouId',routes.getConversation(database));
+  app.delete('/user/:uId/messages/:ouId',routes.deleteConversation(database));
   app.get('/user/:uId/clothing/', routes.getUserClothing(database));
   app.get('/user/:id', routes.getUserProfile(database));
   app.put('/user/:uId', routes.putUserProfile(database));
+  app.delete('/user/:uId', routes.deleteUserProfile(database));
+  app.delete('/user/:uId/clothing', routes.deleteUserClothing(database));
+  app.post('/user/:uId/rating',routes.postUserRating(database));
+  app.get('/user/:uId/rating',routes.getUserRating(database));
   app.post('/users', routes.postUser(database));
 
+  app.put('/user/:uId/clothing', routes.putClothing(database));
   app.get('/clothing/:cId', routes.getClothing(database));
+  app.put('/clothing/:cId',routes.putClothing(database));
+  app.delete('/clothing/:cId',routes.deleteClothing(database));
 
   app.post('/klamotten', routes.postKlamotten(database));
   app.get('/klamotten/:latitude/:longitude/:vicinity/:uId', routes.getAllClothingLocation(database));
