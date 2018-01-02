@@ -42,6 +42,7 @@ const getApp = function(database) {
     app.delete('/user/:uId/clothing', routes.deleteUserClothing(database));
     app.post('/user/:uId/rating', routes.postUserRating(database));
     app.get('/user/:uId/rating', routes.getUserRating(database));
+    app.put('/user/:uId/rating/:id', routes.putUserRating(database));
     app.post('/users', routes.postUser(database));
 
     app.put('/user/:uId/clothing', routes.putClothing(database));

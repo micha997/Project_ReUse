@@ -84,6 +84,22 @@ const database = {
             $set: put,
         })
     },
+    putUserRating(uId,id, put) {
+        if (!id) {
+            throw new Error('id is missing.');
+        }
+        if (!put) {
+            throw new Error('put is missing.');
+        }
+        console.log(uId);
+        this.mappings.update({
+            type: "userprofile",
+            uId: uId,
+            "rating.id" : id
+        }, {
+            $push: { rating: put }
+        })
+    },
     putClothing(cId, put, callback) {
         if (!cId) {
             throw new Error('id is missing.');

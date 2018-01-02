@@ -24,3 +24,4 @@ exports.getConversation = require('./getConversation');
 exports.deleteConversation = require('./deleteConversation');
 exports.postUserRating = require('./postUserRating');
 exports.getUserRating = require('./getUserRating');
+exports.putUserRating = require('./putUserRating');

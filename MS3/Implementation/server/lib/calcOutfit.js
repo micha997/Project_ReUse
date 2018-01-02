@@ -8,9 +8,10 @@ const calcOutfit = function(context, clothing) {
       layer2: 0,
       layer3: 0,
       bottom: 0,
-      shoes: 0
+      shoes: 0,
+      layers: ["head","layer1","layer2","layer3","bottom","shoes"]
     }
-    
+
     var wintermodel_1layer = {
         respiratory_activity_low: 7,
         respiratory_activity_high: 10,
@@ -179,6 +180,7 @@ const calcOutfit = function(context, clothing) {
             console.log("There is no clothing for layer 3 winter!");
         }
     }
+    console.log(wintermodel);
 
     return wintermodel;
 
