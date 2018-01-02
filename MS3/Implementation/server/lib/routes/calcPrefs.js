@@ -1,8 +1,8 @@
 'use strict';
 const uuidv4 = require('uuid/v4');
 
-const calcPrefs = function (mappings) {
-    var colors =  mappings.colors;
+const calcPrefs = function(mappings) {
+    var colors = mappings.colors;
     const countBlue = colors.blue;
     const countBlack = colors.black;
     const countYellow = colors.yellow;
@@ -24,23 +24,23 @@ const calcPrefs = function (mappings) {
     percentColor["gray"] = percentGray;
 
 
-    var keysSorted = Object.keys(percentColor).sort(function(a,b) {
-      return percentColor[a]-percentColor[b]
+    var keysSorted = Object.keys(percentColor).sort(function(a, b) {
+        return percentColor[a] - percentColor[b]
     })
 
     var colorSorted = {};
 
-    for (var i=0; i<keysSorted.length;i++) {
-      colorSorted[keysSorted[i]] = percentColor[keysSorted[i]];
+    for (var i = 0; i < keysSorted.length; i++) {
+        colorSorted[keysSorted[i]] = percentColor[keysSorted[i]];
     }
     console.log(colorSorted);
     colorSorted["uId"] = mappings.uId;
     colorSorted["type"] = "colorprefer";
-    
+
     return colorSorted;
 };
 
-const calcPercent = function (countPrefColor, countColor) {
+const calcPercent = function(countPrefColor, countColor) {
     var percentColor = 100 / countPrefColor * countColor;
     return percentColor;
 };

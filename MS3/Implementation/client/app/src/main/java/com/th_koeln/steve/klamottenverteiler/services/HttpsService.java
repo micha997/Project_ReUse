@@ -6,6 +6,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.th_koeln.steve.klamottenverteiler.ShowClothing;
+import com.th_koeln.steve.klamottenverteiler.ShowOutfit;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -136,6 +137,8 @@ public class HttpsService extends IntentService {
                     }
                     bufferedReader.close();
                     Intent intent = new Intent();
+
+                    //send Data back
                     switch (from) {
                         case "SEARCH":
                             // send clothing JSON array to Google Map
@@ -173,7 +176,11 @@ public class HttpsService extends IntentService {
                             intent.putExtra("clothing", stringBuilder.toString());
                             intent.putExtra("from", "EDITCLOTHING");
                             break;
-
+                        case "SEARCHOUTFIT":
+                            intent = new Intent("showoutfit");
+                            intent.putExtra("clothing", stringBuilder.toString());
+                            intent.putExtra("from", "SEARCHCLOTHING");
+                            break;
 
 
                     }

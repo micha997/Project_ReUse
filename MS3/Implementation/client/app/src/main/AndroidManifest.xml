@@ -19,6 +19,7 @@ package="com.th_koeln.steve.klamottenverteiler">
     <activity android:name=".EditProfile"/>
     <activity android:name=".EditClothing"/>
     <activity android:name=".MyClothing"/>
+    <activity android:name=".ShowOutfit"/>
     <service android:name=".services.HttpsService"> </service>
     <activity android:name=".MainActivity">
         <intent-filter>

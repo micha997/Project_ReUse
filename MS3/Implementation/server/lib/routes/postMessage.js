@@ -1,18 +1,18 @@
 'use strict';
 
-const postMessage = function (database) {
+const postMessage = function(database) {
 
-  return function (req, res)  {
-    // call database
-    database.postMessage(req.params.uId, req.body, err => {
-      if (err) {
-        console.log("Failed to add message!");
-        return res.status(500).send("Message could not be added to the database!");
-      }
-      console.log("Successfully added message!");
-    });
-    res.sendStatus(201);
-  };
+    return function(req, res) {
+        // call database
+        database.postMessage(req.params.uId, req.body, err => {
+            if (err) {
+                console.log("Failed to add message!");
+                return res.status(500).send("Message could not be added to the database!");
+            }
+            console.log("Successfully added message!");
+        });
+        res.sendStatus(201);
+    };
 };
 
 module.exports = postMessage;
