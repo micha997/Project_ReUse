@@ -43,6 +43,8 @@ const getApp = function(database) {
     app.post('/user/:uId/rating', routes.postUserRating(database));
     app.get('/user/:uId/rating', routes.getUserRating(database));
     app.put('/user/:uId/rating/:id', routes.putUserRating(database));
+    app.get('/user/:uId/outfits',routes.getUserOutfit(database));
+    app.get('/user/:uId/outfits/:oId',routes.getUserOutfitClothing(database));
     app.post('/users', routes.postUser(database));
 
     app.put('/user/:uId/clothing', routes.putClothing(database));
@@ -53,8 +55,8 @@ const getApp = function(database) {
     app.post('/klamotten', routes.postKlamotten(database));
     app.get('/klamotten/:latitude/:longitude/:vicinity/:uId', routes.getAllClothingLocation(database));
 
-    app.get('/outfit/:art', routes.getOutfit(database));
-
+    app.get('/outfit/:art', routes.getOutfit(database, "false"));
+    app.get('/outfit/:art/:latitude/:longitude/:vicinity',routes.getOutfit(database,"true"));
     app.get('/all', routes.getAll(database));
 
     app.get('/', routes.getIndex());

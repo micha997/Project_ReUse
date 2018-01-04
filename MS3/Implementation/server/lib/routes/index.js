@@ -25,3 +25,5 @@ exports.deleteConversation = require('./deleteConversation');
 exports.postUserRating = require('./postUserRating');
 exports.getUserRating = require('./getUserRating');
 exports.putUserRating = require('./putUserRating');
+exports.getUserOutfit = require('./getUserOutfit');
+exports.getUserOutfitClothing = require ('./getUserOutfitClothing');

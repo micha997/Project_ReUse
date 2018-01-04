@@ -46,6 +46,50 @@ const database = {
             callback(null, mappings);
         })
     },
+    getUserOutfitClothing(uId,oId, callback) {
+        if (!uId) {
+            throw new Error('id is missing.');
+        }
+        if (!oId) {
+            throw new Error('id is missing.');
+        }
+        if (!callback) {
+            throw new Error('Callback is missing.');
+        }
+        // find all elements
+        this.mappings.find({
+            type: "clothing",
+            uId: uId,
+            active: "false",
+            oId: oId
+        }).toArray((err, mappings) => {
+            if (err) {
+                return callback(err);
+            }
+            //send results back to handler
+            callback(null, mappings);
+        })
+    },
+    getUserOutfit(uId, callback) {
+        if (!uId) {
+            throw new Error('id is missing.');
+        }
+        if (!callback) {
+            throw new Error('Callback is missing.');
+        }
+        // find all elements
+        this.mappings.find({
+            type: "clothing",
+            uId: uId,
+            active: "false"
+        }).toArray((err, mappings) => {
+            if (err) {
+                return callback(err);
+            }
+            //send results back to handler
+            callback(null, mappings);
+        })
+    },
     getUserProfile(uId, callback) {
         if (!uId) {
             throw new Error('id is missing.');
@@ -91,7 +135,6 @@ const database = {
         if (!put) {
             throw new Error('put is missing.');
         }
-        console.log(uId);
         this.mappings.update({
             type: "userprofile",
             uId: uId,
@@ -111,7 +154,6 @@ const database = {
             throw new Error('put is missing.');
         }
         // find all elements
-        console.log("hi");
         this.mappings.update({
             type: "clothing",
             id: cId
@@ -171,7 +213,7 @@ const database = {
             callback(null, mappings);
         })
     },
-    getOutfit(art, callback) {
+    getOutfit(choise,art, params, callback) {
         if (!callback) {
             throw new Error('Callback is missing.');
         }
@@ -187,9 +229,22 @@ const database = {
                 return callback(err);
             }
             //send results back to handler
+            if (choise=="true") {
+              var mappings_new = [];
+              for (var i = 0; i < mappings.length; i++) {
+                  // calc distance
+                  var distance = calcDistance(mappings[i].latitude, mappings[i].longitude, params.latitude, params.longitude);
+                  if (distance <= params.vicinity) {
+                      // add distance
+                      mappings[i].distance = distance;
+                      mappings_new.push(mappings[i]);
+                  }
+              }
+              mappings=mappings_new;
+            }
+              var clothing = calcOutfit("winter", mappings);
 
-            var clothing = calcOutfit("winter", mappings);
-            console.log(clothing);
+              // search for elements in vicinity + add distance
             callback(null, clothing);
         })
     },

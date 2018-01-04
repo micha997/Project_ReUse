@@ -2,81 +2,109 @@
 
 const calcOutfit = function(context, clothing) {
     var wintermodel = {
-      model: "wintermodel",
-      head: 0,
-      layer1: 0,
-      layer2: 0,
-      layer3: 0,
-      bottom: 0,
-      shoes: 0,
-      layers: ["head","layer1","layer2","layer3","bottom","shoes"]
+        wintermodel_head: {
+          respiratory_activity_low: 0,
+          respiratory_activity_high: 0,
+          warmth_low: 7,
+          warmth_high: 10,
+          moisture_pickup_low: 0,
+          moisture_pickup_high: 0,
+          art: ["wollmütze","mütze"],
+          model: "wintermodel_head"
+        },
+        wintermodel_1layer: {
+            respiratory_activity_low: 7,
+            respiratory_activity_high: 10,
+            warmth_low: 0,
+            warmth_high: 0,
+            moisture_pickup_low: 0,
+            moisture_pickup_high: 0,
+            art: ["tshirt", "shirt"],
+            model: "wintermodel_1layer"
+        },
+        wintermodel_1layer_alternative: {
+            respiratory_activity_low: 7,
+            respiratory_activity_high: 10,
+            warmth_low: 0,
+            warmth_high: 0,
+            moisture_pickup_low: 0,
+            moisture_pickup_high: 0,
+            art: ["tshirt", "shirt"],
+            model: "wintermodel_1layer_alternative"
+        },
+        wintermodel_2layer: {
+            respiratory_activity_low: 0,
+            respiratory_activity_high: 4,
+            warmth_low: 0,
+            warmth_high: 0,
+            moisture_pickup_low: 0,
+            moisture_pickup_high: 0,
+            art: ["tshirt", "shirt"],
+            model: "wintermodel_2layer"
+        },
+        wintermodel_2layer_alternative: {
+            respiratory_activity_low: 7,
+            respiratory_activity_high: 10,
+            warmth_low: 0,
+            warmth_high: 0,
+            moisture_pickup_low: 0,
+            moisture_pickup_high: 0,
+            art: ["tshirt", "shirt"],
+            model: "wintermodel_1layer_alternative"
+        },
+        wintermodel_3layer: {
+            respiratory_activity_low: 0,
+            respiratory_activity_high: 0,
+            warmth_low: 8,
+            warmth_high: 10,
+            moisture_pickup_low: 0,
+            moisture_pickup_high: 5,
+            art: ["wintermantel","mantel"],
+            model: "wintermodel_3layer"
+        },
+        wintermodel_3layer_alternative: {
+            respiratory_activity_low: 4,
+            respiratory_activity_high: 10,
+            warmth_low: 0,
+            warmth_high: 0,
+            moisture_pickup_low: 5,
+            moisture_pickup_high: 10,
+          art: ["wintermantel","mantel"],
+            model: "wintermodel_3layer_alternative"
+        },
+        wintermodel_bottom: {
+            respiratory_activity_low: 0,
+            respiratory_activity_high: 0,
+            warmth_low: 0,
+            warmth_high: 0,
+            moisture_pickup_low: 0,
+            moisture_pickup_high: 0,
+            art: ["hose", "jeans"],
+            model: "wintermodel_bottom"
+        },
+        wintermodel_shoes: {
+            respiratory_activity_low: 0,
+            respiratory_activity_high: 0,
+            warmth_low: 0,
+            warmth_high: 0,
+            moisture_pickup_low: 0,
+            moisture_pickup_high: 0,
+            art: ["shoes","schuhe"],
+            model: "shoes"
+        }
+
     }
 
-    var wintermodel_1layer = {
-        respiratory_activity_low: 7,
-        respiratory_activity_high: 10,
-        warmth_low: 0,
-        warmth_high: 0,
-        moisture_pickup_low: 0,
-        moisture_pickup_high: 0,
-        art: ["tshirt", "shirt"],
-        model: "wintermodel_1layer"
-    }
-
-    var wintermodel_1layer_alternative = {
-        respiratory_activity_low: 7,
-        respiratory_activity_high: 10,
-        warmth_low: 0,
-        warmth_high: 0,
-        moisture_pickup_low: 0,
-        moisture_pickup_high: 0,
-        art: ["tshirt", "shirt"],
-        model: "wintermodel_1layer_alternative"
-    }
-
-    var wintermodel_2layer = {
-        respiratory_activity_low: 0,
-        respiratory_activity_high: 4,
-        warmth_low: 0,
-        warmth_high: 0,
-        moisture_pickup_low: 0,
-        moisture_pickup_high: 0,
-        art: ["tshirt", "shirt"],
-        model: "wintermodel_2layer"
-    }
-
-    var wintermodel_2layer_alternative = {
-        respiratory_activity_low: 7,
-        respiratory_activity_high: 10,
-        warmth_low: 0,
-        warmth_high: 0,
-        moisture_pickup_low: 0,
-        moisture_pickup_high: 0,
-        art: ["tshirt", "shirt"],
-        model: "wintermodel_1layer_alternative"
-    }
-
-    var wintermodel_3layer = {
-        respiratory_activity_low: 0,
-        respiratory_activity_high: 0,
-        warmth_low: 8,
-        warmth_high: 10,
-        moisture_pickup_low: 0,
-        moisture_pickup_high: 5,
-        art: ["wintermantel"],
-        model: "wintermodel_3layer"
-    }
-
-    var wintermodel_3layer_alternative = {
-        respiratory_activity_low: 4,
-        respiratory_activity_high: 10,
-        warmth_low: 0,
-        warmth_high: 0,
-        moisture_pickup_low: 5,
-        moisture_pickup_high: 10,
-        art: ["wintermantel"],
-        model: "wintermodel_3layer_alternative"
-    }
+    var outfit =    {
+            model: "wintermodel",
+            head: 0,
+            layer1: 0,
+            layer2: 0,
+            layer3: 0,
+            bottom: 0,
+            shoes: 0,
+            layers: ["head", "layer1", "layer2", "layer3", "bottom", "shoes"]
+            }
 
     var charac = [{
             name: "baumwolle",
@@ -158,33 +186,43 @@ const calcOutfit = function(context, clothing) {
         }
 
     ];
+    if (context== "winter") {
+      outfit.head = calcLayerClothing(wintermodel["wintermodel_head"], clothing, charac);
+      if (outfit.head == 0) {
+          console.log("There is no clothing for head winter!");
+      }
+      outfit.layer1 = calcLayerClothing(wintermodel["wintermodel_1layer"], clothing, charac);
+      if (outfit.layer1 == 0) {
+          outfit.layer1 = calcLayerClothing(wintermodel["wintermodel_1layer_alternative"], clothing, charac);
+          if (outfit.layer1 == 0) {
+              console.log("There is no clothing for layer 1 winter!");
+          }
+      }
+      outfit.layer2 = calcLayerClothing(wintermodel["wintermodel_2layer"], clothing, charac);
+      if (outfit.layer2 == 0) {
+          outfit.layer2 = calcLayerClothing(wintermodel["wintermodel_2layer_alternative"], clothing, charac);
+          if (outfit.layer2 == 0) {
+              console.log("There is no clothing for layer 3 winter!");
+          }
+      }
+      outfit.layer3 = calcLayerClothing(wintermodel["wintermodel_3layer"], clothing, charac);
+      if (outfit.layer3 == 0) {
+          outfit.layer3 = calcLayerClothing(wintermodel["wintermodel_3layer_alternative"], clothing, charac);
+          if (outfit.layer3 == 0) {
+              console.log("There is no clothing for layer 3 winter!");
+          }
+      }
+      outfit.bottom = calcLayerClothing(wintermodel["wintermodel_bottom"], clothing, charac);
+      if (outfit.bottom == 0) {
+          console.log("There is no clothing for bottom winter!");
+      }
+      outfit.shoes = calcLayerClothing(wintermodel["wintermodel_shoes"], clothing, charac);
+      if (outfit.shoes == 0) {
 
-    wintermodel.layer1 = calcLayerClothing(wintermodel_1layer, clothing, charac);
-    if (wintermodel.layer1 == 0) {
-        wintermodel.layer1 = calcLayerClothing(wintermodel_1layer_alternative, clothing, charac);
-        if (wintermodel.layer1 == 0) {
-            console.log("There is no clothing for layer 1 winter!");
-        }
+          console.log("There is no clothing for shoes winter!");
+      }
+          return wintermodel;
     }
-    wintermodel.layer2 = calcLayerClothing(wintermodel_2layer, clothing, charac);
-    if (wintermodel.layer2 == 0) {
-        wintermodel.layer2 = calcLayerClothing(wintermodel_2layer_alternative, clothing, charac);
-        if (wintermodel.layer2 == 0) {
-            console.log("There is no clothing for layer 3 winter!");
-        }
-    }
-    wintermodel.layer3 = calcLayerClothing(wintermodel_3layer, clothing, charac);
-    if (wintermodel.layer3 == 0) {
-        wintermodel.layer3 = calcLayerClothing(wintermodel_3layer_alternative, clothing, charac);
-        if (wintermodel.layer3 == 0) {
-            console.log("There is no clothing for layer 3 winter!");
-        }
-    }
-    console.log(wintermodel);
-
-    return wintermodel;
-
-
 
     function calcLayerClothing(model, clothing, charac) {
         var result = [];
