@@ -345,6 +345,37 @@ const database = {
             callback(null);
         });
     },
+    postUserSearch(uId,body, callback) {
+        if (!uId) {
+            throw new Error('id is missing.');
+        }
+        if (!body) {
+            throw new Error('body is missing.');
+        }
+        if (!callback) {
+            throw new Error('Callback is missing.');
+        }
+        //write mapping to Database
+        const mapping = {
+            id: uuidv4(),
+            type: body.model + "_" + body.missing,
+            time: "heute"
+        };
+
+        this.mappings.update({
+            type: "userprofile",
+            uId: uId
+        }, {
+            $push: {
+                subscription: mapping
+            }
+        }, mapping, err => {
+            if (err) {
+                return callback(err);
+            }
+            callback(null);
+        });
+    },
     postMessage(id, message, callback) {
         if (!id) {
             throw new Error('id is missing.');

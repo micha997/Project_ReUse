@@ -8,4 +8,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="TextView" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Missing:" />
+
+    <Spinner
+        android:id="@+id/spinMissingClothing"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/btnSubscribeMissingClothing"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Subcribe!" />
+
 </LinearLayout>

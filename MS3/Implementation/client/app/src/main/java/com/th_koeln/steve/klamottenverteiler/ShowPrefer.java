@@ -26,6 +26,7 @@ public class ShowPrefer extends AppCompatActivity {
     private TextView tvPreferUserName;
     private TextView tvPreferUserColor;
 
+
     @Override
     protected void onCreate( Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

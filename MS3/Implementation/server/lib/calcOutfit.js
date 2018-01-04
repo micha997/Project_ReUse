@@ -12,7 +12,7 @@ const calcOutfit = function(context, clothing) {
           art: ["wollmütze","mütze"],
           model: "wintermodel_head"
         },
-        wintermodel_1layer: {
+        wintermodel_layer1: {
             respiratory_activity_low: 7,
             respiratory_activity_high: 10,
             warmth_low: 0,
@@ -22,7 +22,7 @@ const calcOutfit = function(context, clothing) {
             art: ["tshirt", "shirt"],
             model: "wintermodel_1layer"
         },
-        wintermodel_1layer_alternative: {
+        wintermodel_layer1_alternative: {
             respiratory_activity_low: 7,
             respiratory_activity_high: 10,
             warmth_low: 0,
@@ -32,7 +32,7 @@ const calcOutfit = function(context, clothing) {
             art: ["tshirt", "shirt"],
             model: "wintermodel_1layer_alternative"
         },
-        wintermodel_2layer: {
+        wintermodel_layer2: {
             respiratory_activity_low: 0,
             respiratory_activity_high: 4,
             warmth_low: 0,
@@ -42,7 +42,7 @@ const calcOutfit = function(context, clothing) {
             art: ["tshirt", "shirt"],
             model: "wintermodel_2layer"
         },
-        wintermodel_2layer_alternative: {
+        wintermodel_layer2_alternative: {
             respiratory_activity_low: 7,
             respiratory_activity_high: 10,
             warmth_low: 0,
@@ -52,7 +52,7 @@ const calcOutfit = function(context, clothing) {
             art: ["tshirt", "shirt"],
             model: "wintermodel_1layer_alternative"
         },
-        wintermodel_3layer: {
+        wintermodel_layer3: {
             respiratory_activity_low: 0,
             respiratory_activity_high: 0,
             warmth_low: 8,
@@ -62,7 +62,7 @@ const calcOutfit = function(context, clothing) {
             art: ["wintermantel","mantel"],
             model: "wintermodel_3layer"
         },
-        wintermodel_3layer_alternative: {
+        wintermodel_layer3_alternative: {
             respiratory_activity_low: 4,
             respiratory_activity_high: 10,
             warmth_low: 0,
@@ -87,8 +87,8 @@ const calcOutfit = function(context, clothing) {
             respiratory_activity_high: 0,
             warmth_low: 0,
             warmth_high: 0,
-            moisture_pickup_low: 0,
-            moisture_pickup_high: 0,
+            moisture_pickup_low: 10,
+            moisture_pickup_high: 10,
             art: ["shoes","schuhe"],
             model: "shoes"
         }
@@ -191,23 +191,24 @@ const calcOutfit = function(context, clothing) {
       if (outfit.head == 0) {
           console.log("There is no clothing for head winter!");
       }
-      outfit.layer1 = calcLayerClothing(wintermodel["wintermodel_1layer"], clothing, charac);
+
+      outfit.layer1 = calcLayerClothing(wintermodel["wintermodel_layer1"], clothing, charac);
       if (outfit.layer1 == 0) {
-          outfit.layer1 = calcLayerClothing(wintermodel["wintermodel_1layer_alternative"], clothing, charac);
+          outfit.layer1 = calcLayerClothing(wintermodel["wintermodel_layer1_alternative"], clothing, charac);
           if (outfit.layer1 == 0) {
               console.log("There is no clothing for layer 1 winter!");
           }
       }
-      outfit.layer2 = calcLayerClothing(wintermodel["wintermodel_2layer"], clothing, charac);
+      outfit.layer2 = calcLayerClothing(wintermodel["wintermodel_layer2"], clothing, charac);
       if (outfit.layer2 == 0) {
-          outfit.layer2 = calcLayerClothing(wintermodel["wintermodel_2layer_alternative"], clothing, charac);
+          outfit.layer2 = calcLayerClothing(wintermodel["wintermodel_layer2_alternative"], clothing, charac);
           if (outfit.layer2 == 0) {
               console.log("There is no clothing for layer 3 winter!");
           }
       }
-      outfit.layer3 = calcLayerClothing(wintermodel["wintermodel_3layer"], clothing, charac);
+      outfit.layer3 = calcLayerClothing(wintermodel["wintermodel_layer3"], clothing, charac);
       if (outfit.layer3 == 0) {
-          outfit.layer3 = calcLayerClothing(wintermodel["wintermodel_3layer_alternative"], clothing, charac);
+          outfit.layer3 = calcLayerClothing(wintermodel["wintermodel_layer3_alternative"], clothing, charac);
           if (outfit.layer3 == 0) {
               console.log("There is no clothing for layer 3 winter!");
           }
@@ -221,7 +222,7 @@ const calcOutfit = function(context, clothing) {
 
           console.log("There is no clothing for shoes winter!");
       }
-          return wintermodel;
+          return outfit;
     }
 
     function calcLayerClothing(model, clothing, charac) {

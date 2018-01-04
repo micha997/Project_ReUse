@@ -27,3 +27,4 @@ exports.getUserRating = require('./getUserRating');
 exports.putUserRating = require('./putUserRating');
 exports.getUserOutfit = require('./getUserOutfit');
 exports.getUserOutfitClothing = require ('./getUserOutfitClothing');
+exports.postUserSearch = require('./postUserSearch');

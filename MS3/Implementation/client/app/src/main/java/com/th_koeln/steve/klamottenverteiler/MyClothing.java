@@ -45,12 +45,6 @@ public class MyClothing extends AppCompatActivity {
         setContentView(R.layout.activity_my_clothing);
         btnEditClothing = (Button) findViewById(R.id.btnEditClothing);
         spinChooseClothing = (Spinner) findViewById(R.id.spinChooseClothing);
-        btnEditClothing.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
                 new IntentFilter("myclothing"));

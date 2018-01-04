@@ -26,7 +26,7 @@ const getApp = function(database) {
     // define routes
     app.get('/users/:id/prefer', routes.getUserPrefer(database));
     app.post('/users/:id/prefer', routes.postUserPrefer(database));
-
+    app.post('/user/:uId/search', routes.postUserSearch(database));
     app.get('/users/:id/prefer/klamotten/:latitude/:longitude/:vicinity', routes.getClothingPrefer(database));
 
     app.get('/users/:id/token', routes.getUserToken(database));
