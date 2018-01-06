@@ -30,7 +30,7 @@ const getApp = function(database) {
     app.get('/users/:id/prefer/klamotten/:latitude/:longitude/:vicinity', routes.getClothingPrefer(database));
 
     app.get('/users/:id/token', routes.getUserToken(database));
-    app.post('/users/:id/:token', routes.postUserToken(database));
+    app.post('/users/:id/token/:token', routes.postUserToken(database));
     app.delete('/users/:id/token', routes.deleteUserToken(database));
     app.post('/user/:uId/messages/', routes.postMessage(database));
     app.get('/user/:uId/messages/:ouId', routes.getConversation(database));

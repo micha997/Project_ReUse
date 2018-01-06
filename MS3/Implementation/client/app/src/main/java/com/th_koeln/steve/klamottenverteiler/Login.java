@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,12 +14,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.storage.UploadTask;
 import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Created by steve on 05.11.17.
@@ -28,7 +35,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     private TextView etPasswordLogin;
     private TextView etEmailLogin;
     private TextView tvLogin;
-
+    private String uID;
     private Button btnLogin;
 
     private FirebaseAuth firebaseAuth;
@@ -119,21 +126,29 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     }
 
     private void sendTokenToServer() {
+
         final FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
         mUser.getToken(true)
                 .addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
                     public void onComplete(@NonNull Task<GetTokenResult> task) {
                         if (task.isSuccessful()) {
-                            String idToken = task.getResult().getToken();
-                            String uID = mUser.getUid();
-                            Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
-                            myIntent.putExtra("payload","");
-                            myIntent.putExtra("method","POST");
-                            myIntent.putExtra("from", "NEW_TOKEN");
-                            myIntent.putExtra("url",getString(R.string.DOMAIN) + "/users/"+ uID + "/" + idToken);
-                            //call http service
-                            startService(myIntent);
+                            String idToken = FirebaseInstanceId.getInstance().getToken();
+                            uID = mUser.getUid();
 
+                                    Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
+                                    JSONObject token = new JSONObject();
+                                    try {
+                                        token.put("token",idToken);
+
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                    myIntent.putExtra("payload",token.toString());
+                                    myIntent.putExtra("method","POST");
+                                    myIntent.putExtra("from", "NEW_TOKEN");
+                                    myIntent.putExtra("url",getString(R.string.DOMAIN) + "/users/"+ uID + "/token/" + idToken);
+                                    //call http service
+                                    startService(myIntent);
                         } else {
 
                         }

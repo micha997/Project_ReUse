@@ -8,7 +8,7 @@ const getUserToken = function(database) {
     return function(req, res) {
 
         // call database
-        database.getAll((err, mappings) => {
+        database.getUserToken(req.params.id, (err, mappings) => {
             res.setHeader("Content-Type", "application/json");
             if (err) {
                 return res.status(500).end();

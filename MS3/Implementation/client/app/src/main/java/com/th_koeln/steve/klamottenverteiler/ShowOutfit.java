@@ -53,7 +53,7 @@ public class ShowOutfit extends AppCompatActivity {
                 JSONObject subscribe = new JSONObject();
                 try {
                     subscribe.put("model", model );
-                    subscribe.put("missing",miss);
+                    subscribe.put("missing",spinMissingClothing.getSelectedItem().toString());
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -62,8 +62,10 @@ public class ShowOutfit extends AppCompatActivity {
                 myIntent.putExtra("method","POST");
                 myIntent.putExtra("from","SUBSCRIBECLOTHING");
                 myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId + "/search");
+                startService(myIntent);
             }
         });
+
         try {
             String outfit= getIntent().getStringExtra("outfit");
             JSONObject outfitsArray = new JSONObject(outfit);

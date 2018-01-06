@@ -8,6 +8,11 @@ package="com.th_koeln.steve.klamottenverteiler">
     android:supportsRtl="true" android:theme="@style/AppTheme">
     <meta-data android:name="com.google.android.geo.API_KEY"
         android:value="AIzaSyDO8RzwH_FL_G51NXJg5_2pPwV5UCXWhVE" />
+    <service android:name=".services.MyFirebaseMessagingService">
+        <intent-filter>
+            <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+        </intent-filter>
+    </service>
     <activity android:name=".UserInterface" />
     <activity android:name=".Login"/>
     <activity android:name=".AddClothing" />

@@ -3,6 +3,7 @@
 const mongo = require('mongodb');
 const calcDistance = require('./calcDistance');
 const calcOutfit = require('./calcOutfit');
+const sendPushNotification = require('./sendPushNotification');
 const MongoClient = mongo.MongoClient;
 const uuidv4 = require('uuid/v4');
 
@@ -46,7 +47,7 @@ const database = {
             callback(null, mappings);
         })
     },
-    getUserOutfitClothing(uId,oId, callback) {
+    getUserOutfitClothing(uId, oId, callback) {
         if (!uId) {
             throw new Error('id is missing.');
         }
@@ -128,7 +129,7 @@ const database = {
             $set: put,
         })
     },
-    putUserRating(uId,id, put) {
+    putUserRating(uId, id, put) {
         if (!id) {
             throw new Error('id is missing.');
         }
@@ -138,9 +139,11 @@ const database = {
         this.mappings.update({
             type: "userprofile",
             uId: uId,
-            "rating.id" : id
+            "rating.id": id
         }, {
-            $push: { rating: put }
+            $push: {
+                rating: put
+            }
         })
     },
     putClothing(cId, put, callback) {
@@ -213,7 +216,7 @@ const database = {
             callback(null, mappings);
         })
     },
-    getOutfit(choise,art, params, callback) {
+    getOutfit(choise, art, params, callback) {
         if (!callback) {
             throw new Error('Callback is missing.');
         }
@@ -229,22 +232,22 @@ const database = {
                 return callback(err);
             }
             //send results back to handler
-            if (choise=="true") {
-              var mappings_new = [];
-              for (var i = 0; i < mappings.length; i++) {
-                  // calc distance
-                  var distance = calcDistance(mappings[i].latitude, mappings[i].longitude, params.latitude, params.longitude);
-                  if (distance <= params.vicinity) {
-                      // add distance
-                      mappings[i].distance = distance;
-                      mappings_new.push(mappings[i]);
-                  }
-              }
-              mappings=mappings_new;
+            if (choise == "true") {
+                var mappings_new = [];
+                for (var i = 0; i < mappings.length; i++) {
+                    // calc distance
+                    var distance = calcDistance(mappings[i].latitude, mappings[i].longitude, params.latitude, params.longitude);
+                    if (distance <= params.vicinity) {
+                        // add distance
+                        mappings[i].distance = distance;
+                        mappings_new.push(mappings[i]);
+                    }
+                }
+                mappings = mappings_new;
             }
-              var clothing = calcOutfit("winter", mappings);
+            var clothing = calcOutfit("winter", mappings, false);
 
-              // search for elements in vicinity + add distance
+            // search for elements in vicinity + add distance
             callback(null, clothing);
         })
     },
@@ -317,6 +320,38 @@ const database = {
             if (err) {
                 return callback(err);
             }
+
+            var fits = calcOutfit(null, mapping, true);
+            this.mappings.find({
+                type: "userprofile",
+            }).toArray((err, mappings) => {
+
+                if (err) {
+                    return callback(err);
+                }
+                for (var single_mapping in mappings) {
+                    if (mappings[single_mapping].subscription != null) {
+                        for (var single_subscription in mappings[single_mapping].subscription) {
+                            //console.log("Jeweils eine: " + mappings[single_mapping].subscription[single_subscription].type + "_" + mappings[single_mapping].subscription[single_subscription].missing + "\n");
+                            //console.log("Fits: " + fits.model + "\n\n");
+                            var uId = mappings[single_mapping].uId;
+                            if (fits.model == mappings[single_mapping].subscription[single_subscription].type + "_" + mappings[single_mapping].subscription[single_subscription].missing) {
+                              this.mappings.findOne({
+                                  uId: mappings[single_mapping].uId,
+                                  type: "token"
+                              }, (err, mappings) => {
+                                  if (err) {
+                                      return callback(err);
+                                  }
+
+                                  sendPushNotification(mappings.token, uId, mapping,fits);
+                              })
+                            }
+                        }
+                    }
+
+                }
+            })
             callback(null);
         });
     },
@@ -345,7 +380,7 @@ const database = {
             callback(null);
         });
     },
-    postUserSearch(uId,body, callback) {
+    postUserSearch(uId, body, callback) {
         if (!uId) {
             throw new Error('id is missing.');
         }
@@ -358,7 +393,8 @@ const database = {
         //write mapping to Database
         const mapping = {
             id: uuidv4(),
-            type: body.model + "_" + body.missing,
+            type: body.model,
+            missing: body.missing,
             time: "heute"
         };
 
@@ -654,6 +690,22 @@ const database = {
         // find all elements
         this.mappings.findOne({
             type: "userprofile"
+        }, (err, mappings) => {
+            if (err) {
+                return callback(err);
+            }
+            //send results back to handler
+            callback(null, mappings);
+        })
+    },
+    getUserToken(uId, callback) {
+        if (!callback) {
+            throw new Error('Callback is missing.');
+        }
+        // find all elements
+        this.mappings.findOne({
+            uId: uId,
+            type: "token"
         }, (err, mappings) => {
             if (err) {
                 return callback(err);

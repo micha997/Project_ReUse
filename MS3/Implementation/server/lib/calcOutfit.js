@@ -1,7 +1,7 @@
 'use strict';
 
-const calcOutfit = function(context, clothing) {
-    var wintermodel = {
+const calcOutfit = function(context, clothing, single) {
+var wintermodel = {
         wintermodel_head: {
           respiratory_activity_low: 0,
           respiratory_activity_high: 0,
@@ -186,38 +186,54 @@ const calcOutfit = function(context, clothing) {
         }
 
     ];
-    if (context== "winter") {
-      outfit.head = calcLayerClothing(wintermodel["wintermodel_head"], clothing, charac);
+
+    var models = [wintermodel];
+    var fits;
+    var res;
+    if (single) {
+        for (var single_model in models) {
+            for (var single_layer in models[single_model]) {
+                 res = calcLayerClothing(models[single_model][single_layer], clothing, charac, single);
+                if (res != null) {
+                    fits=res;
+                }
+            }
+        }
+      return fits;
+    }
+
+    if (!single && context== "winter") {
+      outfit.head = calcLayerClothing(wintermodel["wintermodel_head"], clothing, charac, false);
       if (outfit.head == 0) {
           console.log("There is no clothing for head winter!");
       }
 
-      outfit.layer1 = calcLayerClothing(wintermodel["wintermodel_layer1"], clothing, charac);
+      outfit.layer1 = calcLayerClothing(wintermodel["wintermodel_layer1"], clothing, charac, false);
       if (outfit.layer1 == 0) {
-          outfit.layer1 = calcLayerClothing(wintermodel["wintermodel_layer1_alternative"], clothing, charac);
+          outfit.layer1 = calcLayerClothing(wintermodel["wintermodel_layer1_alternative"], clothing, charac, false);
           if (outfit.layer1 == 0) {
               console.log("There is no clothing for layer 1 winter!");
           }
       }
-      outfit.layer2 = calcLayerClothing(wintermodel["wintermodel_layer2"], clothing, charac);
+      outfit.layer2 = calcLayerClothing(wintermodel["wintermodel_layer2"], clothing, charac, false);
       if (outfit.layer2 == 0) {
-          outfit.layer2 = calcLayerClothing(wintermodel["wintermodel_layer2_alternative"], clothing, charac);
+          outfit.layer2 = calcLayerClothing(wintermodel["wintermodel_layer2_alternative"], clothing, charac, false);
           if (outfit.layer2 == 0) {
               console.log("There is no clothing for layer 3 winter!");
           }
       }
-      outfit.layer3 = calcLayerClothing(wintermodel["wintermodel_layer3"], clothing, charac);
+      outfit.layer3 = calcLayerClothing(wintermodel["wintermodel_layer3"], clothing, charac, false);
       if (outfit.layer3 == 0) {
-          outfit.layer3 = calcLayerClothing(wintermodel["wintermodel_layer3_alternative"], clothing, charac);
+          outfit.layer3 = calcLayerClothing(wintermodel["wintermodel_layer3_alternative"], clothing, charac, false);
           if (outfit.layer3 == 0) {
               console.log("There is no clothing for layer 3 winter!");
           }
       }
-      outfit.bottom = calcLayerClothing(wintermodel["wintermodel_bottom"], clothing, charac);
+      outfit.bottom = calcLayerClothing(wintermodel["wintermodel_bottom"], clothing, charac, false);
       if (outfit.bottom == 0) {
           console.log("There is no clothing for bottom winter!");
       }
-      outfit.shoes = calcLayerClothing(wintermodel["wintermodel_shoes"], clothing, charac);
+      outfit.shoes = calcLayerClothing(wintermodel["wintermodel_shoes"], clothing, charac, false);
       if (outfit.shoes == 0) {
 
           console.log("There is no clothing for shoes winter!");
@@ -225,16 +241,31 @@ const calcOutfit = function(context, clothing) {
           return outfit;
     }
 
-    function calcLayerClothing(model, clothing, charac) {
-        var result = [];
-        for (var single_charac in charac) {
-            if ((model.respiratory_activity_low <= charac[single_charac].respiratory_activity && model.respiratory_activity_high >= charac[single_charac].respiratory_activity) || (model.respiratory_activity_high == 0 && model.respiratory_activity_low == 0)) {
-                if ((model.warmth_low <= charac[single_charac].warmth && model.warmth_high >= charac[single_charac].warmth) || (model.warmth_high == 0 && model.warmth_low == 0)) {
-                    if ((model.moisture_pickup_low <= charac[single_charac].moisture_pickup && model.moisture_pickup_high >= charac[single_charac].moisture_pickup) || (model.moisture_pickup_high == 0 && model.moisture_pickup_low == 0)) {
+    function calcLayerClothing(model, clothing, charac, single) {
+    var result = [];
+
+    for (var single_charac in charac) {
+
+        if ((model.respiratory_activity_low <= charac[single_charac].respiratory_activity && model.respiratory_activity_high >= charac[single_charac].respiratory_activity) || (model.respiratory_activity_high == 0 && model.respiratory_activity_low == 0)) {
+            if ((model.warmth_low <= charac[single_charac].warmth && model.warmth_high >= charac[single_charac].warmth) || (model.warmth_high == 0 && model.warmth_low == 0)) {
+                if ((model.moisture_pickup_low <= charac[single_charac].moisture_pickup && model.moisture_pickup_high >= charac[single_charac].moisture_pickup) || (model.moisture_pickup_high == 0 && model.moisture_pickup_low == 0)) {
+
+                    for (var art in model.art) {
+                        if (single && clothing.art == model.art[art] && clothing.fabric == charac[single_charac].name) {
+                            const fits = {
+                                id: clothing.id,
+                                model: model.model
+                            };
+                            return fits;
+                        }
+                    }
+                    if (!single) {
                         for (var single_clothing in clothing) {
                             for (var art in model.art) {
+
                                 if (clothing[single_clothing].art == model.art[art] && clothing[single_clothing].fabric == charac[single_charac].name) {
                                     result.push(clothing[single_clothing].id);
+
                                 }
                             }
                         }
@@ -242,8 +273,11 @@ const calcOutfit = function(context, clothing) {
                 }
             }
         }
+    }
+    if (!single) {
         return result;
-    };
-}
+    }
+};
+    }
 
 module.exports = calcOutfit;
