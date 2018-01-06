@@ -24,6 +24,7 @@ const getApp = function(database) {
 
 
     // define routes
+        app.get('/outfit/:art', routes.getOutfit(database, "false"));
     app.get('/users/:id/prefer', routes.getUserPrefer(database));
     app.post('/users/:id/prefer', routes.postUserPrefer(database));
     app.post('/user/:uId/search', routes.postUserSearch(database));
@@ -55,7 +56,7 @@ const getApp = function(database) {
     app.post('/klamotten', routes.postKlamotten(database));
     app.get('/klamotten/:latitude/:longitude/:vicinity/:uId', routes.getAllClothingLocation(database));
 
-    app.get('/outfit/:art', routes.getOutfit(database, "false"));
+
     app.get('/outfit/:art/:latitude/:longitude/:vicinity',routes.getOutfit(database,"true"));
     app.get('/all', routes.getAll(database));
 
