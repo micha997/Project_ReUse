@@ -21,14 +21,10 @@ import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Locale;
 
 /**
@@ -63,7 +59,7 @@ public class AddClothing extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_klamotten_anlegen);
+        setContentView(R.layout.activity_add_clothing);
         etSize = (EditText) findViewById(R.id.etSize);
         etArt = (EditText) findViewById(R.id.etArt);
         etStyle = (EditText) findViewById(R.id.etStyle);

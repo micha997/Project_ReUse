@@ -390,7 +390,7 @@ const database = {
             if (err) {
                 return callback(err);
             }
-            sendPushNotification(mappings.token, cId, body.uId, "", "postRequest");
+            sendPushNotification(mappings.token, cId, body.ouId, "", "postRequest");
             callback(null);
         });
     },

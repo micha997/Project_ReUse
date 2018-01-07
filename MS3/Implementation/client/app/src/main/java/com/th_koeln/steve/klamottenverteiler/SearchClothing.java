@@ -38,7 +38,7 @@ public class SearchClothing extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_klamotten_suchen);
+        setContentView(R.layout.acticity_search_clothing);
 
         btnSearchPref = (Button) findViewById(R.id.btnSearchPrefer);
         btnSuchen = (Button) findViewById(R.id.btnSuchen);

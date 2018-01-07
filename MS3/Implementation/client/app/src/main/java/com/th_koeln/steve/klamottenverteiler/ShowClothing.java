@@ -28,12 +28,12 @@ import org.json.JSONObject;
  */
 
 public class ShowClothing extends AppCompatActivity {
-
     private ImageView imgClothingDetails;
     private TextView txtClothing;
     private Button btnGetClothing;
     private String clothing;
     private String ouId = null;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

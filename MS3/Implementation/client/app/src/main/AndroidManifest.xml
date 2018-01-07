@@ -18,6 +18,7 @@ package="com.th_koeln.steve.klamottenverteiler">
     <activity android:name=".AddClothing" />
     <activity android:name=".map_results" />
     <activity android:name=".SearchClothing" />
+    <activity android:name=".ShowRequest" />
     <activity android:name=".ShowPrefer" />
     <activity android:name=".ShowClothing" />
     <activity android:name=".ChooseContext"/>

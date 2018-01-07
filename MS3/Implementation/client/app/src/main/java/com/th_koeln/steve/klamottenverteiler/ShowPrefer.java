@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
@@ -15,7 +14,6 @@ import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 /**
  * Created by Frank on 09.11.2017.
@@ -30,7 +28,7 @@ public class ShowPrefer extends AppCompatActivity {
     @Override
     protected void onCreate( Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.acitivy_showprefer);
+        setContentView(R.layout.actitivy_showprefer);
 
         tvPreferUserColor = (TextView) findViewById(R.id.tvPreferUserColor);
         tvPreferUserName = (TextView) findViewById(R.id.tvPreferUserName);
