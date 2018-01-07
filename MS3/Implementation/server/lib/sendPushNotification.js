@@ -14,9 +14,6 @@ firebase.initializeApp({
 
 const sendPushNotification = function(token, cId, payload, fits, from) {
 
-
-    console.log(token);
-
     if (from == "missing") {
     var message = {
         data: {

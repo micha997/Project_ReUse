@@ -370,7 +370,6 @@ const database = {
             cId: cId,
             ouId: body.ouId,
         };
-        console.log(body);
         //write mapping to Database
         this.mappings.update({
             type: "userprofile",
