@@ -24,7 +24,7 @@ const getApp = function(database) {
 
 
     // define routes
-        app.get('/outfit/:art', routes.getOutfit(database, "false"));
+    app.get('/outfit/:art', routes.getOutfit(database, "false"));
     app.get('/users/:id/prefer', routes.getUserPrefer(database));
     app.post('/users/:id/prefer', routes.postUserPrefer(database));
     app.post('/user/:uId/search', routes.postUserSearch(database));
@@ -51,6 +51,7 @@ const getApp = function(database) {
     app.put('/user/:uId/clothing', routes.putClothing(database));
     app.get('/clothing/:cId', routes.getClothing(database));
     app.put('/clothing/:cId', routes.putClothing(database));
+    app.post('/clothing/:cId', routes.postRequest(database));
     app.delete('/clothing/:cId', routes.deleteClothing(database));
 
     app.post('/klamotten', routes.postKlamotten(database));

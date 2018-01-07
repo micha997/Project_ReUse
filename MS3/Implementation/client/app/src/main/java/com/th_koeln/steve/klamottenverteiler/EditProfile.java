@@ -29,6 +29,7 @@ public class EditProfile extends AppCompatActivity {
 
     private EditText etGender;
     private Button btnSendProfile;
+    private TextView txtShowUserProfile;
 
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +40,7 @@ public class EditProfile extends AppCompatActivity {
 
         etGender = (EditText) findViewById(R.id.editTextGender);
         btnSendProfile = (Button) findViewById(R.id.btnSendProfile);
+        txtShowUserProfile= (TextView) findViewById(R.id.txtShowUserProfile);
 
         btnSendProfile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,6 +85,7 @@ public class EditProfile extends AppCompatActivity {
         try {
             JSONObject profileJson = new JSONObject(profile);
             etGender.setText(profileJson.getString("gender"));
+            txtShowUserProfile.setText(profile.toString());
             //... fill user profile interface
         } catch (JSONException e) {
             e.printStackTrace();

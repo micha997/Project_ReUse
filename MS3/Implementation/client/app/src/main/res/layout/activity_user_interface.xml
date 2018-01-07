@@ -20,46 +20,43 @@
         android:layout_centerHorizontal="true" />
 
     <Button
-        android:text="Klamotten eintragen"
+        android:id="@+id/btnKlamottenAnlegen"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/textView"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
+        android:layout_below="@+id/textView"
         android:layout_marginLeft="11dp"
         android:layout_marginStart="11dp"
         android:layout_marginTop="16dp"
-        android:id="@+id/btnKlamottenAnlegen" />
+        android:text="Add Clothing" />
 
     <Button
-        android:text="Klamotten suchen"
+        android:id="@+id/btnKlamottenSuchen"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/btnKlamottenAnlegen"
         android:layout_marginLeft="11dp"
         android:layout_marginStart="11dp"
         android:layout_marginTop="16dp"
-        android:id="@+id/btnKlamottenSuchen"
-        android:layout_below="@+id/btnKlamottenAnlegen"
-        android:layout_alignLeft="@+id/btnKlamottenAnlegen"
-        android:layout_alignStart="@+id/btnKlamottenAnlegen" />
-
+        android:text="Search Clothing" />
 
 
     <Button
         android:id="@+id/btnChooseContext"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:layout_marginLeft="11dp"
-        android:layout_marginStart="11dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/btnKlamottenSuchen"
         android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="11dp"
+        android:layout_marginStart="11dp"
+        android:layout_marginTop="15dp"
 
-        android:text="Outfit Suchen" />
+        android:text="Search Outfit" />
 
     <Button
         android:id="@+id/btnEditProfile"
@@ -86,17 +83,27 @@
         android:layout_below="@+id/btnEditProfile"
         android:layout_gravity="center_horizontal"
         android:text="My Clothing" />
+    <Button
+        android:id="@+id/btnRequests"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="11dp"
+        android:layout_marginStart="11dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/btnMyClothing"
+        android:layout_gravity="center_horizontal"
+        android:text="Requests" />
 
     <Button
         android:id="@+id/btnLogout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/btnChooseContext"
+        android:layout_alignLeft="@+id/btnRequests"
         android:layout_alignParentBottom="true"
-        android:layout_alignStart="@+id/btnChooseContext"
+        android:layout_alignStart="@+id/btnRequests"
         android:layout_gravity="center_horizontal"
-        android:layout_marginLeft="11dp"
-        android:layout_marginStart="11dp"
         android:text="Logout" />
 
 </RelativeLayout>

@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
@@ -30,6 +31,7 @@ public class EditClothing extends AppCompatActivity {
     private EditText txtFabric;
     private Button btnPutClothing;
     private String cId;
+    private TextView txtShowClothing;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -42,7 +44,7 @@ public class EditClothing extends AppCompatActivity {
 
         txtFabric = (EditText) findViewById(R.id.txtFabric);
         btnPutClothing = (Button) findViewById(R.id.btnPutClothing);
-
+        txtShowClothing = (TextView) findViewById(R.id.txtShowClothing);
         btnPutClothing.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -90,6 +92,7 @@ public class EditClothing extends AppCompatActivity {
             try {
                 JSONObject clothingJson=new JSONObject(clothing);
                 txtFabric.setText(clothingJson.getString("fabric"));
+                txtShowClothing.setText(clothingJson.toString());
             } catch (JSONException e) {
                 e.printStackTrace();
             }
