@@ -344,7 +344,7 @@ const database = {
                                       return callback(err);
                                   }
 
-                                  sendPushNotification(mappings.token, uId, mapping,fits);
+                                  sendPushNotification(mappings.token, uId, mapping,fits, "missing");
                               })
                             }
                         }
@@ -369,8 +369,8 @@ const database = {
             id: uuidv4(),
             cId: cId,
             ouId: body.ouId,
-            type: "token"
         };
+        console.log(body);
         //write mapping to Database
         this.mappings.update({
             type: "userprofile",
@@ -383,6 +383,15 @@ const database = {
             if (err) {
                 return callback(err);
             }
+        });
+        this.mappings.findOne({
+            uId: body.uId,
+            type: "token"
+        }, (err, mappings) => {
+            if (err) {
+                return callback(err);
+            }
+            sendPushNotification(mappings.token, cId, body.uId, "", "postRequest");
             callback(null);
         });
     },

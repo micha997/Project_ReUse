@@ -6,7 +6,6 @@ const getUserClothing = function(database) {
     }
 
     return function(req, res) {
-
         // call database
         database.getUserClothing(req.params.uId, (err, mappings) => {
             res.setHeader("Content-Type", "application/json");

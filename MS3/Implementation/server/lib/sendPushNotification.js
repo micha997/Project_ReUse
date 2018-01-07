@@ -12,26 +12,37 @@ firebase.initializeApp({
     apiKey: API_KEY
 });
 
-const sendPushNotification = function(token, cId, mapping, fits) {
+const sendPushNotification = function(token, cId, payload, fits, from) {
 
 
-    console.log(fits);
+    console.log(token);
 
-
-    var payload = {
+    if (from == "missing") {
+    var message = {
         data: {
-            art: mapping["art"],
+            art: payload["art"],
             model: fits["model"],
             type: "missing"
         }
     };
+    }
+
+    if (from == "postRequest") {
+    var message = {
+        data: {
+            cId: cId,
+            ouId: payload,
+            type: "postRequest"
+        }
+    };
+    }
 
     var options = {
         priority: "high",
         timeToLive: 60 * 60 * 24
     };
 
-    firebase.messaging().sendToDevice(token, payload, options).then(function(response) {
+    firebase.messaging().sendToDevice(token, message, options).then(function(response) {
         console.log("Successfully", response.results);
     }).catch(function(error) {
         console.log("Error", error);

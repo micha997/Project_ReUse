@@ -15,6 +15,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.th_koeln.steve.klamottenverteiler.R;
 import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
 
@@ -31,15 +33,16 @@ public class ShowClothing extends AppCompatActivity {
     private TextView txtClothing;
     private Button btnGetClothing;
     private String clothing;
-
+    private String ouId = null;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_showclothing);
         txtClothing = (TextView) findViewById(R.id.txtClothing);
         imgClothingDetails = (ImageView) findViewById(R.id.imgCLothingDetail);
+        btnGetClothing = (Button) findViewById(R.id.btnGetClothing);
         FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-        final String ouId= firebaseAuth.getCurrentUser().getUid();
+        ouId= firebaseAuth.getCurrentUser().getUid();
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
                 new IntentFilter("showdetails"));
 
@@ -50,13 +53,14 @@ public class ShowClothing extends AppCompatActivity {
                 try {
                     JSONObject clothingJson = new JSONObject(clothing);
 
-                    request.put("uId", clothingJson.getString("uId)"));
-                    request.put("ouId", clothingJson.getString("ouId"));
+                    request.put("uId", clothingJson.getString("uId"));
+                    request.put("ouId", ouId);
+
                     Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
                     myIntent.putExtra("payload",request.toString());
                     myIntent.putExtra("method","POST");
                     myIntent.putExtra("from", "NEWREQUEST");
-                    myIntent.putExtra("url",getString(R.string.DOMAIN) + "/clothing/"+ clothingJson.getString("id)"));
+                    myIntent.putExtra("url",getString(R.string.DOMAIN) + "/clothing/"+ clothingJson.getString("id"));
                     startService(myIntent);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -73,9 +77,13 @@ public class ShowClothing extends AppCompatActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
+            final FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
+            String idToken = FirebaseInstanceId.getInstance().getToken();
             // get clothing results from HTTP-Service
             clothing = intent.getStringExtra("clothing");
             txtClothing.setText(clothing);
+            txtClothing.append("Meine ID: " + ouId);
+            txtClothing.append("Mein Token: " + idToken);
         }
     };
 }
