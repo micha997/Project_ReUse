@@ -1,5 +1,7 @@
 package com.th_koeln.steve.klamottenverteiler;
 
+import android.app.Dialog;
+import android.app.TimePickerDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +15,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
@@ -21,6 +25,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+
 /**
  * Created by Frank on 30.12.2017.
  */
@@ -28,43 +33,69 @@ import org.json.JSONObject;
 public class EditProfile extends AppCompatActivity {
 
     private EditText etGender;
-    private Button btnSendProfile;
     private TextView txtShowUserProfile;
-    private TextView txtWeekTimeBegin;
-    private TextView txtWeekTimeEnd;
-    private TextView txtWeekendTimeBegin;
-    private TextView txtWeekendTimeEnd;
+
+    private Button btnSendProfile;
+    private Button btnTimeSend;
+
+    private Button btnTimeFromWeekday;
+    private Button btnTimeToWeekday;
+    private Button btnTimeFromWeekend;
+    private Button btnTimeToWeekend;
+
+    private String txtWeekTimeBegin = "00:00";
+    private String txtWeekTimeEnd = "00:00";
+    private String txtWeekendTimeBegin = "00:00";
+    private String txtWeekendTimeEnd = "00:00";
+
+    //Variablen fuer TimePicker
+    int DIALOG_ID = -1;
+    int hourPick;
+    int minutePick;
 
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit_profile);
+        setContentView(R.layout.activity_edit_profile_2);
+
+        timePickerDialog();
 
         FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         final String uId = firebaseAuth.getCurrentUser().getUid();
 
         etGender = (EditText) findViewById(R.id.editTextGender);
         btnSendProfile = (Button) findViewById(R.id.btnSendProfile);
-        txtShowUserProfile= (TextView) findViewById(R.id.txtShowUserProfile);
-        txtWeekTimeBegin = (TextView) findViewById(R.id.txtWeekTimeBegin);
-        txtWeekTimeEnd = (TextView) findViewById(R.id.txtWeekTimeEnd);
-        txtWeekendTimeBegin = (TextView) findViewById(R.id.txtWeekendTimeBegin);
-        txtWeekendTimeEnd = (TextView) findViewById(R.id.txtWeekendTimeEnd);
+        btnTimeSend = (Button) findViewById(R.id.btnTimeSend);
+
+        btnTimeSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                JSONObject newProfile = new JSONObject();
+                try {
+                    newProfile.put("txtWeekTimeBegin", txtWeekTimeBegin);
+                    newProfile.put("txtWeekTimeEnd", txtWeekTimeEnd);
+                    newProfile.put("txtWeekendTimeBegin", txtWeekendTimeBegin);
+                    newProfile.put("txtWeekendTimeEnd", txtWeekendTimeEnd);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                // define http service call
+                Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
+                // define parameters for Service-Call
+                myIntent.putExtra("payload",newProfile.toString());
+                myIntent.putExtra("method","PUT");
+                myIntent.putExtra("from","PUTPROFILE");
+                myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId);
+                //call http service
+                startService(myIntent);
+            }
+        });
 
         btnSendProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 JSONObject newProfile = new JSONObject();
-                JSONObject times = new JSONObject();
                 try {
                     newProfile.put("gender", etGender.getText().toString());
-                    times.put("txtWeekTimeBegin", txtWeekTimeBegin.getText().toString());
-                    times.put("txtWeekTimeEnd", txtWeekTimeEnd.getText().toString());
-                    times.put("txtWeekendTimeBegin", txtWeekendTimeBegin.getText().toString());
-                    times.put("txtWeekendTimeEnd", txtWeekendTimeEnd.getText().toString());
-                    String msgetEscaped = times.toString().replace("\\\"", "\"");
-
-                    newProfile.put("times", msgetEscaped);
-
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -93,23 +124,102 @@ public class EditProfile extends AppCompatActivity {
         startService(myIntent);
     }
 
+    @Override
+    protected Dialog onCreateDialog(int id){
+        if(id == DIALOG_ID){
+            return new TimePickerDialog(EditProfile.this, kTimePickerListener, hourPick, minutePick, true);
+        }
+        return null;
+    }
+
+    protected TimePickerDialog.OnTimeSetListener kTimePickerListener = new TimePickerDialog.OnTimeSetListener(){
+        @Override
+        public void onTimeSet(TimePicker timePicker, int i, int i1) {
+
+            String showHour = i+"";
+            String showMinute = i1+"";
+
+            if(i<10){showHour = "0"+i;}
+            if(i1<10){ showMinute = "0"+i1;}
+
+            switch(DIALOG_ID){
+                //TimeFromWeekday
+                case 1: btnTimeFromWeekday.setText("Von "+showHour+":"+showMinute);
+                    txtWeekTimeBegin = showHour+":"+showMinute;
+                    break;
+                //TimeToWeekday
+                case 2: btnTimeToWeekday.setText("Bis "+showHour+":"+showMinute);
+                    txtWeekTimeEnd = showHour+":"+showMinute;
+                    break;
+                //TimeFromWeekend
+                case 3: btnTimeFromWeekend.setText("Von "+showHour+":"+showMinute);
+                    txtWeekendTimeBegin = showHour+":"+showMinute;
+                    break;
+                //TimeToWeekend
+                case 4: btnTimeToWeekend.setText("Bis "+showHour+":"+showMinute);
+                    txtWeekendTimeEnd = showHour+":"+showMinute;
+                    break;
+            }
+            //Toast.makeText(EditProfile.this, showHour+":"+showMinute, Toast.LENGTH_LONG).show();
+        }
+    };
+
+    public void timePickerDialog(){
+        btnTimeFromWeekday = (Button) findViewById(R.id.btnTimeFromWeekday);
+        btnTimeToWeekday = (Button) findViewById(R.id.btnTimeToWeekday);
+        btnTimeFromWeekend = (Button) findViewById(R.id.btnTimeFromWeekend);
+        btnTimeToWeekend = (Button) findViewById(R.id.btnTimeToWeekend);
+
+        btnTimeFromWeekday.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DIALOG_ID = 1;
+                showDialog(DIALOG_ID);
+            }
+        });
+
+        btnTimeToWeekday.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DIALOG_ID = 2;
+                showDialog(DIALOG_ID);
+            }
+        });
+
+        btnTimeFromWeekend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DIALOG_ID = 3;
+                showDialog(DIALOG_ID);
+            }
+        });
+
+        btnTimeToWeekend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DIALOG_ID = 4;
+                showDialog(DIALOG_ID);
+            }
+        });
+    }
+
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        // get clothing results from HTTP-Service
-        String profile = intent.getStringExtra("profile");
-        try {
-            JSONObject profileJson = new JSONObject(profile);
-            etGender.setText(profileJson.getString("gender"));
-            txtShowUserProfile.setText(profile.toString());
-            //... fill user profile interface
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // get clothing results from HTTP-Service
+            String profile = intent.getStringExtra("profile");
+            try {
+                JSONObject profileJson = new JSONObject(profile);
+                etGender.setText(profileJson.getString("gender"));
+                txtShowUserProfile.setText(profile.toString());
+                //... fill user profile interface
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
-    }
-};
+        }
+    };
 
 
 }
