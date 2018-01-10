@@ -49,6 +49,7 @@ public class Chat extends AppCompatActivity {
     public void onStart() {
         super.onStart();
         active = true;
+
     }
 
     @Override
@@ -95,13 +96,11 @@ public class Chat extends AppCompatActivity {
                 try {
                     Date date = sdfDate.parse(strDate);
                     message.put("time",date.getTime());
+                    message.put("from", message_from);
+                    message.put("to", message_to);
                     if (message_from.equals(uId)) {
-                        message.put("from", message_from);
-                        message.put("to", message_to);
                         myIntent.putExtra("url", getString(R.string.DOMAIN) + "/user/" + message_from + "/messages");
                     } else {
-                        message.put("from", message_to);
-                        message.put("to", message_from);
                         myIntent.putExtra("url", getString(R.string.DOMAIN) + "/user/" + message_to + "/messages");
                     }
                     message.put("message",text);

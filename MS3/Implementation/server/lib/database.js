@@ -137,6 +137,7 @@ const database = {
                   }
                 }
             }
+            console.log(uId);
             this.mappings.findOne({
                 type: "userprofile",
                 uId: uId
@@ -447,19 +448,18 @@ const database = {
         if (!callback) {
             throw new Error('Callback is missing.');
         }
-        console.log("hi");
         const mapping = {
             id: uuidv4(),
             cId: cId,
-            uId: body.ouId,
-            ouId: body.uId,
+            uId: body.uId,
+            ouId: body.ouId,
             status: "open"
         };
         //write mapping to Database
-        console.log(body.uId);
+        console.log("Mapping: " + JSON.stringify(mapping));
         this.mappings.update({
             type: "userprofile",
-            uId: body.uId
+            uId: mapping.uId
         }, {
             $push: {
                 requests: mapping
@@ -468,7 +468,6 @@ const database = {
             if (err) {
                 return callback(err);
             }
-            console.log(body.ouId);
             this.mappings.findOne({
                 uId: body.ouId,
                 type: "token"
@@ -476,6 +475,7 @@ const database = {
                 if (err) {
                     return callback(err);
                 }
+                console.log("Send to: " + body.ouId);
                 sendPushNotification(mappings.token, cId, body.ouId, "", "postRequest");
                 callback(null);
             });
@@ -571,9 +571,9 @@ const database = {
             }
 
         });
-        console.log("Suche Token von: " + message["to"]);
+        console.log("Suche Token von: " + uId);
         this.mappings.findOne({
-            uId: message["to"],
+            uId: mapping["to"],
             type: "token"
         }, (err, mappings) => {
             if (err) {
