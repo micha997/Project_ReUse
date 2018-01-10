@@ -61,8 +61,8 @@ public class ShowClothing extends AppCompatActivity {
                 try {
                     JSONObject clothingJson = new JSONObject(clothing);
 
-                    request.put("uId", clothingJson.getString("uId"));
-                    request.put("ouId", ouId);
+                    request.put("uId", ouId);
+                    request.put("ouId", clothingJson.getString("uId"));
 
                     Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
                     myIntent.putExtra("payload",request.toString());

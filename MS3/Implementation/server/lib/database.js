@@ -212,6 +212,7 @@ const database = {
                 "requests.$.status": body.status
             }
           })
+          console.log(body);
           if (body.status == "accepted") {
             this.mappings.findOne({
                 uId: body.uId,
@@ -446,6 +447,7 @@ const database = {
         if (!callback) {
             throw new Error('Callback is missing.');
         }
+        console.log("hi");
         const mapping = {
             id: uuidv4(),
             cId: cId,
@@ -454,10 +456,10 @@ const database = {
             status: "open"
         };
         //write mapping to Database
-          console.log(body.ouId);
+        console.log(body.uId);
         this.mappings.update({
             type: "userprofile",
-            uId: body.ouId
+            uId: body.uId
         }, {
             $push: {
                 requests: mapping
@@ -466,17 +468,19 @@ const database = {
             if (err) {
                 return callback(err);
             }
+            console.log(body.ouId);
+            this.mappings.findOne({
+                uId: body.ouId,
+                type: "token"
+            }, (err, mappings) => {
+                if (err) {
+                    return callback(err);
+                }
+                sendPushNotification(mappings.token, cId, body.ouId, "", "postRequest");
+                callback(null);
+            });
         });
-        this.mappings.findOne({
-            uId: body.uId,
-            type: "token"
-        }, (err, mappings) => {
-            if (err) {
-                return callback(err);
-            }
-            sendPushNotification(mappings.token, cId, body.ouId, "", "postRequest");
-            callback(null);
-        });
+
     },
     postUserToken(id, token, callback) {
         if (!id) {

@@ -81,7 +81,7 @@ public class ShowRequest extends AppCompatActivity {
         btnAcceptRequest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setStatus("accepted", spinActiveRequests.getSelectedItem().toString());
+                setStatus("accepted", spinAcceptRequest.getSelectedItem().toString());
             }
         });
 

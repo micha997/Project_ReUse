@@ -79,13 +79,13 @@ public class UserInterface extends AppCompatActivity {
             public void onClick(View view) {
                 FirebaseAuth mUser = FirebaseAuth.getInstance();
                 String uID = mUser.getCurrentUser().getUid();
-                Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
+                /*Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
                 myIntent.putExtra("payload","");
                 myIntent.putExtra("method","DELETE");
                 myIntent.putExtra("from", "DELETETOKEN");
                 myIntent.putExtra("url",getString(R.string.DOMAIN) + "/users/"+ uID + "/token");
                 //call http service
-                startService(myIntent);
+                startService(myIntent);*/
 
                 firebaseAuth.signOut();
                 startActivity(new Intent(getApplicationContext(),Login.class));
