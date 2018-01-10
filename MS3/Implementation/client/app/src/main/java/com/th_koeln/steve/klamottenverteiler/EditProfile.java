@@ -54,12 +54,17 @@ public class EditProfile extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 JSONObject newProfile = new JSONObject();
+                JSONObject times = new JSONObject();
                 try {
                     newProfile.put("gender", etGender.getText().toString());
-                    newProfile.put("txtWeekTimeBegin", txtWeekTimeBegin.getText().toString());
-                    newProfile.put("txtWeekTimeEnd", txtWeekTimeEnd.getText().toString());
-                    newProfile.put("txtWeekendTimeBegin", txtWeekendTimeBegin.getText().toString());
-                    newProfile.put("txtWeekendTimeEnd", txtWeekendTimeEnd.getText().toString());
+                    times.put("txtWeekTimeBegin", txtWeekTimeBegin.getText().toString());
+                    times.put("txtWeekTimeEnd", txtWeekTimeEnd.getText().toString());
+                    times.put("txtWeekendTimeBegin", txtWeekendTimeBegin.getText().toString());
+                    times.put("txtWeekendTimeEnd", txtWeekendTimeEnd.getText().toString());
+                    String msgetEscaped = times.toString().replace("\\\"", "\"");
+
+                    newProfile.put("times", msgetEscaped);
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

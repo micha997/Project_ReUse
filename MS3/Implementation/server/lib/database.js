@@ -174,7 +174,7 @@ const database = {
             type: "userprofile",
             uId: uId
         }, {
-            $set: times { put },
+            $set:  put
         })
     },
     putUserRating(uId, id, put) {
@@ -401,6 +401,7 @@ const database = {
             }
 
             var fits = calcOutfit(null, mapping, true);
+
             this.mappings.find({
                 type: "userprofile",
             }).toArray((err, mappings) => {
@@ -413,6 +414,7 @@ const database = {
                         for (var single_subscription in mappings[single_mapping].subscription) {
                             //console.log("Jeweils eine: " + mappings[single_mapping].subscription[single_subscription].type + "_" + mappings[single_mapping].subscription[single_subscription].missing + "\n");
                             //console.log("Fits: " + fits.model + "\n\n");
+
                             var uId = mappings[single_mapping].uId;
                             if (fits.model == mappings[single_mapping].subscription[single_subscription].type + "_" + mappings[single_mapping].subscription[single_subscription].missing) {
                                 this.mappings.findOne({
