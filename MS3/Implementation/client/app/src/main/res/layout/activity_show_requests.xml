@@ -50,5 +50,23 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Start Chat" />
+    <Button
+        android:id="@+id/btnTransSuccess"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Transaction successful" />
+    <Spinner
+        android:id="@+id/spinRequestsWaiting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/btnConfirmTransaction"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Confirm Transaction"/>
 </LinearLayout>
+
+
+
+
 </ScrollView>

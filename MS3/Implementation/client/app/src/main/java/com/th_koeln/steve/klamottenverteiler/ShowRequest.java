@@ -32,6 +32,7 @@ public class ShowRequest extends AppCompatActivity {
     private Spinner spinAcceptRequest;
     private ArrayList<String> ids = new ArrayList();
     private ArrayList<String> activeRequests = new ArrayList();
+    private ArrayList<String> requestsWaiting = new ArrayList();
     private ArrayAdapter<String> requestAdapter;
     private Button btnAcceptRequest;
     private Button btnStartChat;
@@ -41,7 +42,9 @@ public class ShowRequest extends AppCompatActivity {
     private Spinner spinActiveRequests;
     private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private final String uId= firebaseAuth.getCurrentUser().getUid();
-
+    private Button btnTransSuccess;
+    private Spinner spinRequestsWaiting;
+    private Button btnConfirmTransaction;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -54,7 +57,9 @@ public class ShowRequest extends AppCompatActivity {
         txtShowForeignRequests = (TextView) findViewById(R.id.txtShowForeignRequests);
         spinAcceptRequest = (Spinner) findViewById(R.id.spinAcceptRequest);
         spinActiveRequests = (Spinner) findViewById(R.id.spinActiveRequests);
-
+        btnTransSuccess = (Button) findViewById(R.id.btnTransSuccess);
+        spinRequestsWaiting = (Spinner) findViewById(R.id.spinRequestsWaiting);
+        btnConfirmTransaction = (Button) findViewById(R.id.btnConfirmTransaction);
 
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
@@ -66,30 +71,27 @@ public class ShowRequest extends AppCompatActivity {
         myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId + "/requests");
         startService(myIntent);
 
+        btnTransSuccess.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setStatus("waiting", spinAcceptRequest.getSelectedItem().toString());
+            }
+        });
+
         btnAcceptRequest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
-                try {
-                    for (int i = 0; i < requestJsonArray.length(); i++) {
+                setStatus("accepted", spinActiveRequests.getSelectedItem().toString());
+            }
+        });
 
-                            if (requestJsonArray.getJSONObject(i).getString("id").equals(spinAcceptRequest.getSelectedItem().toString())) {
-                                JSONObject putRequest = requestJsonArray.getJSONObject(i);
-                                putRequest.put("status", "accepted");
-                                myIntent.putExtra("payload",putRequest.toString());
-                                break;
-                            }
+        btnConfirmTransaction.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setStatus("confirmed", spinRequestsWaiting.getSelectedItem().toString());
+                Intent myIntent = new Intent(getApplicationContext(), RateUser.class);
+                startActivity(myIntent);
 
-
-                    }
-                    } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                myIntent.putExtra("method","PUT");
-                myIntent.putExtra("from","PUTREQUEST");
-                myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId + "/requests/" + spinAcceptRequest.getSelectedItem().toString());
-                startService(myIntent);
             }
         });
 
@@ -101,6 +103,7 @@ public class ShowRequest extends AppCompatActivity {
 
                 myIntent.putExtra("rId", spinActiveRequests.getSelectedItem().toString());
                 for (int i = 0; i < requestJsonArray.length(); i++) {
+
                     try {
                         if (requestJsonArray.getJSONObject(i).getString("id").equals(spinActiveRequests.getSelectedItem().toString())) {
                             if (uId.equals(requestJsonArray.getJSONObject(i).getString("uId"))) {
@@ -112,6 +115,7 @@ public class ShowRequest extends AppCompatActivity {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+
                 }
                 myIntent.putExtra("from", uId);
                 startActivity(myIntent);
@@ -121,8 +125,31 @@ public class ShowRequest extends AppCompatActivity {
 
     }
 
+    private JSONObject setStatus(String status, String spin) {
+        Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
 
-    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        try {
+            for (int i = 0; i < requestJsonArray.length(); i++) {
+
+                if (requestJsonArray.getJSONObject(i).getString("id").equals(spin)) {
+                    JSONObject putRequest = requestJsonArray.getJSONObject(i);
+                    putRequest.put("status", status);
+                    myIntent.putExtra("payload",putRequest.toString());
+                }
+            }
+            myIntent.putExtra("method","PUT");
+            myIntent.putExtra("from","PUTREQUEST");
+            myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId + "/requests/" + spin);
+            startService(myIntent);
+        } catch (JSONException e1) {
+            e1.printStackTrace();
+        }
+
+        return null;
+        }
+
+
+        private BroadcastReceiver mReceiver = new BroadcastReceiver() {
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -141,7 +168,8 @@ public class ShowRequest extends AppCompatActivity {
                     }
                     if (requestJsonObject.getString("status").equals("accepted"))
                         activeRequests.add(requestJsonObject.getString("id").toString());
-
+                    if (requestJsonObject.getString("status").equals("waiting"))
+                        requestsWaiting.add(requestJsonObject.getString("id").toString());
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -151,6 +179,9 @@ public class ShowRequest extends AppCompatActivity {
 
             requestAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, ids);
             spinAcceptRequest.setAdapter(requestAdapter);
+
+            requestAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, requestsWaiting);
+            spinRequestsWaiting.setAdapter(requestAdapter);
         }
     };
 }

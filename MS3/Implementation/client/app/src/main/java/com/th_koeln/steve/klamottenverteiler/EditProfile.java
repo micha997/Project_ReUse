@@ -30,6 +30,10 @@ public class EditProfile extends AppCompatActivity {
     private EditText etGender;
     private Button btnSendProfile;
     private TextView txtShowUserProfile;
+    private TextView txtWeekTimeBegin;
+    private TextView txtWeekTimeEnd;
+    private TextView txtWeekendTimeBegin;
+    private TextView txtWeekendTimeEnd;
 
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +45,10 @@ public class EditProfile extends AppCompatActivity {
         etGender = (EditText) findViewById(R.id.editTextGender);
         btnSendProfile = (Button) findViewById(R.id.btnSendProfile);
         txtShowUserProfile= (TextView) findViewById(R.id.txtShowUserProfile);
+        txtWeekTimeBegin = (TextView) findViewById(R.id.txtWeekTimeBegin);
+        txtWeekTimeEnd = (TextView) findViewById(R.id.txtWeekTimeEnd);
+        txtWeekendTimeBegin = (TextView) findViewById(R.id.txtWeekendTimeBegin);
+        txtWeekendTimeEnd = (TextView) findViewById(R.id.txtWeekendTimeEnd);
 
         btnSendProfile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -48,6 +56,10 @@ public class EditProfile extends AppCompatActivity {
                 JSONObject newProfile = new JSONObject();
                 try {
                     newProfile.put("gender", etGender.getText().toString());
+                    newProfile.put("txtWeekTimeBegin", txtWeekTimeBegin.getText().toString());
+                    newProfile.put("txtWeekTimeEnd", txtWeekTimeEnd.getText().toString());
+                    newProfile.put("txtWeekendTimeBegin", txtWeekendTimeBegin.getText().toString());
+                    newProfile.put("txtWeekendTimeEnd", txtWeekendTimeEnd.getText().toString());
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

@@ -174,7 +174,7 @@ const database = {
             type: "userprofile",
             uId: uId
         }, {
-            $set: put,
+            $set: times { put },
         })
     },
     putUserRating(uId, id, put) {

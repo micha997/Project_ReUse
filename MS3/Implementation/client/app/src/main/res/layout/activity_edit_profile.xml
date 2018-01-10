@@ -34,6 +34,44 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:inputType="textPersonName" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Week Time::" />
+
+        <EditText
+            android:id="@+id/txtWeekTimeBegin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="WeekTimeBegin"/>
+        <EditText
+            android:id="@+id/txtWeekTimeEnd"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="WeekTimeEnd"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Weekend Time::" />
+
+        <EditText
+            android:id="@+id/txtWeekendTimeBegin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="WeekTimeBegin"/>
+        <EditText
+            android:id="@+id/txtWeekendTimeEnd"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="WeekTimeEnd"/>
 
     <Button
         android:id="@+id/btnSendProfile"
