@@ -9,6 +9,7 @@ import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -38,6 +39,11 @@ public class Chat extends AppCompatActivity {
     private final String uId= firebaseAuth.getCurrentUser().getUid();
     private TextView txtChat;
     public static boolean active = false;
+    private String text;
+    private String rId;
+    private String message_to;
+    private String message_from;
+
 
     @Override
     public void onStart() {
@@ -58,6 +64,13 @@ public class Chat extends AppCompatActivity {
         btnSendMessages = (Button) findViewById(R.id.btnSendMessages);
         txtMessage = (EditText) findViewById(R.id.txtMessage);
         txtChat = (TextView) findViewById(R.id.txtChat);
+        txtChat.setMovementMethod(new ScrollingMovementMethod());
+
+
+
+        rId = getIntent().getStringExtra("rId");
+        message_to = getIntent().getStringExtra("to");
+        message_from = getIntent().getStringExtra("from");
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
                 new IntentFilter("chat"));
@@ -71,10 +84,7 @@ public class Chat extends AppCompatActivity {
         btnSendMessages.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String text = txtMessage.getText().toString();
-                String rId = getIntent().getStringExtra("rId");
-                String to = getIntent().getStringExtra("to");
-                String from = getIntent().getStringExtra("from");
+                text = txtMessage.getText().toString();
                 txtChat.append("You: " + text + "\n");
                 JSONObject message = new JSONObject();
                 Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
@@ -85,14 +95,14 @@ public class Chat extends AppCompatActivity {
                 try {
                     Date date = sdfDate.parse(strDate);
                     message.put("time",date.getTime());
-                    if (from.equals(uId)) {
-                        message.put("from", from);
-                        message.put("to", to);
-                        myIntent.putExtra("url", getString(R.string.DOMAIN) + "/user/" + from + "/messages");
+                    if (message_from.equals(uId)) {
+                        message.put("from", message_from);
+                        message.put("to", message_to);
+                        myIntent.putExtra("url", getString(R.string.DOMAIN) + "/user/" + message_from + "/messages");
                     } else {
-                        message.put("from", to);
-                        message.put("to", from);
-                        myIntent.putExtra("url", getString(R.string.DOMAIN) + "/user/" + to + "/messages");
+                        message.put("from", message_to);
+                        message.put("to", message_from);
+                        myIntent.putExtra("url", getString(R.string.DOMAIN) + "/user/" + message_to + "/messages");
                     }
                     message.put("message",text);
                     message.put("attach","attach");
@@ -126,32 +136,32 @@ public class Chat extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             String params = intent.getStringExtra("params");
             String from = intent.getStringExtra("from");
+            try {
 
-            if (from.equals("newMessage")) {
+                if (from.equals("newMessage")) {
 
-                try {
-                    JSONObject message= null;
-                    message = new JSONObject(params);
+                    JSONObject message= new JSONObject(params);
                     txtChat.append("Partner: " + message.getString("message") + "\n");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            } else if (from.equals("GETCONVERSATION")) {
-                try {
+
+                } else if (from.equals("GETCONVERSATION")) {
+
                     JSONArray messageArray = new JSONArray(params);
+
                     for (int i = 0; i < messageArray.length(); i++) {
-                        if (messageArray.getJSONObject(i).getString("from").equals(uId)) {
+
+                        if (messageArray.getJSONObject(i).getString("from").equals(uId) && messageArray.getJSONObject(i).getString("to").equals(message_to) ) {
                             txtChat.append("You: " + messageArray.getJSONObject(i).getString("message") + "\n");
-                    } else {
+                        } else if (messageArray.getJSONObject(i).getString("from").equals(message_to) && messageArray.getJSONObject(i).getString("to").equals(uId) ) {
                             txtChat.append("Partner: " + messageArray.getJSONObject(i).getString("message") + "\n");
-
                         }
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
 
+                    }
+                }
+            } catch (JSONException e) {
+
+                e.printStackTrace();
+
+            }
 
         }
     };

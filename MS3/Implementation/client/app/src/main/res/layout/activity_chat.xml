@@ -7,7 +7,9 @@
     <TextView
         android:id="@+id/txtChat"
         android:layout_width="match_parent"
-        android:layout_height="249dp" />
+        android:layout_height="183dp"
+        android:gravity="bottom"
+        android:scrollbars="vertical" />
 
     <EditText
         android:id="@+id/txtMessage"

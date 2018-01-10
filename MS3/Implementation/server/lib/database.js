@@ -565,7 +565,7 @@ const database = {
             }
 
         });
-        console.log(message);
+        console.log("Suche Token von: " + message["to"]);
         this.mappings.findOne({
             uId: message["to"],
             type: "token"
@@ -574,7 +574,7 @@ const database = {
                 return callback(err);
             }
 
-            sendPushNotification(mappings.token, message["from"], message, "", "message");
+            sendPushNotification(mappings.token, message["to"], message, "", "message");
         })
                     callback(null);
     },

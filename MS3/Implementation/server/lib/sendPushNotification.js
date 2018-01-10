@@ -14,12 +14,13 @@ firebase.initializeApp({
 
 const sendPushNotification = function(token, cId, payload, fits, from) {
  //TODO: Switch
+ console.log(payload);
  if (from=="message") {
    var message = {
        data: {
          message: payload["message"],
-         sender: from
-        // uId: cId
+         sender: from,
+         ouId: payload["from"]
        }
      }
  };

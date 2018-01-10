@@ -37,27 +37,28 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         Map<String, String> params = message.getData();
         JSONObject paramsJson = new JSONObject(params);
         String from = paramsJson.getString("sender");
-        Intent myIntent;
+        Intent myIntent = new Intent();
 
             switch (from) {
             case "accepted":
                 myIntent = new Intent(getApplicationContext(),ShowRequest.class);
-                myIntent.putExtra("cId", paramsJson.getString("cId"));
-                myIntent.putExtra("uId", paramsJson.getString("ouId"));
+
                 myIntent.putExtra("from", "showNotification");
 
 
                 break;
             case "message":
-                Intent intent = new Intent("chat");
-                intent.putExtra("params", paramsJson.toString());
-                intent.putExtra("from", "newMessage");
+                if (Chat.active == true) {
+                    Intent intent = new Intent("chat");
+                    intent.putExtra("params", paramsJson.toString());
+                    intent.putExtra("from", "newMessage");
 
-                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-
-                myIntent = new Intent(getApplicationContext(),Chat.class);
-                myIntent.putExtra("from", "newMessage");
-                myIntent.putExtra("to", paramsJson.getString("ouId"));
+                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+                } else if (Chat.active == false) {
+                    myIntent = new Intent(getApplicationContext(), Chat.class);
+                    myIntent.putExtra("from", "newMessage");
+                    myIntent.putExtra("to", paramsJson.getString("ouId"));
+                }
                 break;
             default :
                     myIntent = new Intent(getApplicationContext(),UserInterface.class);
@@ -65,6 +66,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         }
             if (Chat.active == false) {
+
             PendingIntent pendingIntent =
                     PendingIntent.getActivity(this, 0, myIntent, PendingIntent.FLAG_ONE_SHOT);
 
