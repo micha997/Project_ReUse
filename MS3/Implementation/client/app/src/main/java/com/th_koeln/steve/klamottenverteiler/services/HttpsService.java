@@ -181,7 +181,16 @@ public class HttpsService extends IntentService {
                             intent.putExtra("clothing", stringBuilder.toString());
                             intent.putExtra("from", "SEARCHCLOTHING");
                             break;
-
+                        case "SHOWREQUESTS":
+                            intent = new Intent("showrequests");
+                            intent.putExtra("clothing", stringBuilder.toString());
+                            intent.putExtra("from", "SHOWREQUESTS");
+                            break;
+                        case "GETCONVERSATION":
+                            intent = new Intent("chat");
+                            intent.putExtra("params", stringBuilder.toString());
+                            intent.putExtra("from", "GETCONVERSATION");
+                        break;
 
                     }
                     LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);

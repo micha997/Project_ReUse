@@ -110,6 +110,54 @@ const database = {
             callback(null, mappings);
         })
     },
+    getUserRequests(uId, callback) {
+        if (!uId) {
+            throw new Error('id is missing.');
+        }
+        if (!callback) {
+            throw new Error('Callback is missing.');
+        }
+        // find all elements
+                    var requests = [];
+
+        this.mappings.find({
+            type: "userprofile",
+            "requests.ouId": uId
+        }).toArray((err, mapping) => {
+            if (err) {
+                return callback(err);
+            }
+
+            for (var single_map in mapping) {
+                var obj = mapping[single_map].requests;
+                for (var single_request in obj) {
+                  if (obj[single_request].ouId == uId) {
+                    obj[single_request].from = "foreign";
+                   requests.push(obj[single_request]);
+                  }
+                }
+            }
+            this.mappings.findOne({
+                type: "userprofile",
+                uId: uId
+            }, (err, mappings) => {
+                if (err) {
+                    return callback(err);
+                }
+                for (var single_ownReq in mappings.requests) {
+                  mappings.requests[single_ownReq].from = "own";
+                requests.push(mappings.requests[single_ownReq]);
+                }
+                //send results back to handler
+                callback(null, requests);
+            })
+
+
+        })
+
+
+    },
+
     putUserProfile(uId, put, callback) {
         if (!uId) {
             throw new Error('id is missing.');
@@ -145,6 +193,37 @@ const database = {
                 rating: put
             }
         })
+    },
+    putRequest(body, uId, id, callback) {
+        if (!body) {
+            throw new Error('body is missing.');
+        }
+        if (!uId) {
+            throw new Error('id is missing.');
+        }
+        if (!callback) {
+            throw new Error('callback is missing.');
+        }
+        this.mappings.update({
+            type: "userprofile",
+            "requests.id": id
+        }, {
+            $set: {
+                "requests.$.status": body.status
+            }
+          })
+          if (body.status == "accepted") {
+            this.mappings.findOne({
+                uId: body.uId,
+                type: "token"
+            }, (err, mappings) => {
+                if (err) {
+                    return callback(err);
+                }
+
+                sendPushNotification(mappings.token, body.uId, mappings, "", "accepted");
+            })
+        }
     },
     putClothing(cId, put, callback) {
         if (!cId) {
@@ -336,16 +415,16 @@ const database = {
                             //console.log("Fits: " + fits.model + "\n\n");
                             var uId = mappings[single_mapping].uId;
                             if (fits.model == mappings[single_mapping].subscription[single_subscription].type + "_" + mappings[single_mapping].subscription[single_subscription].missing) {
-                              this.mappings.findOne({
-                                  uId: mappings[single_mapping].uId,
-                                  type: "token"
-                              }, (err, mappings) => {
-                                  if (err) {
-                                      return callback(err);
-                                  }
+                                this.mappings.findOne({
+                                    uId: mappings[single_mapping].uId,
+                                    type: "token"
+                                }, (err, mappings) => {
+                                    if (err) {
+                                        return callback(err);
+                                    }
 
-                                  sendPushNotification(mappings.token, uId, mapping,fits, "missing");
-                              })
+                                    sendPushNotification(mappings.token, uId, mapping, fits, "missing");
+                                })
                             }
                         }
                     }
@@ -368,12 +447,15 @@ const database = {
         const mapping = {
             id: uuidv4(),
             cId: cId,
-            ouId: body.ouId,
+            uId: body.ouId,
+            ouId: body.uId,
+            status: "open"
         };
         //write mapping to Database
+          console.log(body.ouId);
         this.mappings.update({
             type: "userprofile",
-            uId: body.uId
+            uId: body.ouId
         }, {
             $push: {
                 requests: mapping
@@ -450,8 +532,8 @@ const database = {
             callback(null);
         });
     },
-    postMessage(id, message, callback) {
-        if (!id) {
+    postMessage(uId, message, callback) {
+        if (!uId) {
             throw new Error('id is missing.');
         }
         if (!message) {
@@ -462,20 +544,39 @@ const database = {
         }
         const mapping = {
             id: uuidv4(),
-            type: "message",
             from: message["from"],
-            to: message["from"],
+            to: message["to"],
             message: message["message"],
             attach: message["attach"],
             time: message["time"]
         };
         //write mapping to Database
-        this.mappings.insertOne(mapping, err => {
+        //write mapping to Database
+        this.mappings.update({
+            type: "userprofile",
+            uId: message["from"]
+        }, {
+            $push: {
+                messages: mapping
+            }
+        }, mapping, err => {
             if (err) {
                 return callback(err);
             }
-            callback(null);
+
         });
+        console.log(message);
+        this.mappings.findOne({
+            uId: message["to"],
+            type: "token"
+        }, (err, mappings) => {
+            if (err) {
+                return callback(err);
+            }
+
+            sendPushNotification(mappings.token, message["from"], message, "", "message");
+        })
+                    callback(null);
     },
     postUserRating(uId, rating, callback) {
         if (!uId) {
@@ -763,16 +864,37 @@ const database = {
             throw new Error('ouId is missing.');
         }
         // find all elements
-        this.mappings.find({
-            from: uId,
-            to: ouId
-        }).toArray((err, mappings) => {
+        this.mappings.findOne({
+            type: "userprofile",
+            uId: uId,
+          }, (err, mappings) => {
             if (err) {
                 return callback(err);
             }
-            //send results back to handler
-            callback(null, mappings);
+
+            this.mappings.find({type: "userprofile",
+            "messages.from": ouId,"messages.to": uId,}).toArray((err, mapping) => {
+                if (err) {
+                    return callback(err);
+                }
+                var allMessages=[];
+                for (var single_mapping in mapping) {
+                  for (var one_message in mapping[single_mapping].messages) {
+                    if (mapping[single_mapping].messages[one_message].to == uId) {
+                      allMessages.push(mapping[single_mapping].messages[one_message]);
+                    }
+                  }
+
+                }
+                for (var single_Messages in mappings.messages) {
+                    allMessages.push(mappings.messages[single_Messages]);
+                }
+                //send results back to handler
+                callback(null, allMessages);
+            })
         })
+
+
     },
     getClothingPrefer(uId, callback) {
         if (!callback) {

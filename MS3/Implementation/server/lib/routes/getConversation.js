@@ -12,7 +12,9 @@ const getConversation = function(database) {
             if (err) {
                 return res.status(500).end();
             }
-            console.log(mappings);
+            mappings.sort(function(a, b) {
+              return parseFloat(a.time) - parseFloat(b.time);
+            });
             res.status(201).send(mappings);
         })
     };

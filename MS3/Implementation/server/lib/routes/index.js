@@ -29,3 +29,5 @@ exports.getUserOutfit = require('./getUserOutfit');
 exports.getUserOutfitClothing = require ('./getUserOutfitClothing');
 exports.postUserSearch = require('./postUserSearch');
 exports.postRequest = require('./postRequest');
+exports.getUserRequests = require('./getUserRequests');
+exports.putRequest = require('./putRequest');

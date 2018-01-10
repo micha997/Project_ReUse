@@ -33,7 +33,7 @@ const getApp = function(database) {
     app.get('/users/:id/token', routes.getUserToken(database));
     app.post('/users/:id/token/:token', routes.postUserToken(database));
     app.delete('/users/:id/token', routes.deleteUserToken(database));
-    app.post('/user/:uId/messages/', routes.postMessage(database));
+    app.post('/user/:uId/messages', routes.postMessage(database));
     app.get('/user/:uId/messages/:ouId', routes.getConversation(database));
     app.delete('/user/:uId/messages/:ouId', routes.deleteConversation(database));
     app.get('/user/:uId/clothing/', routes.getUserClothing(database));
@@ -41,6 +41,8 @@ const getApp = function(database) {
     app.put('/user/:uId', routes.putUserProfile(database));
     app.delete('/user/:uId', routes.deleteUserProfile(database));
     app.delete('/user/:uId/clothing', routes.deleteUserClothing(database));
+    app.get('/user/:uId/requests', routes.getUserRequests(database));
+    app.put('/user/:uId/requests/:id', routes.putRequest(database));
     app.post('/user/:uId/rating', routes.postUserRating(database));
     app.get('/user/:uId/rating', routes.getUserRating(database));
     app.put('/user/:uId/rating/:id', routes.putUserRating(database));

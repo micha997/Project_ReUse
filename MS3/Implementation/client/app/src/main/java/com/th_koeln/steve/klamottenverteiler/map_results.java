@@ -1,8 +1,12 @@
 package com.th_koeln.steve.klamottenverteiler;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.LocalBroadcastManager;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -11,6 +15,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
 
 import org.json.JSONArray;
@@ -36,6 +42,9 @@ public class map_results extends FragmentActivity implements OnMapReadyCallback,
         mapFragment.getMapAsync(this);
         // get Elements to show in map
         clothing_list = getIntent().getStringExtra("clothing_list");
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
+                new IntentFilter("showdetails"));
 
     }
 
@@ -64,6 +73,21 @@ public class map_results extends FragmentActivity implements OnMapReadyCallback,
         }
     }
 
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
+            String idToken = FirebaseInstanceId.getInstance().getToken();
+            // get clothing results from HTTP-Service
+            String clothing = intent.getStringExtra("clothing");
+            Intent myIntent = new Intent(getApplicationContext(),ShowClothing.class);
+            myIntent.putExtra("clothing",clothing);
+            startActivity(myIntent);
+
+        }
+    };
+
     @Override
     public boolean onMarkerClick(Marker marker) {
         Object cId = marker.getTag();
@@ -73,9 +97,8 @@ public class map_results extends FragmentActivity implements OnMapReadyCallback,
         myIntent.putExtra("url",getString(R.string.DOMAIN) + "/clothing/" + cId);
         startService(myIntent);
 
-        myIntent = new Intent(getApplicationContext(),ShowClothing.class);
-        startActivity(myIntent);
-        finish();
+
+
         /*String uId = FirebaseAuth.getInstance().getCurrentUser().getUid().toString();
         JSONObject prefer = new JSONObject();
         try {

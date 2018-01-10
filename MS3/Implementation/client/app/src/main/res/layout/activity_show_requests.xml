@@ -1,11 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scrollView1"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/txtShowRequests"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="My Requests:" />
+
+    <TextView
+        android:id="@+id/txtShowMyRequests"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="TextView" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Foreign Requests:" />
+
+    <TextView
+        android:id="@+id/txtShowForeignRequests"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="TextView" />
+
+    <Spinner
+        android:id="@+id/spinAcceptRequest"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/btnAcceptRequest"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Accept Request" />
+
+    <Spinner
+        android:id="@+id/spinActiveRequests"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/btnStartChat"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Start Chat" />
 </LinearLayout>
+</ScrollView>

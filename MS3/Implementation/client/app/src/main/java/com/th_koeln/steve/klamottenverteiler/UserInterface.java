@@ -18,6 +18,7 @@ public class UserInterface extends AppCompatActivity {
     private Button btnChooseContext;
     private Button btnEditProfile;
     private FirebaseAuth firebaseAuth;
+    private Button btnRequests;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +36,15 @@ public class UserInterface extends AppCompatActivity {
         btnChooseContext = (Button) findViewById(R.id.btnChooseContext);
         btnEditProfile = (Button) findViewById(R.id.btnEditProfile);
         btnMyClothing = (Button) findViewById(R.id.btnMyClothing);
+        btnRequests = (Button) findViewById(R.id.btnRequests);
+
+        btnRequests.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent myIntent = new Intent(getApplicationContext(), ShowRequest.class);
+                startActivity(myIntent);
+            }
+        });
 
         btnMyClothing.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -13,15 +13,36 @@ firebase.initializeApp({
 });
 
 const sendPushNotification = function(token, cId, payload, fits, from) {
+ //TODO: Switch
+ if (from=="message") {
+   var message = {
+       data: {
+         message: payload["message"],
+         sender: from
+        // uId: cId
+       }
+     }
+ };
+
+  if (from == "accepted") {
+  var message = {
+      data: {
+        uId: cId,
+        sender: from
+      }
+    }
+  };
 
     if (from == "missing") {
     var message = {
         data: {
             art: payload["art"],
             model: fits["model"],
-            type: "missing"
+            type: "missing",
+            sender: from
         }
     };
+
     }
 
     if (from == "postRequest") {
@@ -29,7 +50,8 @@ const sendPushNotification = function(token, cId, payload, fits, from) {
         data: {
             cId: cId,
             ouId: payload,
-            type: "postRequest"
+            type: "postRequest",
+            sender: from
         }
     };
     }

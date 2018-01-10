@@ -43,8 +43,16 @@ public class ShowClothing extends AppCompatActivity {
         btnGetClothing = (Button) findViewById(R.id.btnGetClothing);
         FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         ouId= firebaseAuth.getCurrentUser().getUid();
-        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
-                new IntentFilter("showdetails"));
+
+        clothing = getIntent().getStringExtra("clothing");
+        try {
+            JSONObject request = new JSONObject(clothing);
+            txtClothing.setText(clothing);
+            txtClothing.append("Meine ID: " + request.getString("uId"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
 
         btnGetClothing.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,18 +81,5 @@ public class ShowClothing extends AppCompatActivity {
 
     }
 
-    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
-            String idToken = FirebaseInstanceId.getInstance().getToken();
-            // get clothing results from HTTP-Service
-            clothing = intent.getStringExtra("clothing");
-            txtClothing.setText(clothing);
-            txtClothing.append("Meine ID: " + ouId);
-            txtClothing.append("Mein Token: " + idToken);
-        }
-    };
 }
 

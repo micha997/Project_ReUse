@@ -28,7 +28,6 @@ public class MainActivity extends AppCompatActivity {
     private EditText etPassword;
     private TextView tvGoLogin;
     private FirebaseAuth.AuthStateListener firebaseAuthListener;
-    private boolean authFlag = true;
     private boolean isFirebaseCalledOnce =false;
 
     private ProgressDialog progressDialog;

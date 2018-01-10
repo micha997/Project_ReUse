@@ -1,32 +1,156 @@
 package com.th_koeln.steve.klamottenverteiler;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.th_koeln.steve.klamottenverteiler.R;
+import com.google.firebase.auth.FirebaseAuth;
+import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
 
-import java.util.Map;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 /**
  * Created by Frank on 07.01.2018.
  */
 
 public class ShowRequest extends AppCompatActivity {
-    private TextView txtShowRequests;
+    private TextView txtShowMyRequests;
+    private Spinner spinAcceptRequest;
+    private ArrayList<String> ids = new ArrayList();
+    private ArrayList<String> activeRequests = new ArrayList();
+    private ArrayAdapter<String> requestAdapter;
+    private Button btnAcceptRequest;
+    private Button btnStartChat;
+    private String requests;
+    private JSONArray requestJsonArray;
+    private TextView txtShowForeignRequests;
+    private Spinner spinActiveRequests;
+    private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+    private final String uId= firebaseAuth.getCurrentUser().getUid();
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Intent intent = getIntent();
+
         setContentView(R.layout.activity_show_requests);
+        btnAcceptRequest = (Button) findViewById(R.id.btnAcceptRequest);
+        btnStartChat = (Button) findViewById(R.id.btnStartChat);
+        txtShowMyRequests = (TextView) findViewById(R.id.txtShowMyRequests);
+        txtShowForeignRequests = (TextView) findViewById(R.id.txtShowForeignRequests);
+        spinAcceptRequest = (Spinner) findViewById(R.id.spinAcceptRequest);
+        spinActiveRequests = (Spinner) findViewById(R.id.spinActiveRequests);
 
 
 
-        txtShowRequests = (TextView) findViewById(R.id.txtShowRequests);
-        txtShowRequests.setText(intent.getStringExtra("uId")  + " möchte " + intent.getStringExtra("cId"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
+                new IntentFilter("showrequests"));
+
+        Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
+        myIntent.putExtra("method","GET");
+        myIntent.putExtra("from","SHOWREQUESTS");
+        myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId + "/requests");
+        startService(myIntent);
+
+        btnAcceptRequest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
+                try {
+                    for (int i = 0; i < requestJsonArray.length(); i++) {
+
+                            if (requestJsonArray.getJSONObject(i).getString("id").equals(spinAcceptRequest.getSelectedItem().toString())) {
+                                JSONObject putRequest = requestJsonArray.getJSONObject(i);
+                                putRequest.put("status", "accepted");
+                                myIntent.putExtra("payload",putRequest.toString());
+                                break;
+                            }
+
+
+                    }
+                    } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                myIntent.putExtra("method","PUT");
+                myIntent.putExtra("from","PUTREQUEST");
+                myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId + "/requests/" + spinAcceptRequest.getSelectedItem().toString());
+                startService(myIntent);
+            }
+        });
+
+        btnStartChat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent myIntent = new Intent(getApplicationContext(),Chat.class);
+
+
+                myIntent.putExtra("rId", spinActiveRequests.getSelectedItem().toString());
+                for (int i = 0; i < requestJsonArray.length(); i++) {
+                    try {
+                        if (requestJsonArray.getJSONObject(i).getString("id").equals(spinActiveRequests.getSelectedItem().toString())) {
+                            if (uId.equals(requestJsonArray.getJSONObject(i).getString("uId"))) {
+                                myIntent.putExtra("to", requestJsonArray.getJSONObject(i).getString("ouId"));
+                            } else {
+                                myIntent.putExtra("to", requestJsonArray.getJSONObject(i).getString("uId"));
+                            }
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                myIntent.putExtra("from", uId);
+                startActivity(myIntent);
+
+            }
+        });
+
     }
+
+
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String requests = intent.getStringExtra("clothing");
+            try {
+                requestJsonArray = new JSONArray(requests);
+                for (int i = 0; i < requestJsonArray.length(); i++) {
+                    JSONObject requestJsonObject = requestJsonArray.getJSONObject(i);
+                    if ( requestJsonObject.getString("from").equals("own")) {
+                        txtShowMyRequests.append(requestJsonObject.toString());
+
+                    } else if (requestJsonObject.getString("from").equals("foreign")) {
+                        txtShowForeignRequests.append(requestJsonObject.toString());
+                        if (requestJsonObject.getString("status").equals("open"))
+                        ids.add(requestJsonObject.getString("id").toString());
+                    }
+                    if (requestJsonObject.getString("status").equals("accepted"))
+                        activeRequests.add(requestJsonObject.getString("id").toString());
+
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            requestAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, activeRequests);
+            spinActiveRequests.setAdapter(requestAdapter);
+
+            requestAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, ids);
+            spinAcceptRequest.setAdapter(requestAdapter);
+        }
+    };
 }
