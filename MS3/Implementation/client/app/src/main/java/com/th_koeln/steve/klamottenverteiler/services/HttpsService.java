@@ -124,6 +124,7 @@ public class HttpsService extends IntentService {
             StringBuilder stringBuilder = new StringBuilder();
             // get Statuscode from Response
             int status = connection.getResponseCode();
+            Intent intent = new Intent();
             // analyse Status code
             switch (status) {
                 case 200:
@@ -136,70 +137,99 @@ public class HttpsService extends IntentService {
                         stringBuilder.append(response + "\n");
                     }
                     bufferedReader.close();
-                    Intent intent = new Intent();
+
 
                     //send Data back
                     switch (from) {
+
                         case "SEARCH":
                             // send clothing JSON array to Google Map
                             intent = new Intent("clothing");
                             intent.putExtra("clothing", stringBuilder.toString());
                             intent.putExtra("from", "SEARCH");
                             break;
+
                         case "SEARCHPREFER":
                             intent = new Intent("prefer");
                             intent.putExtra("prefer", stringBuilder.toString());
                             intent.putExtra("from", "SEARCHPREFER");
                             break;
+
                         case "SEARCHPREFCLOTHING":
                             intent = new Intent("clothing");
                             intent.putExtra("clothing", stringBuilder.toString());
                             intent.putExtra("from", "SEARCHPREFCLOTHING");
                             break;
+
                         case "SHOWDETAILS":
                             intent = new Intent("showdetails");
                             intent.putExtra("clothing", stringBuilder.toString());
                             intent.putExtra("from", "SHOWDETAILS");
                             break;
+
                         case "PROFILE":
                             intent = new Intent("profile");
                             intent.putExtra("profile", stringBuilder.toString());
                             intent.putExtra("from", "SEARCHPROFILE");
                             break;
+
                         case "MYCLOTHING":
                             intent = new Intent("myclothing");
                             intent.putExtra("clothing", stringBuilder.toString());
                             intent.putExtra("from", "MYCLOTHING");
                             break;
+
                         case "EDITCLOTHING":
                             intent = new Intent("editclothing");
                             intent.putExtra("clothing", stringBuilder.toString());
                             intent.putExtra("from", "EDITCLOTHING");
                             break;
+
                         case "SEARCHOUTFIT":
                             intent = new Intent("showoutfit");
                             intent.putExtra("clothing", stringBuilder.toString());
                             intent.putExtra("from", "SEARCHCLOTHING");
                             break;
+
                         case "SHOWREQUESTS":
                             intent = new Intent("showrequests");
                             intent.putExtra("clothing", stringBuilder.toString());
                             intent.putExtra("from", "SHOWREQUESTS");
                             break;
+
                         case "GETCONVERSATION":
                             intent = new Intent("chat");
                             intent.putExtra("params", stringBuilder.toString());
                             intent.putExtra("from", "GETCONVERSATION");
                         break;
 
+                        case "ADDCLOTHING":
+                            intent = new Intent("addclothing");
+                            intent.putExtra("from", "ADDCLOTHING");
+                            intent.putExtra("success", "1");
+                            break;
+
                     }
                     LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-                    Log.d("test", stringBuilder.toString());
+                    break;
+
+                case 500:
+                    switch (from) {
+
+                        case "ADDCLOTHING":
+                            intent = new Intent("addclothing");
+                            intent.putExtra("from", "ADDCLOTHING");
+                            intent.putExtra("success", "0");
+                            break;
+                    }
+                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
                     break;
                 default:
-                Log.e("test", connection.getResponseMessage());
+                    Log.e("test", connection.getResponseMessage());
                     break;
             }
+
+
         } catch (Exception exception) {
             Log.e("test", exception.toString());
             // send reponse + alertdialog by brodcast

@@ -37,6 +37,7 @@ public class RateUser extends AppCompatActivity {
     private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private final String uId= firebaseAuth.getCurrentUser().getUid();
 
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,14 +47,18 @@ public class RateUser extends AppCompatActivity {
         spinChooseRating = (Spinner) findViewById(R.id.spinChooseRating);
         btnSendRating = (Button) findViewById(R.id.btnSendRating);
         txtTransactionDetails = (TextView) findViewById(R.id.txtTransactionDetails);
+
+
         ArrayAdapter<String> aArrayAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item);
         aArrayAdapter.add("Good");
         aArrayAdapter.add("Okay");
         aArrayAdapter.add("Bad");
+
         spinChooseRating.setAdapter(aArrayAdapter);
 
         String tId = getIntent().getStringExtra("tId");
         final String request = getIntent().getStringExtra("request");
+
         txtTransactionDetails.append(tId);
         txtTransactionDetails.append(request);
 

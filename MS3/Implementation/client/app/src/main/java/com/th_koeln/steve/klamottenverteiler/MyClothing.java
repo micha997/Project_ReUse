@@ -46,11 +46,12 @@ public class MyClothing extends AppCompatActivity {
         btnEditClothing = (Button) findViewById(R.id.btnEditClothing);
         spinChooseClothing = (Spinner) findViewById(R.id.spinChooseClothing);
 
+        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+        final String uId = firebaseAuth.getCurrentUser().getUid();
+
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
                 new IntentFilter("myclothing"));
 
-        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-        final String uId = firebaseAuth.getCurrentUser().getUid();
         Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
         myIntent.putExtra("payload", "");
         myIntent.putExtra("method", "GET");
@@ -82,11 +83,12 @@ public class MyClothing extends AppCompatActivity {
                     JSONObject clothingJsonObject = clothingJsonArray.getJSONObject(i);
                     ids.add(clothingJsonObject.getString("id").toString());
                 }
+                clothingAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, ids);
+                spinChooseClothing.setAdapter(clothingAdapter);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            clothingAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, ids);
-            spinChooseClothing.setAdapter(clothingAdapter);
+
 
         spinChooseClothing.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override

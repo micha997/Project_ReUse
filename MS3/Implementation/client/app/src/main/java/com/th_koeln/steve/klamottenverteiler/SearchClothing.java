@@ -22,11 +22,13 @@ import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
 /**
  * Created by steve on 01.11.17.
  */
-public class SearchClothing extends AppCompatActivity {
-    private Button btnSuchenLocation;
-    private Button btnSuchen;
-    private Button btnSearchPref;
+public class SearchClothing extends AppCompatActivity implements View.OnClickListener {
     private EditText etVicinity;
+    private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+    private String uId = firebaseAuth.getCurrentUser().getUid();
+    private Button btnSearchPrefer;
+    private Button btnSearch;
+    private Button btnSearchLocation;
 
     private double latitude;
     private double longitude;
@@ -40,72 +42,20 @@ public class SearchClothing extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.acticity_search_clothing);
 
-        btnSearchPref = (Button) findViewById(R.id.btnSearchPrefer);
-        btnSuchen = (Button) findViewById(R.id.btnSuchen);
-        btnSuchenLocation = (Button) findViewById(R.id.btnSucheLocation);
+        btnSearchLocation = (Button) findViewById(R.id.btnSearchLocation);
+        btnSearchLocation.setOnClickListener(this);
+
+        btnSearch = (Button) findViewById(R.id.btnSearch);
+        btnSearch.setOnClickListener(this);
+
+        btnSearchPrefer = (Button) findViewById(R.id.btnSearchPrefer);
+        btnSearchPrefer.setOnClickListener(this);
+
         etVicinity = (EditText) findViewById(R.id.eTvicinity);
 
         // broadcast for getting clothing elements from HTTP Service
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
                 new IntentFilter("clothing"));
-
-        // search for clothing
-
-        btnSearchPref.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
-                FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-                String uId = firebaseAuth.getCurrentUser().getUid();
-                // get desired vicinity in km
-                vicinity = etVicinity.getText().toString();
-                // define parameters for Http-Service call
-                myIntent.putExtra("payload","");
-                myIntent.putExtra("method","GET");
-                myIntent.putExtra("from","SEARCHPREFCLOTHING");
-                myIntent.putExtra("url",getString(R.string.DOMAIN) +"/users/"+ uId + "/prefer/klamotten/"+ latitude + "/" + longitude + "/" + vicinity);
-                //call http service
-                startService(myIntent);
-
-            }
-        });
-
-        btnSuchen.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
-                FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-                String uId = firebaseAuth.getCurrentUser().getUid();
-                // get desired vicinity in km
-                vicinity = etVicinity.getText().toString();
-                // define parameters for Http-Service call
-                myIntent.putExtra("payload","");
-                myIntent.putExtra("method","GET");
-                myIntent.putExtra("from","SEARCH");
-                myIntent.putExtra("url",getString(R.string.DOMAIN) +"/klamotten/"+ latitude + "/" + longitude + "/" + vicinity + "/" + uId);
-                //call http service
-                startService(myIntent);
-            }
-        });
-
-
-        // Choose Search-Location Button
-        btnSuchenLocation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // start Place Picker Fragment to choose a location
-                try {
-                    Intent intent = new PlacePicker.IntentBuilder().build(SearchClothing.this);
-                    startActivityForResult(intent, SearchClothing.PLACE_PICKER_REQUEST);
-                } catch (GooglePlayServicesRepairableException e) {
-                    e.printStackTrace();
-                } catch (GooglePlayServicesNotAvailableException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-
     }
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -131,6 +81,54 @@ public class SearchClothing extends AppCompatActivity {
                 latitude = place.getLatLng().latitude;
                 longitude = place.getLatLng().longitude;
             }
+        }
+    }
+
+    @Override
+    public void onClick(View view) {
+        Intent myIntent;
+
+        switch (view.getId()) {
+
+            case R.id.btnSearchLocation:
+                try {
+                    myIntent = new PlacePicker.IntentBuilder().build(SearchClothing.this);
+                    startActivityForResult(myIntent, SearchClothing.PLACE_PICKER_REQUEST);
+                } catch (GooglePlayServicesRepairableException e) {
+                    e.printStackTrace();
+                } catch (GooglePlayServicesNotAvailableException e) {
+                    e.printStackTrace();
+                }
+                break;
+
+            case R.id.btnSearch:
+                myIntent = new Intent(getApplicationContext(), HttpsService.class);
+                // get desired vicinity in km
+                vicinity = etVicinity.getText().toString();
+                // define parameters for Http-Service call
+                myIntent.putExtra("payload","");
+                myIntent.putExtra("method","GET");
+                myIntent.putExtra("from","SEARCH");
+                myIntent.putExtra("url",getString(R.string.DOMAIN) +"/klamotten/"+ latitude + "/" + longitude + "/" + vicinity + "/" + uId);
+                //call http service
+                startService(myIntent);
+                break;
+
+            case R.id.btnSearchPrefer:
+                myIntent = new Intent(getApplicationContext(), HttpsService.class);
+                // get desired vicinity in km
+                vicinity = etVicinity.getText().toString();
+                // define parameters for Http-Service call
+                myIntent.putExtra("payload","");
+                myIntent.putExtra("method","GET");
+                myIntent.putExtra("from","SEARCHPREFCLOTHING");
+                myIntent.putExtra("url",getString(R.string.DOMAIN) +"/users/"+ uId + "/prefer/klamotten/"+ latitude + "/" + longitude + "/" + vicinity);
+                //call http service
+                startService(myIntent);
+                break;
+
+            default:
+                break;
         }
     }
 }

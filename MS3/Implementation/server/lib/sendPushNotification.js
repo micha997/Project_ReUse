@@ -24,7 +24,7 @@ const sendPushNotification = function(token, cId, payload, fits, from) {
        }
      }
  };
-console.log("Ich sende jetzt an tokeN" + token);
+
   if (from == "accepted") {
   var message = {
       data: {

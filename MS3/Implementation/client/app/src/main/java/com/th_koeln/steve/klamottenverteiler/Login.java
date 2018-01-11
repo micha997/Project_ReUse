@@ -48,9 +48,12 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 
         etPasswordLogin = (EditText) findViewById(R.id.etPasswordLogin);
         etEmailLogin = (EditText) findViewById(R.id.etEmailLogin);
+
         tvLogin = (TextView) findViewById(R.id.tvLogin);
+        tvLogin.setOnClickListener(this);
 
         btnLogin = (Button) findViewById(R.id.btnLogin);
+        btnLogin.setOnClickListener(this);
 
         firebaseAuth = FirebaseAuth.getInstance();
 
@@ -59,12 +62,6 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         }
         progressDialog = new ProgressDialog(this);
 
-        btnLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                userLogin();
-            }
-        });
     }
 
     private void userLogin() {
@@ -100,34 +97,29 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         if (view == btnLogin) {
-
+            userLogin();
         } else if (view == tvLogin) {
             startActivity(new Intent(this, MainActivity.class));
         }
     }
 
-    private void checkVerified()
-    {
+    private void checkVerified() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-        if (user.isEmailVerified())
-        {
+        if (user.isEmailVerified()) {
             sendTokenToServer();
             finish();
             Toast.makeText(this, "You are now logged in", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(getApplicationContext(),UserInterface.class));
-        }
-        else
-        {
+        } else {
             Toast.makeText(getApplicationContext(), "Email is not verified", Toast.LENGTH_SHORT).show();
             FirebaseAuth.getInstance().signOut();
-
         }
     }
 
     private void sendTokenToServer() {
-
         final FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
+
         mUser.getToken(true)
                 .addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
                     public void onComplete(@NonNull Task<GetTokenResult> task) {
@@ -135,22 +127,19 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                             String idToken = FirebaseInstanceId.getInstance().getToken();
                             uID = mUser.getUid();
 
-                                    Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
-                                    JSONObject token = new JSONObject();
-                                    try {
-                                        token.put("token",idToken);
-
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                    myIntent.putExtra("payload",token.toString());
-                                    myIntent.putExtra("method","POST");
-                                    myIntent.putExtra("from", "NEW_TOKEN");
-                                    myIntent.putExtra("url",getString(R.string.DOMAIN) + "/users/"+ uID + "/token/" + idToken);
-                                    //call http service
-                                    startService(myIntent);
-                        } else {
-
+                            Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
+                            JSONObject token = new JSONObject();
+                            try {
+                                token.put("token",idToken);
+                                myIntent.putExtra("payload",token.toString());
+                                myIntent.putExtra("method","POST");
+                                myIntent.putExtra("from", "NEW_TOKEN");
+                                myIntent.putExtra("url",getString(R.string.DOMAIN) + "/users/"+ uID + "/token/" + idToken);
+                                //call http service
+                                startService(myIntent);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 });

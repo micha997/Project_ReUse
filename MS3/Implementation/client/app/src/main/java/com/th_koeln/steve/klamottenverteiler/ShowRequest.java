@@ -27,40 +27,47 @@ import java.util.ArrayList;
  * Created by Frank on 07.01.2018.
  */
 
-public class ShowRequest extends AppCompatActivity {
+public class ShowRequest extends AppCompatActivity implements View.OnClickListener {
     private TextView txtShowMyRequests;
     private Spinner spinOpenRequests;
     private ArrayList<String> ids = new ArrayList();
     private ArrayList<String> activeRequests = new ArrayList();
     private ArrayList<String> requestsWaiting = new ArrayList();
     private ArrayAdapter<String> requestAdapter;
-    private Button btnAcceptRequest;
-    private Button btnStartChat;
-    private String requests;
     private JSONArray requestJsonArray;
     private TextView txtShowForeignRequests;
+    private Button btnTransSuccess;
+    private Button btnStartChat;
+    private Button btnConfirmTransaction;
+    private Button btnAcceptRequest;
+
     private Spinner spinActiveRequests;
     private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private final String uId= firebaseAuth.getCurrentUser().getUid();
-    private Button btnTransSuccess;
     private Spinner spinRequestsWaiting;
-    private Button btnConfirmTransaction;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_show_requests);
-        btnAcceptRequest = (Button) findViewById(R.id.btnAcceptRequest);
-        btnStartChat = (Button) findViewById(R.id.btnStartChat);
+
         txtShowMyRequests = (TextView) findViewById(R.id.txtShowMyRequests);
         txtShowForeignRequests = (TextView) findViewById(R.id.txtShowForeignRequests);
         spinOpenRequests = (Spinner) findViewById(R.id.spinOpenRequests);
         spinActiveRequests = (Spinner) findViewById(R.id.spinActiveRequests);
-        btnTransSuccess = (Button) findViewById(R.id.btnTransSuccess);
         spinRequestsWaiting = (Spinner) findViewById(R.id.spinRequestsWaiting);
-        btnConfirmTransaction = (Button) findViewById(R.id.btnConfirmTransaction);
 
+        btnStartChat = (Button) findViewById(R.id.btnStartChat);
+        btnStartChat.setOnClickListener(this);
+
+        btnConfirmTransaction = (Button) findViewById(R.id.btnConfirmTransaction);
+        btnConfirmTransaction.setOnClickListener(this);
+
+        btnAcceptRequest = (Button) findViewById(R.id.btnAcceptRequest);
+        btnAcceptRequest.setOnClickListener(this);
+
+        btnTransSuccess = (Button) findViewById(R.id.btnTransSuccess);
+        btnTransSuccess.setOnClickListener(this);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
                 new IntentFilter("showrequests"));
@@ -70,69 +77,6 @@ public class ShowRequest extends AppCompatActivity {
         myIntent.putExtra("from","SHOWREQUESTS");
         myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId + "/requests");
         startService(myIntent);
-
-        btnTransSuccess.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                setStatus("waiting", spinActiveRequests.getSelectedItem().toString());
-            }
-        });
-
-        btnAcceptRequest.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                setStatus("accepted", spinOpenRequests.getSelectedItem().toString());
-            }
-        });
-
-        btnConfirmTransaction.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                setStatus("confirmed", spinRequestsWaiting.getSelectedItem().toString());
-                Intent myIntent = new Intent(getApplicationContext(), RateUser.class);
-                myIntent.putExtra("tId", spinRequestsWaiting.getSelectedItem().toString());
-                try {
-                    for (int i = 0; i < requestJsonArray.length(); i++) {
-
-                        if (requestJsonArray.getJSONObject(i).getString("id").equals(spinRequestsWaiting.getSelectedItem().toString())) {
-                            myIntent.putExtra("request",requestJsonArray.getJSONObject(i).toString());
-                        }
-                    }
-                    startActivity(myIntent);
-                    finish();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        btnStartChat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent myIntent = new Intent(getApplicationContext(),Chat.class);
-
-
-                myIntent.putExtra("rId", spinActiveRequests.getSelectedItem().toString());
-                for (int i = 0; i < requestJsonArray.length(); i++) {
-
-                    try {
-                        if (requestJsonArray.getJSONObject(i).getString("id").equals(spinActiveRequests.getSelectedItem().toString())) {
-                            if (uId.equals(requestJsonArray.getJSONObject(i).getString("uId"))) {
-                                myIntent.putExtra("to", requestJsonArray.getJSONObject(i).getString("ouId"));
-                            } else {
-                                myIntent.putExtra("to", requestJsonArray.getJSONObject(i).getString("uId"));
-                            }
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-                }
-                myIntent.putExtra("from", uId);
-                startActivity(myIntent);
-
-            }
-        });
 
     }
 
@@ -170,7 +114,9 @@ public class ShowRequest extends AppCompatActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
+
             String requests = intent.getStringExtra("clothing");
+
             try {
                 requestJsonArray = new JSONArray(requests);
                 for (int i = 0; i < requestJsonArray.length(); i++) {
@@ -188,18 +134,76 @@ public class ShowRequest extends AppCompatActivity {
                     if (requestJsonObject.getString("status").equals("waiting") && (!requestJsonObject.getString("confirmed").equals(uId)))
                         requestsWaiting.add(requestJsonObject.getString("id").toString());
                 }
+
+                requestAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, activeRequests);
+                spinActiveRequests.setAdapter(requestAdapter);
+
+                requestAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, ids);
+                spinOpenRequests.setAdapter(requestAdapter);
+
+                requestAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, requestsWaiting);
+                spinRequestsWaiting.setAdapter(requestAdapter);
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            
-            requestAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, activeRequests);
-            spinActiveRequests.setAdapter(requestAdapter);
 
-            requestAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, ids);
-            spinOpenRequests.setAdapter(requestAdapter);
 
-            requestAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, requestsWaiting);
-            spinRequestsWaiting.setAdapter(requestAdapter);
         }
     };
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+
+            case R.id.btnStartChat:
+                Intent myIntent = new Intent(getApplicationContext(),Chat.class);
+
+
+                myIntent.putExtra("rId", spinActiveRequests.getSelectedItem().toString());
+                try {
+                    for (int i = 0; i < requestJsonArray.length(); i++) {
+                            if (requestJsonArray.getJSONObject(i).getString("id").equals(spinActiveRequests.getSelectedItem().toString())) {
+                                if (uId.equals(requestJsonArray.getJSONObject(i).getString("uId"))) {
+                                    myIntent.putExtra("to", requestJsonArray.getJSONObject(i).getString("ouId"));
+                                } else {
+                                    myIntent.putExtra("to", requestJsonArray.getJSONObject(i).getString("uId"));
+                                }
+                            }
+                    }
+                    myIntent.putExtra("from", uId);
+                    startActivity(myIntent);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                break;
+
+            case R.id.btnConfirmTransaction:
+                setStatus("confirmed", spinRequestsWaiting.getSelectedItem().toString());
+                myIntent = new Intent(getApplicationContext(), RateUser.class);
+                myIntent.putExtra("tId", spinRequestsWaiting.getSelectedItem().toString());
+                try {
+                    for (int i = 0; i < requestJsonArray.length(); i++) {
+
+                        if (requestJsonArray.getJSONObject(i).getString("id").equals(spinRequestsWaiting.getSelectedItem().toString())) {
+                            myIntent.putExtra("request",requestJsonArray.getJSONObject(i).toString());
+                        }
+                    }
+                    startActivity(myIntent);
+                    finish();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                break;
+
+            case R.id.btnAcceptRequest:
+                setStatus("accepted", spinOpenRequests.getSelectedItem().toString());
+
+                break;
+
+            case R.id.btnTransSuccess:
+                setStatus("waiting", spinActiveRequests.getSelectedItem().toString());
+                break;
+        }
+    }
 }

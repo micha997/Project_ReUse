@@ -20,7 +20,7 @@
         android:layout_centerHorizontal="true" />
 
     <Button
-        android:id="@+id/btnKlamottenAnlegen"
+        android:id="@+id/btnAddClothingUserInterface"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -32,12 +32,12 @@
         android:text="Add Clothing" />
 
     <Button
-        android:id="@+id/btnKlamottenSuchen"
+        android:id="@+id/btnSearchClothingUserInterface"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/btnKlamottenAnlegen"
+        android:layout_below="@+id/btnAddClothingUserInterface"
         android:layout_marginLeft="11dp"
         android:layout_marginStart="11dp"
         android:layout_marginTop="16dp"
@@ -50,7 +50,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/btnKlamottenSuchen"
+        android:layout_below="@+id/btnSearchClothingUserInterface"
         android:layout_gravity="center_horizontal"
         android:layout_marginLeft="11dp"
         android:layout_marginStart="11dp"

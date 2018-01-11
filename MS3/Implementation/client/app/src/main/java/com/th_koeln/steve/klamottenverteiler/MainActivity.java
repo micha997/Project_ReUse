@@ -48,10 +48,8 @@ public class MainActivity extends AppCompatActivity {
         progressDialog = new ProgressDialog(this);
 
         btnRegister = (Button) findViewById(R.id.btnRegister);
-
         etEmail = (EditText) findViewById(R.id.etEmailRegistration);
         etPassword = (EditText) findViewById(R.id.etPasswordRegister);
-
         tvGoLogin = (TextView) findViewById(R.id.tvGoLogin);
 
         btnRegister.setOnClickListener(new View.OnClickListener() {
@@ -113,15 +111,15 @@ public class MainActivity extends AppCompatActivity {
                  JSONObject payload = new JSONObject();
                  try {
                      payload.put("uId", uId);
+                     myIntent.putExtra("payload",payload.toString());
+                     myIntent.putExtra("method","POST");
+                     myIntent.putExtra("from","NEWUSER");
+                     myIntent.putExtra("url",getString(R.string.DOMAIN) + "/users/");
+                     //call http service
+                     startService(myIntent);
                  } catch (JSONException e) {
                      e.printStackTrace();
                  }
-                 myIntent.putExtra("payload",payload.toString());
-                 myIntent.putExtra("method","POST");
-                 myIntent.putExtra("from","NEWUSER");
-                 myIntent.putExtra("url",getString(R.string.DOMAIN) + "/users/");
-                 //call http service
-                 startService(myIntent);
              } else {
                  Toast.makeText(getApplicationContext(), "Registrierung fehlgeschlagen", Toast.LENGTH_SHORT).show();
              }
@@ -141,14 +139,11 @@ public class MainActivity extends AppCompatActivity {
                             FirebaseAuth.getInstance().signOut();
                             startActivity(new Intent(getApplicationContext(), Login.class));
                             finish();
-                        }
-                        else
-                        {
+                        } else {
                             // no email sent
                             Toast.makeText(getApplicationContext(), "Fehler beim Senden der Email", Toast.LENGTH_SHORT).show();
                             finish();
                             startActivity(getIntent());
-
                         }
                     }
                 });

@@ -45,32 +45,33 @@ public class EditClothing extends AppCompatActivity {
         txtFabric = (EditText) findViewById(R.id.txtFabric);
         btnPutClothing = (Button) findViewById(R.id.btnPutClothing);
         txtShowClothing = (TextView) findViewById(R.id.txtShowClothing);
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
+                new IntentFilter("editclothing"));
+
         btnPutClothing.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 JSONObject newProfile = new JSONObject();
                 try {
                     newProfile.put("fabric", txtFabric.getText().toString());
+                    // define http service call
+                    Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
+                    // define parameters for Service-Call
+                    myIntent.putExtra("payload", newProfile.toString());
+                    myIntent.putExtra("method", "PUT");
+                    myIntent.putExtra("from", "PUTCLOTHING");
+                    myIntent.putExtra("url", getString(R.string.DOMAIN) + "/clothing/" + cId);
+                    //call http service
+                    startService(myIntent);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                // define http service call
-                Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
-                // define parameters for Service-Call
-                myIntent.putExtra("payload", newProfile.toString());
-                myIntent.putExtra("method", "PUT");
-                myIntent.putExtra("from", "PUTCLOTHING");
-                myIntent.putExtra("url", getString(R.string.DOMAIN) + "/clothing/" + cId);
-                //call http service
-                startService(myIntent);
+
             }
         });
 
-
         Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
-        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
-                new IntentFilter("editclothing"));
-
         myIntent.putExtra("payload", "");
         myIntent.putExtra("method", "GET");
         myIntent.putExtra("from", "EDITCLOTHING");

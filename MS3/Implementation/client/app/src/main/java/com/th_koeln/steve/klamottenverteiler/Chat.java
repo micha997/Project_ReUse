@@ -107,16 +107,17 @@ public class Chat extends AppCompatActivity {
                     message.put("attach","attach");
 
                     message.put("rId",rId);
+                    myIntent.putExtra("payload", message.toString());
+                    myIntent.putExtra("method","POST");
+                    myIntent.putExtra("from","POSTMESSAGE");
+                    startService(myIntent);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
 
-                myIntent.putExtra("payload", message.toString());
-                myIntent.putExtra("method","POST");
-                myIntent.putExtra("from","POSTMESSAGE");
-                startService(myIntent);
+
 
 
             }

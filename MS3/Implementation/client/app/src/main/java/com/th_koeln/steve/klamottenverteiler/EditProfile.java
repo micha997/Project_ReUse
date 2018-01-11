@@ -30,7 +30,7 @@ import org.json.JSONObject;
  * Created by Frank on 30.12.2017.
  */
 
-public class EditProfile extends AppCompatActivity {
+public class EditProfile extends AppCompatActivity implements View.OnClickListener {
 
     private EditText etGender;
     private TextView txtShowUserProfile;
@@ -48,75 +48,35 @@ public class EditProfile extends AppCompatActivity {
     private String txtWeekendTimeBegin = "00:00";
     private String txtWeekendTimeEnd = "00:00";
 
+    private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+    private final String uId = firebaseAuth.getCurrentUser().getUid();
+
     //Variablen fuer TimePicker
-    int DIALOG_ID = -1;
-    int hourPick;
-    int minutePick;
+    private int DIALOG_ID = -1;
+    private int hourPick;
+    private int minutePick;
 
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile_2);
 
-        timePickerDialog();
-
-        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-        final String uId = firebaseAuth.getCurrentUser().getUid();
-
         etGender = (EditText) findViewById(R.id.editTextGender);
         txtShowUserProfile = (TextView) findViewById(R.id.txtShowUserProfile);
+
         btnSendProfile = (Button) findViewById(R.id.btnSendProfile);
-        btnTimeSend = (Button) findViewById(R.id.btnTimeSend);
+        btnSendProfile.setOnClickListener(this);
 
-        btnTimeSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                JSONObject newProfile = new JSONObject();
-                try {
-                    newProfile.put("txtWeekTimeBegin", txtWeekTimeBegin);
-                    newProfile.put("txtWeekTimeEnd", txtWeekTimeEnd);
-                    newProfile.put("txtWeekendTimeBegin", txtWeekendTimeBegin);
-                    newProfile.put("txtWeekendTimeEnd", txtWeekendTimeEnd);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                // define http service call
-                Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
-                // define parameters for Service-Call
-                myIntent.putExtra("payload",newProfile.toString());
-                myIntent.putExtra("method","PUT");
-                myIntent.putExtra("from","PUTPROFILE");
-                myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId);
-                //call http service
-                startService(myIntent);
-            }
-        });
+        btnTimeSend = (Button) findViewById(R.id.btnChooseLocation);
+        btnTimeSend.setOnClickListener(this);
 
-        btnSendProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                JSONObject newProfile = new JSONObject();
-                try {
-                    newProfile.put("gender", etGender.getText().toString());
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                // define http service call
-                Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
-                // define parameters for Service-Call
-                myIntent.putExtra("payload",newProfile.toString());
-                myIntent.putExtra("method","PUT");
-                myIntent.putExtra("from","PUTPROFILE");
-                myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId);
-                //call http service
-                startService(myIntent);
-            }
-        });
+        timePickerDialog();
 
-        Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
                 new IntentFilter("profile"));
+
         // get desired vicinity in km
         // define parameters for Http-Service call
+        Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
         myIntent.putExtra("payload","");
         myIntent.putExtra("method","GET");
         myIntent.putExtra("from","PROFILE");
@@ -223,4 +183,51 @@ public class EditProfile extends AppCompatActivity {
     };
 
 
+    @Override
+    public void onClick(View view) {
+        Intent myIntent;
+        switch (view.getId()) {
+
+            case R.id.btnSendProfile:
+                JSONObject profile = new JSONObject();
+                try {
+                    profile.put("gender", etGender.getText().toString());
+                    // define http service call
+                    myIntent = new Intent(getApplicationContext(), HttpsService.class);
+                    // define parameters for Service-Call
+                    myIntent.putExtra("payload",profile.toString());
+                    myIntent.putExtra("method","PUT");
+                    myIntent.putExtra("from","PUTPROFILE");
+                    myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId);
+                    //call http service
+                    startService(myIntent);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                break;
+
+            case R.id.btnTimeSend:
+                JSONObject newProfile = new JSONObject();
+                try {
+                    newProfile.put("txtWeekTimeBegin", txtWeekTimeBegin);
+                    newProfile.put("txtWeekTimeEnd", txtWeekTimeEnd);
+                    newProfile.put("txtWeekendTimeBegin", txtWeekendTimeBegin);
+                    newProfile.put("txtWeekendTimeEnd", txtWeekendTimeEnd);
+                    // define http service call
+                    myIntent = new Intent(getApplicationContext(), HttpsService.class);
+                    // define parameters for Service-Call
+                    myIntent.putExtra("payload",newProfile.toString());
+                    myIntent.putExtra("method","PUT");
+                    myIntent.putExtra("from","PUTPROFILE");
+                    myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId);
+                    //call http service
+                    startService(myIntent);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                break;
+
+        }
+    }
 }

@@ -7,7 +7,7 @@
         android:text="Location wählen"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/btnSucheLocation" />
+        android:id="@+id/btnSearchLocation" />
 
     <TextView
         android:text="Umkreis:"
@@ -27,7 +27,7 @@
         android:text="Suchen"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/btnSuchen" />
+        android:id="@+id/btnSearch" />
 
     <Button
         android:id="@+id/btnSearchPrefer"

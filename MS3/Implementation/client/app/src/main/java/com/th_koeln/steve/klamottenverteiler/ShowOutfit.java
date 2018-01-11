@@ -34,18 +34,21 @@ public class ShowOutfit extends AppCompatActivity {
     private ArrayAdapter<String> missingAdapter;
     private Button btnSubscribeMissingClothing;
     private String model;
+    private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+    private final String uId = firebaseAuth.getCurrentUser().getUid();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_outfit);
+
         txtShowOutfit = (TextView) findViewById(R.id.txtShowOutfit);
-        txtShowOutfit.setText("");
         spinMissingClothing = (Spinner) findViewById(R.id.spinMissingClothing);
         btnSubscribeMissingClothing = (Button) findViewById(R.id.btnSubscribeMissingClothing);
 
-        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-        final String uId = firebaseAuth.getCurrentUser().getUid();
+        txtShowOutfit.setText("");
+
+
 
         btnSubscribeMissingClothing.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -54,15 +57,17 @@ public class ShowOutfit extends AppCompatActivity {
                 try {
                     subscribe.put("model", model );
                     subscribe.put("missing",spinMissingClothing.getSelectedItem().toString());
+
+                    Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
+                    myIntent.putExtra("payload", subscribe.toString());
+                    myIntent.putExtra("method","POST");
+                    myIntent.putExtra("from","SUBSCRIBECLOTHING");
+                    myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId + "/search");
+                    startService(myIntent);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
-                myIntent.putExtra("payload", subscribe.toString());
-                myIntent.putExtra("method","POST");
-                myIntent.putExtra("from","SUBSCRIBECLOTHING");
-                myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId + "/search");
-                startService(myIntent);
+
             }
         });
 
