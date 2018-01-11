@@ -1,29 +1,110 @@
 package com.th_koeln.steve.klamottenverteiler;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.widget.Toast;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.th_koeln.steve.klamottenverteiler.R;
+import com.th_koeln.steve.klamottenverteiler.services.GPStracker;
+import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-/**
- * Created by Michael on 10.01.2018.
- */
+public class TimePlan extends AppCompatActivity {
 
-public class TimePlanMaker {
+    private LocationManager locationManager;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_time_plan);
+
+        //Eigene User-ID besorgen
+        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+        final String uId = firebaseAuth.getCurrentUser().getUid();
+
+        //Intent mit einem Service-Call erstellen
+        Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
+        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
+                new IntentFilter("profile"));
+        //Parameter des Service-Call definieren
+        //IDs der Kleidung soll besorgt werden,
+        //die von dem Nutzer abgeholt werden soll
+        myIntent.putExtra("payload","");
+        myIntent.putExtra("method","GET");
+        myIntent.putExtra("from","PROFILE");
+        myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId);
+        //Service-Call starten
+        startService(myIntent);
+    }
+
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            //Response vom Service erhalten
+            String profile = intent.getStringExtra("profile");
+            try {
+                JSONObject clothingIDS = new JSONObject(profile);
+                //JSONObject an die Funktion weitergeben
+                makeTimePlan(clothingIDS);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+    };
 
     /*
     Soll ein Array erhalten mit den Clothing-IDS der
     Objekte, die von einem User angenommen wurden und
     abgeholt werden sollen.
     */
-    public void makeTimePlan(String[] cIDS){
+    public void makeTimePlan(JSONObject clothingIDS) throws JSONException {
 
-        //Eigene Location soll geholt werden
-        double myLongitude = 2.3123;
-        double myLatitude = 4.4123;
+        //Array zum fuellen mit den IDs
+        ArrayList<myTransaktion> Transaktionen = new ArrayList<myTransaktion>();
 
+        //JSONObject in eigene Struktur transferieren und zum Array hinufuegen
+        try {
+            JSONArray cIDs = clothingIDS.getJSONArray("nameIDs");
+            for(int i=0;cIDs.length()>i;i++){
+                String cID = (String) cIDs.get(i);
+                myTransaktion tmpTrans = new myTransaktion(cID);
+                Transaktionen.add(tmpTrans);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
+        //Eigene Location
+        double myLongitude = 0;
+        double myLatitude = 0;
 
-        //Klasse "myTransaktion" soll genutzt werden, um die Transaktionobjekte zu erstellen und weiter zu nutzen
+        //Service wird gestartet um eigene Koordianten zu holen
+        GPStracker gpsTracker = new GPStracker(getApplicationContext());
+        Location myLocation = gpsTracker.getLocation();
+        if(myLocation != null){
+            myLongitude = myLocation.getLongitude();
+            myLatitude = myLocation.getLatitude();
+        }else{
+            Toast.makeText(getApplicationContext(),"Location unavailable",Toast.LENGTH_LONG).show();
+        }
 
         /*
         HTTPS-SERVICE CALL FOR USER-IDS
@@ -31,10 +112,7 @@ public class TimePlanMaker {
         */
         //-> IDs und weitere Infos werden zu den "myTransaktion"-Objekten hinzugefuegt
 
-
-
-        //Array mit den geholten IDs
-        ArrayList<myTransaktion> Transaktionen = new ArrayList<myTransaktion>();
+        //Neue ArrayList die nach "STEP 1" gefuellt sein soll
         ArrayList<myTransaktion> Clean_Transaktionen = new ArrayList<myTransaktion>();
 
         //////////////////////////////
@@ -198,5 +276,4 @@ public class TimePlanMaker {
         }
         return index;
     }
-
 }
