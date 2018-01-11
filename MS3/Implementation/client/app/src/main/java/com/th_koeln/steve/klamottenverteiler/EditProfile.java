@@ -63,6 +63,7 @@ public class EditProfile extends AppCompatActivity {
         final String uId = firebaseAuth.getCurrentUser().getUid();
 
         etGender = (EditText) findViewById(R.id.editTextGender);
+        txtShowUserProfile = (TextView) findViewById(R.id.txtShowUserProfile);
         btnSendProfile = (Button) findViewById(R.id.btnSendProfile);
         btnTimeSend = (Button) findViewById(R.id.btnTimeSend);
 
