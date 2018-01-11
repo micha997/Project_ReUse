@@ -6,7 +6,7 @@ const putUserRating = function(database) {
     }
 
     return function(req, res) {
-
+        console.log("hi");
         database.putUserRating(req.params.uId, req.params.id, req.body, err => {
             if (err) {
                 console.log("Failed to edit Userprofile!");

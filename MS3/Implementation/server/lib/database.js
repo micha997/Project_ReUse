@@ -205,12 +205,16 @@ const database = {
         if (!callback) {
             throw new Error('callback is missing.');
         }
+        console.log(body);
         this.mappings.update({
             type: "userprofile",
-            "requests.id": id
+            "requests.id": id,
+
         }, {
             $set: {
-                "requests.$.status": body.status
+                "requests.$.status": body.status,
+                "requests.$.confirmed": body.confirmed
+
             }
           })
           console.log(body);
@@ -456,7 +460,7 @@ const database = {
             status: "open"
         };
         //write mapping to Database
-        console.log("Mapping: " + JSON.stringify(mapping));
+
         this.mappings.update({
             type: "userprofile",
             uId: mapping.uId
@@ -468,14 +472,15 @@ const database = {
             if (err) {
                 return callback(err);
             }
+            console.log("SUCHE NACH TOKEN VON:" + body.ouId);
             this.mappings.findOne({
-                uId: body.ouId,
+                uId: body.uId,
                 type: "token"
             }, (err, mappings) => {
                 if (err) {
                     return callback(err);
                 }
-                console.log("Send to: " + body.ouId);
+                console.log("SUCHERGEBNIS:" + mappings.token);
                 sendPushNotification(mappings.token, cId, body.ouId, "", "postRequest");
                 callback(null);
             });
@@ -597,7 +602,7 @@ const database = {
         const mapping = {
             id: uuidv4(),
             type: "rating",
-            from: uId,
+            from: rating["uId"],
             choice: rating["choice"],
             comment: rating["comment"],
             time: rating["time"]

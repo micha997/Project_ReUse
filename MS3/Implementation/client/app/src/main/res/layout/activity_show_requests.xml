@@ -30,7 +30,7 @@
         android:text="TextView" />
 
     <Spinner
-        android:id="@+id/spinAcceptRequest"
+        android:id="@+id/spinOpenRequests"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

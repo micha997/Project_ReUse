@@ -29,7 +29,7 @@ import java.util.ArrayList;
 
 public class ShowRequest extends AppCompatActivity {
     private TextView txtShowMyRequests;
-    private Spinner spinAcceptRequest;
+    private Spinner spinOpenRequests;
     private ArrayList<String> ids = new ArrayList();
     private ArrayList<String> activeRequests = new ArrayList();
     private ArrayList<String> requestsWaiting = new ArrayList();
@@ -55,7 +55,7 @@ public class ShowRequest extends AppCompatActivity {
         btnStartChat = (Button) findViewById(R.id.btnStartChat);
         txtShowMyRequests = (TextView) findViewById(R.id.txtShowMyRequests);
         txtShowForeignRequests = (TextView) findViewById(R.id.txtShowForeignRequests);
-        spinAcceptRequest = (Spinner) findViewById(R.id.spinAcceptRequest);
+        spinOpenRequests = (Spinner) findViewById(R.id.spinOpenRequests);
         spinActiveRequests = (Spinner) findViewById(R.id.spinActiveRequests);
         btnTransSuccess = (Button) findViewById(R.id.btnTransSuccess);
         spinRequestsWaiting = (Spinner) findViewById(R.id.spinRequestsWaiting);
@@ -74,14 +74,14 @@ public class ShowRequest extends AppCompatActivity {
         btnTransSuccess.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setStatus("waiting", spinAcceptRequest.getSelectedItem().toString());
+                setStatus("waiting", spinActiveRequests.getSelectedItem().toString());
             }
         });
 
         btnAcceptRequest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setStatus("accepted", spinAcceptRequest.getSelectedItem().toString());
+                setStatus("accepted", spinOpenRequests.getSelectedItem().toString());
             }
         });
 
@@ -90,8 +90,19 @@ public class ShowRequest extends AppCompatActivity {
             public void onClick(View view) {
                 setStatus("confirmed", spinRequestsWaiting.getSelectedItem().toString());
                 Intent myIntent = new Intent(getApplicationContext(), RateUser.class);
-                startActivity(myIntent);
+                myIntent.putExtra("tId", spinRequestsWaiting.getSelectedItem().toString());
+                try {
+                    for (int i = 0; i < requestJsonArray.length(); i++) {
 
+                        if (requestJsonArray.getJSONObject(i).getString("id").equals(spinRequestsWaiting.getSelectedItem().toString())) {
+                            myIntent.putExtra("request",requestJsonArray.getJSONObject(i).toString());
+                        }
+                    }
+                    startActivity(myIntent);
+                    finish();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -134,6 +145,12 @@ public class ShowRequest extends AppCompatActivity {
                 if (requestJsonArray.getJSONObject(i).getString("id").equals(spin)) {
                     JSONObject putRequest = requestJsonArray.getJSONObject(i);
                     putRequest.put("status", status);
+
+                    if(status.equals("waiting")) {
+                        putRequest.put("confirmed", uId);
+                    } else {
+                        putRequest.put("confirmed", 0);
+                    }
                     myIntent.putExtra("payload",putRequest.toString());
                 }
             }
@@ -168,17 +185,18 @@ public class ShowRequest extends AppCompatActivity {
                     }
                     if (requestJsonObject.getString("status").equals("accepted"))
                         activeRequests.add(requestJsonObject.getString("id").toString());
-                    if (requestJsonObject.getString("status").equals("waiting"))
+                    if (requestJsonObject.getString("status").equals("waiting") && (!requestJsonObject.getString("confirmed").equals(uId)))
                         requestsWaiting.add(requestJsonObject.getString("id").toString());
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+            
             requestAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, activeRequests);
             spinActiveRequests.setAdapter(requestAdapter);
 
             requestAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, ids);
-            spinAcceptRequest.setAdapter(requestAdapter);
+            spinOpenRequests.setAdapter(requestAdapter);
 
             requestAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, requestsWaiting);
             spinRequestsWaiting.setAdapter(requestAdapter);

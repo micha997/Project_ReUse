@@ -33,6 +33,8 @@ public class ShowClothing extends AppCompatActivity {
     private Button btnGetClothing;
     private String clothing;
     private String ouId = null;
+    private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+    private final String uId= firebaseAuth.getCurrentUser().getUid();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -48,7 +50,7 @@ public class ShowClothing extends AppCompatActivity {
         try {
             JSONObject request = new JSONObject(clothing);
             txtClothing.setText(clothing);
-            txtClothing.append("Meine ID: " + request.getString("uId"));
+            txtClothing.append("Meine ID: " + uId);
         } catch (JSONException e) {
             e.printStackTrace();
         }
