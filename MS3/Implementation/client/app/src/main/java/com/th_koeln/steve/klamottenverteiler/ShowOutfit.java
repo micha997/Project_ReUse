@@ -1,14 +1,7 @@
 package com.th_koeln.steve.klamottenverteiler;
 
-<<<<<<< HEAD
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
-=======
-import android.content.BroadcastReceiver;
-import android.content.Context;
->>>>>>> 8c31b1f45ab22bd3d550930c1076cb9fee96a9f2
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -113,8 +106,7 @@ public class ShowOutfit extends AppCompatActivity implements View.OnClickListene
 
         //txtShowOutfit.setText("");
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
-                new IntentFilter("showoutfit"));
+
 
         btnSubscribeMissingClothing.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -151,35 +143,35 @@ public class ShowOutfit extends AppCompatActivity implements View.OnClickListene
                 } else {
                     switch (ilayer){
                         case 0: JSONArray headArray = outfitsArray.getJSONArray("head");
-                                for (int j=0;headArray.length()>j;j++){
-                                    head.add((String) headArray.get(j));
-                                }
-                                break;
+                            for (int j=0;headArray.length()>j;j++){
+                                head.add((String) headArray.get(j));
+                            }
+                            break;
                         case 1: JSONArray layer1Array = outfitsArray.getJSONArray("layer1");
-                                for (int j=0;layer1Array.length()>j;j++){
-                                    layer1.add((String) layer1Array.get(j));
-                                }
-                                break;
+                            for (int j=0;layer1Array.length()>j;j++){
+                                layer1.add((String) layer1Array.get(j));
+                            }
+                            break;
                         case 2: JSONArray layer2Array = outfitsArray.getJSONArray("layer2");
-                                for (int j=0;layer2Array.length()>j;j++){
-                                    layer2.add((String) layer2Array.get(j));
-                                }
-                                break;
+                            for (int j=0;layer2Array.length()>j;j++){
+                                layer2.add((String) layer2Array.get(j));
+                            }
+                            break;
                         case 3: JSONArray layer3Array = outfitsArray.getJSONArray("layer3");
-                                for (int j=0;layer3Array.length()>j;j++){
-                                    layer3.add((String) layer3Array.get(j));
-                                }
-                                break;
+                            for (int j=0;layer3Array.length()>j;j++){
+                                layer3.add((String) layer3Array.get(j));
+                            }
+                            break;
                         case 4: JSONArray bottomArray = outfitsArray.getJSONArray("bottom");
-                                for (int j=0;bottomArray.length()>j;j++){
-                                    bottom.add((String) bottomArray.get(j));
-                                }
-                                break;
+                            for (int j=0;bottomArray.length()>j;j++){
+                                bottom.add((String) bottomArray.get(j));
+                            }
+                            break;
                         case 5: JSONArray shoesArray = outfitsArray.getJSONArray("shoes");
-                                for (int j=0;shoesArray.length()>j;j++){
-                                    shoes.add((String) shoesArray.get(j));
-                                }
-                                break;
+                            for (int j=0;shoesArray.length()>j;j++){
+                                shoes.add((String) shoesArray.get(j));
+                            }
+                            break;
                     }
                     //txtShowOutfit.append(layers.get(ilayer) + ": " + objects + "\n\n");
                 }
@@ -211,40 +203,38 @@ public class ShowOutfit extends AppCompatActivity implements View.OnClickListene
 
     }
 
-<<<<<<< HEAD
-=======
     @Override
     public void onClick(View view) {
         switch (view.getId()){
 
             case R.id.btnSendHeadRequest:
                 if(spinnerHead.getSelectedItem() !=null)
-                sendRequest(spinnerHead.getSelectedItem().toString());
+                    sendRequest(spinnerHead.getSelectedItem().toString());
                 break;
 
             case R.id.btnSendLayer1Request:
                 if(spinnerLayer1.getSelectedItem() !=null)
-                sendRequest(spinnerLayer1.getSelectedItem().toString());
+                    sendRequest(spinnerLayer1.getSelectedItem().toString());
                 break;
 
             case R.id.btnSendLayer2Request:
                 if(spinnerLayer2.getSelectedItem() !=null)
-                sendRequest(spinnerLayer2.getSelectedItem().toString());
+                    sendRequest(spinnerLayer2.getSelectedItem().toString());
                 break;
 
             case R.id.btnSendLayer3Request:
                 if(spinnerLayer3.getSelectedItem() !=null)
-                sendRequest(spinnerLayer3.getSelectedItem().toString());
+                    sendRequest(spinnerLayer3.getSelectedItem().toString());
                 break;
 
             case R.id.btnSendBottomRequest:
                 if(spinnerBottom.getSelectedItem() !=null)
-                sendRequest(spinnerBottom.getSelectedItem().toString());
+                    sendRequest(spinnerBottom.getSelectedItem().toString());
                 break;
 
             case R.id.btnSendShoesRequest:
                 if(spinnerShoes.getSelectedItem() !=null)
-                sendRequest(spinnerShoes.getSelectedItem().toString());
+                    sendRequest(spinnerShoes.getSelectedItem().toString());
                 break;
 
             case R.id.btnSubscribeMissingClothing:
@@ -277,34 +267,10 @@ public class ShowOutfit extends AppCompatActivity implements View.OnClickListene
         startService(myIntent);
     }
 
->>>>>>> 8c31b1f45ab22bd3d550930c1076cb9fee96a9f2
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-<<<<<<< HEAD
-            // get clothing results from HTTP-Service
-            String from = intent.getStringExtra("from");
-            if (from.equals("SUBSCRIBECLOTHINGFAIL")) {
-                showDialog("Error","Could not add subscription!");
-            }
-
-        }
-    };
-
-    private void showDialog(String title, String message) {
-        AlertDialog alertDialog = new AlertDialog.Builder(ShowOutfit.this).create();
-        alertDialog.setTitle(title);
-        alertDialog.setMessage(message);
-        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-        alertDialog.show();
-    }
-=======
             JSONObject request = new JSONObject();
             try {
                 String clothing = intent.getStringExtra("clothing");
@@ -323,5 +289,4 @@ public class ShowOutfit extends AppCompatActivity implements View.OnClickListene
             }
         }
     };
->>>>>>> 8c31b1f45ab22bd3d550930c1076cb9fee96a9f2
 }
