@@ -1,7 +1,9 @@
 package com.th_koeln.steve.klamottenverteiler;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -58,16 +60,35 @@ public class ShowPrefer extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             // get clothing results from HTTP-Service
-            tvPreferUserColor = (TextView) findViewById(R.id.tvPreferUserColor);
-            JSONObject prefer = null;
-            try {
-                prefer = new JSONObject(intent.getStringExtra("prefer"));
-                tvPreferUserColor.setText("Blau: " + prefer.get("blue").toString() + "\n" +"Gelb: " + prefer.get("yellow").toString() + "\n"
-                        +"Rot: " + prefer.get("red").toString() + "\n"+"Grau: " + prefer.get("gray").toString() + "\n"
-                        +"Schwarz: " + prefer.get("black").toString() + "\n" );
-            } catch (JSONException e) {
-                e.printStackTrace();
+            String from = intent.getStringExtra("from");
+            if (from.equals("SEARCHPREFERFAIL")) {
+                showDialog("Error","Could not add prefer!");
+            } else {
+                tvPreferUserColor = (TextView) findViewById(R.id.tvPreferUserColor);
+                JSONObject prefer = null;
+                try {
+                    prefer = new JSONObject(intent.getStringExtra("prefer"));
+                    tvPreferUserColor.setText("Blau: " + prefer.get("blue").toString() + "\n" + "Gelb: " + prefer.get("yellow").toString() + "\n"
+                            + "Rot: " + prefer.get("red").toString() + "\n" + "Grau: " + prefer.get("gray").toString() + "\n"
+                            + "Schwarz: " + prefer.get("black").toString() + "\n");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         }
     };
+
+
+    private void showDialog(String title, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(ShowPrefer.this).create();
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        alertDialog.show();
+    }
 }

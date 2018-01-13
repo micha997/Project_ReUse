@@ -1,7 +1,9 @@
 package com.th_koeln.steve.klamottenverteiler;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -114,43 +116,61 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
 
         @Override
         public void onReceive(Context context, Intent intent) {
+            String from = intent.getStringExtra("from");
+            if (from.equals("SHOWREQUESTSFAIL")) {
+                showDialog("Error","Could not get request!");
+            } else {
 
-            String requests = intent.getStringExtra("clothing");
+                String requests = intent.getStringExtra("clothing");
 
-            try {
-                requestJsonArray = new JSONArray(requests);
-                for (int i = 0; i < requestJsonArray.length(); i++) {
-                    JSONObject requestJsonObject = requestJsonArray.getJSONObject(i);
-                    if ( requestJsonObject.getString("from").equals("own")) {
-                        txtShowMyRequests.append(requestJsonObject.toString());
+                try {
+                    requestJsonArray = new JSONArray(requests);
+                    for (int i = 0; i < requestJsonArray.length(); i++) {
+                        JSONObject requestJsonObject = requestJsonArray.getJSONObject(i);
+                        if (requestJsonObject.getString("from").equals("own")) {
+                            txtShowMyRequests.append(requestJsonObject.toString());
 
-                    } else if (requestJsonObject.getString("from").equals("foreign")) {
-                        txtShowForeignRequests.append(requestJsonObject.toString());
-                        if (requestJsonObject.getString("status").equals("open"))
-                        ids.add(requestJsonObject.getString("id").toString());
+                        } else if (requestJsonObject.getString("from").equals("foreign")) {
+                            txtShowForeignRequests.append(requestJsonObject.toString());
+                            if (requestJsonObject.getString("status").equals("open"))
+                                ids.add(requestJsonObject.getString("id").toString());
+                        }
+                        if (requestJsonObject.getString("status").equals("accepted"))
+                            activeRequests.add(requestJsonObject.getString("id").toString());
+                        if (requestJsonObject.getString("status").equals("waiting") && (!requestJsonObject.getString("confirmed").equals(uId)))
+                            requestsWaiting.add(requestJsonObject.getString("id").toString());
                     }
-                    if (requestJsonObject.getString("status").equals("accepted"))
-                        activeRequests.add(requestJsonObject.getString("id").toString());
-                    if (requestJsonObject.getString("status").equals("waiting") && (!requestJsonObject.getString("confirmed").equals(uId)))
-                        requestsWaiting.add(requestJsonObject.getString("id").toString());
+
+                    requestAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, activeRequests);
+                    spinActiveRequests.setAdapter(requestAdapter);
+
+                    requestAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, ids);
+                    spinOpenRequests.setAdapter(requestAdapter);
+
+                    requestAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, requestsWaiting);
+                    spinRequestsWaiting.setAdapter(requestAdapter);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
 
-                requestAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, activeRequests);
-                spinActiveRequests.setAdapter(requestAdapter);
-
-                requestAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, ids);
-                spinOpenRequests.setAdapter(requestAdapter);
-
-                requestAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, requestsWaiting);
-                spinRequestsWaiting.setAdapter(requestAdapter);
-
-            } catch (JSONException e) {
-                e.printStackTrace();
             }
-
-
         }
     };
+
+
+    private void showDialog(String title, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(ShowRequest.this).create();
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        alertDialog.show();
+    }
 
     @Override
     public void onClick(View view) {
@@ -190,7 +210,6 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
                         }
                     }
                     startActivity(myIntent);
-                    finish();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

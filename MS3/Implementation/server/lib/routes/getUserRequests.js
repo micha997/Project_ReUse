@@ -13,7 +13,8 @@ const getUserRequests = function(database) {
             if (err) {
                 return res.status(500).end();
             }
-            res.send(mappings);
+          res.send(mappings);
+
         })
 
     };

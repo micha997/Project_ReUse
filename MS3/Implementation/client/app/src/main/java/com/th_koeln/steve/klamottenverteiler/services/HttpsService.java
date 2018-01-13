@@ -1,10 +1,16 @@
 package com.th_koeln.steve.klamottenverteiler.services;
 
+import android.app.AlertDialog;
 import android.app.IntentService;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.th_koeln.steve.klamottenverteiler.Chat;
+import com.th_koeln.steve.klamottenverteiler.EditProfile;
 import com.th_koeln.steve.klamottenverteiler.ShowClothing;
 import com.th_koeln.steve.klamottenverteiler.ShowOutfit;
 
@@ -13,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -37,10 +44,17 @@ public class HttpsService extends IntentService {
     private String method;
     private String from;
     HttpURLConnection connection = null;
+    Handler mHandler;
+
+    public void onCreate() {
+        super.onCreate();
+         mHandler = new Handler();
+    }
 
 
     @Override
     protected void onHandleIntent(Intent intent) {
+
         String payload = intent.getStringExtra("payload");
         String uri = intent.getStringExtra("url");
         method = intent.getStringExtra("method");
@@ -89,6 +103,7 @@ public class HttpsService extends IntentService {
             connection = (HttpURLConnection) url.openConnection();
             // define HTTP Method
             connection.setRequestMethod(method);
+            connection.setConnectTimeout(5000);
 
             if (method.equals("POST") || method.equals("PUT")) {
                 // http-req with body
@@ -108,6 +123,13 @@ public class HttpsService extends IntentService {
                 connection.connect();
             }
             sendJSON(uri, payload);
+        }  catch (SocketTimeoutException e) {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(HttpsService.this, "Can not connect to server. Internet missing?", Toast.LENGTH_LONG).show();
+                }
+            });
         } catch (IOException e) {
             e.printStackTrace();
         } catch (NoSuchAlgorithmException e) {
@@ -122,7 +144,7 @@ public class HttpsService extends IntentService {
         try {
             //container for response
             StringBuilder stringBuilder = new StringBuilder();
-            // get Statuscode from Response
+            // get statuscode from response
             int status = connection.getResponseCode();
             Intent intent = new Intent();
             // analyse Status code
@@ -221,6 +243,78 @@ public class HttpsService extends IntentService {
                             intent.putExtra("from", "ADDCLOTHING");
                             intent.putExtra("success", "0");
                             break;
+                        case "SEARCHOUTFIT":
+                            intent = new Intent("showoutfit");
+                            intent.putExtra("from", "SEARCHOUTFITFAIL");
+                            intent.putExtra("success", "0");
+                            break;
+                        case "GETCONVERSATION":
+                            intent = new Intent("chat");
+                            intent.putExtra("from", "GETCONVERSATIONFAIL");
+                            break;
+                        case "POSTMESSAGE":
+                            intent = new Intent("chat");
+                            intent.putExtra("from", "POSTMESSAGEFAIL");
+                            break;
+                        case "EDITCLOTHING":
+                            intent = new Intent("editclothing");
+                            intent.putExtra("from", "EDITCLOTHINGFAIL");
+                            break;
+                        case "PUTCLOTHING":
+                            intent = new Intent("editclothing");
+                            intent.putExtra("from", "PUTCLOTHINGFAIL");
+                            break;
+                        case "PROFILE":
+                            intent = new Intent("profile");
+                            intent.putExtra("from", "SEARCHPROFILEFAIL");
+                            break;
+                        case "PUTPROFILE":
+                            intent = new Intent("profile");
+                            intent.putExtra("from", "PUTPROFILEFAIL");
+                            break;
+                        case "NEW_TOKEN":
+                            intent = new Intent("login");
+                            intent.putExtra("from", "POSTTOKENFAIL");
+                            break;
+                        case "NEWUSER":
+                            intent = new Intent("main");
+                            intent.putExtra("from", "POSTUSERFAIL");
+                            break;
+                        case "SHOWDETAILS":
+                            intent = new Intent("showdetails");
+                            intent.putExtra("from", "SHOWDETAILSFAIL");
+                            break;
+
+                        case "MYCLOTHING":
+                            intent = new Intent("myclothing");
+                            intent.putExtra("from", "MYCLOTHINGFAIL");
+                            break;
+                        case "POSTRATING":
+                            intent = new Intent("RATEUSER");
+                            intent.putExtra("from", "POSTRATINGFAIL");
+                            break;
+                        case "SEARCH":
+                            intent = new Intent("clothing");
+                            intent.putExtra("from", "SEARCHFAIL");
+                            break;
+                        case "SEARCHPREFER":
+                            intent = new Intent("clothing");
+                            intent.putExtra("from", "SEARCHPREFERFAIL");
+                            break;
+                        case "NEWREQUEST":
+                            intent = new Intent("showclothing");
+                            intent.putExtra("from", "NEWREQUESTFAIL");
+                            break;
+                        case "SUBSCRIBECLOTHING":
+                            intent = new Intent("showoutfit");
+                            intent.putExtra("from", "SUBSCRIBECLOTHINGFAIL");
+                            break;
+                        case "SHOWREQUESTS":
+                            intent = new Intent("showrequests");
+                            intent.putExtra("from", "SHOWREQUESTSFAIL");
+                            break;
+
+
                     }
                     LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
                     break;

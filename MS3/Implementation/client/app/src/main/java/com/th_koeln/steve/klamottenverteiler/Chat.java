@@ -1,7 +1,9 @@
 package com.th_koeln.steve.klamottenverteiler;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -134,35 +136,56 @@ public class Chat extends AppCompatActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            String params = intent.getStringExtra("params");
+
             String from = intent.getStringExtra("from");
-            try {
 
-                if (from.equals("newMessage")) {
+            if (from.equals("GETCONVERSATIONFAIL")) {
+                showDialog("Error!", "Could not get Conversation!");
+            } else if (from.equals("POSTMESSAGEFAIL")){
+                showDialog("Error!", "Could not add message!");
+            } else {
+                String params = intent.getStringExtra("params");
+                try {
 
-                    JSONObject message= new JSONObject(params);
-                    txtChat.append("Partner: " + message.getString("message") + "\n");
+                    if (from.equals("newMessage")) {
 
-                } else if (from.equals("GETCONVERSATION")) {
+                        JSONObject message = new JSONObject(params);
+                        txtChat.append("Partner: " + message.getString("message") + "\n");
 
-                    JSONArray messageArray = new JSONArray(params);
+                    } else if (from.equals("GETCONVERSATION")) {
 
-                    for (int i = 0; i < messageArray.length(); i++) {
+                        JSONArray messageArray = new JSONArray(params);
 
-                        if (messageArray.getJSONObject(i).getString("from").equals(uId) && messageArray.getJSONObject(i).getString("to").equals(message_to) ) {
-                            txtChat.append("You: " + messageArray.getJSONObject(i).getString("message") + "\n");
-                        } else if (messageArray.getJSONObject(i).getString("from").equals(message_to) && messageArray.getJSONObject(i).getString("to").equals(uId) ) {
-                            txtChat.append("Partner: " + messageArray.getJSONObject(i).getString("message") + "\n");
+                        for (int i = 0; i < messageArray.length(); i++) {
+
+                            if (messageArray.getJSONObject(i).getString("from").equals(uId) && messageArray.getJSONObject(i).getString("to").equals(message_to)) {
+                                txtChat.append("You: " + messageArray.getJSONObject(i).getString("message") + "\n");
+                            } else if (messageArray.getJSONObject(i).getString("from").equals(message_to) && messageArray.getJSONObject(i).getString("to").equals(uId)) {
+                                txtChat.append("Partner: " + messageArray.getJSONObject(i).getString("message") + "\n");
+                            }
+
                         }
-
                     }
+                } catch (JSONException e) {
+
+                    e.printStackTrace();
+
                 }
-            } catch (JSONException e) {
-
-                e.printStackTrace();
-
             }
 
         }
     };
+
+    private void showDialog(String title, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(Chat.this).create();
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        alertDialog.show();
+    }
 }

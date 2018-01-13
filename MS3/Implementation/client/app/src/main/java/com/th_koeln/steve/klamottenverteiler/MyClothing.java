@@ -1,7 +1,9 @@
 package com.th_koeln.steve.klamottenverteiler;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -60,35 +62,6 @@ public class MyClothing extends AppCompatActivity {
         //call http service
         startService(myIntent);
 
-        btnEditClothing.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent editIntent = new Intent(getApplicationContext(), EditClothing.class);
-                editIntent.putExtra("cId",cId);
-                startActivity(editIntent);
-            }
-        });
-    }
-
-    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            // get clothing results from HTTP-Service
-            String clothing = intent.getStringExtra("clothing");
-
-            try {
-                JSONArray clothingJsonArray = new JSONArray(clothing);
-                for (int i = 0; i < clothingJsonArray.length(); i++) {
-                    JSONObject clothingJsonObject = clothingJsonArray.getJSONObject(i);
-                    ids.add(clothingJsonObject.getString("id").toString());
-                }
-                clothingAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, ids);
-                spinChooseClothing.setAdapter(clothingAdapter);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
 
         spinChooseClothing.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -102,9 +75,57 @@ public class MyClothing extends AppCompatActivity {
             }
         });
 
+        btnEditClothing.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent editIntent = new Intent(getApplicationContext(), EditClothing.class);
+                editIntent.putExtra("cId",cId);
+                startActivity(editIntent);
+            }
+        });
+    }
+
+
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // get clothing results from HTTP-Service
+
+            String from = intent.getStringExtra("from");
+            if (from.equals("MYCLOTHINGFAIL")) {
+                showDialog("Error","Could not get clothing from Server!");
+            } else {
+                String clothing = intent.getStringExtra("clothing");
+                try {
+                    JSONArray clothingJsonArray = new JSONArray(clothing);
+                    for (int i = 0; i < clothingJsonArray.length(); i++) {
+                        JSONObject clothingJsonObject = clothingJsonArray.getJSONObject(i);
+                        ids.add(clothingJsonObject.getString("id").toString());
+                    }
+                    clothingAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, ids);
+                    spinChooseClothing.setAdapter(clothingAdapter);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
 
         }
     };
+
+
+    private void showDialog(String title, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(MyClothing.this).create();
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        alertDialog.show();
+    }
 }
 
 

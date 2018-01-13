@@ -1,7 +1,9 @@
 package com.th_koeln.steve.klamottenverteiler;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -51,11 +53,26 @@ public class ChooseContext extends AppCompatActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            String outfit = intent.getStringExtra("clothing");
-            Intent showClothing = new Intent(getApplicationContext(),ShowOutfit.class);
-            showClothing.putExtra("outfit", outfit);
-            startActivity(showClothing);
-            finish();
+            String from = intent.getStringExtra("from");
+            if (from.equals("SEARCHOUTFITFAIL")) {
+                AlertDialog alertDialog = new AlertDialog.Builder(ChooseContext.this).create();
+                alertDialog.setTitle("Error!");
+                alertDialog.setMessage("Could not get Outfits!");
+                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                alertDialog.show();
+            } else {
+                String outfit = intent.getStringExtra("clothing");
+                Intent showClothing = new Intent(getApplicationContext(), ShowOutfit.class);
+                showClothing.putExtra("outfit", outfit);
+                startActivity(showClothing);
+            }
         }
     };
+
+
 }

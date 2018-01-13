@@ -1,9 +1,11 @@
 package com.th_koeln.steve.klamottenverteiler;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -66,8 +68,8 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
         btnSendProfile = (Button) findViewById(R.id.btnSendProfile);
         btnSendProfile.setOnClickListener(this);
 
-        btnTimeSend = (Button) findViewById(R.id.btnChooseLocation);
-        btnTimeSend.setOnClickListener(this);
+ //       btnTimeSend = (Button) findViewById(R.id.btnChooseLocation);
+//        btnTimeSend.setOnClickListener(this);
 
         timePickerDialog();
 
@@ -169,18 +171,38 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
         @Override
         public void onReceive(Context context, Intent intent) {
             // get clothing results from HTTP-Service
-            String profile = intent.getStringExtra("profile");
-            try {
-                JSONObject profileJson = new JSONObject(profile);
-                etGender.setText(profileJson.getString("gender"));
-                txtShowUserProfile.setText(profile.toString());
-                //... fill user profile interface
-            } catch (JSONException e) {
-                e.printStackTrace();
+            String from = intent.getStringExtra("from");
+            if (from.equals("SEARCHPROFILEFAIL")) {
+                showDialog("Error","Could not get profile!");
+            } else if (from.equals("PUTPROFILEFAIL")) {
+                showDialog("Error","Could not get profile!");
+            } else {
+                String profile = intent.getStringExtra("profile");
+                try {
+                    JSONObject profileJson = new JSONObject(profile);
+                    etGender.setText(profileJson.getString("gender"));
+                    txtShowUserProfile.setText(profile.toString());
+                    //... fill user profile interface
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
 
         }
     };
+
+    private void showDialog(String title, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(EditProfile.this).create();
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        alertDialog.show();
+    }
 
 
     @Override

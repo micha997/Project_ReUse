@@ -1,7 +1,9 @@
 package com.th_koeln.steve.klamottenverteiler;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -88,15 +90,37 @@ public class EditClothing extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             // get clothing results from HTTP-Service
-            String clothing = intent.getStringExtra("clothing");
+            String from = intent.getStringExtra("from");
 
-            try {
-                JSONObject clothingJson=new JSONObject(clothing);
-                txtFabric.setText(clothingJson.getString("fabric"));
-                txtShowClothing.setText(clothingJson.toString());
-            } catch (JSONException e) {
-                e.printStackTrace();
+            if (from.equals("EDITCLOTHINGFAIL")) {
+                showDialog("Error", "Could not get clothing!");
+            } else if (from.equals("PUTCLOTHINGFAIL")) {
+                showDialog("Error", "Could not edit clothing!");
+            } else {
+                try {
+                    String clothing = intent.getStringExtra("clothing");
+                    JSONObject clothingJson=new JSONObject(clothing);
+                    txtFabric.setText(clothingJson.getString("fabric"));
+                    txtShowClothing.setText(clothingJson.toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
+
+
         }
     };
+
+    private void showDialog(String title, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(EditClothing.this).create();
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        alertDialog.show();
+    }
 }

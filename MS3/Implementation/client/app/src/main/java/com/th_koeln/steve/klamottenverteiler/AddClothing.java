@@ -217,32 +217,27 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
 
             progress.dismiss();
             if (success.equals("1")) {
-
-                AlertDialog alertDialog = new AlertDialog.Builder(AddClothing.this).create();
-                alertDialog.setTitle("Success!");
-                alertDialog.setMessage("Successfully added clothing!");
-                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        });
-                alertDialog.show();
+                showDialog("Success!", "Successfully added clothing!");
             } else {
-                AlertDialog alertDialog = new AlertDialog.Builder(AddClothing.this).create();
-                alertDialog.setTitle("Error!");
-                alertDialog.setMessage("Failed to add clothing!");
-                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        });
-                alertDialog.show();
+                showDialog("Error!", "Failed to add clothing!");
             }
 
         }
     };
+
+
+    private void showDialog(String title, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(AddClothing.this).create();
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        alertDialog.show();
+    }
 
 }
 
