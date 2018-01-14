@@ -27,8 +27,8 @@ public class myTransaktion {
     //Zeitpunkt zum abholen
     Date timeToGet;
 
-    public myTransaktion(String clothingID){
-        uID = "";
+    public myTransaktion(String userID, String clothingID){
+        uID = userID;
         cID = clothingID;
         longitude = 0;
         latitude = 0;

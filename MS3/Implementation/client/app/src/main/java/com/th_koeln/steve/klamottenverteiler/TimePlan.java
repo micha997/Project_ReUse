@@ -1,17 +1,26 @@
 package com.th_koeln.steve.klamottenverteiler;
 
+import android.*;
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
 import com.th_koeln.steve.klamottenverteiler.R;
 import com.th_koeln.steve.klamottenverteiler.services.GPStracker;
@@ -20,14 +29,30 @@ import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
-public class TimePlan extends AppCompatActivity {
+public class TimePlan extends AppCompatActivity implements LocationListener {
 
+    private TextView textViewTimePlan;
+    private Button btnDoStuff;
     private LocationManager locationManager;
+    private double myLongitude = 0;
+    private double myLatitude = 0;
+    private String action;
+    private int addIndex;
+
+    //Array mit Requests mit dem ein Zeitplan erstellt werden soll
+    private ArrayList<myTransaktion> Transaktionen = new ArrayList<myTransaktion>();
+    //Neue ArrayList die nach "STEP 1" gefuellt sein soll
+    private ArrayList<myTransaktion> Clean_Transaktionen = new ArrayList<myTransaktion>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,18 +63,29 @@ public class TimePlan extends AppCompatActivity {
         FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         final String uId = firebaseAuth.getCurrentUser().getUid();
 
+        //Objekte aus dem Layout
+        textViewTimePlan = (TextView) findViewById(R.id.textViewTimePlan);
+        btnDoStuff = (Button) findViewById(R.id.btnDoStuff);
+
+        //Location Longitude/Latitude
+        checkGPSPermission();
+        getLocation();
+
+        //BroadcastReceiver
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("profile");
+        filter.addAction("timeReceive");
+        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, filter);
+
         //Intent mit einem Service-Call erstellen
         Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
-        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
-                new IntentFilter("profile"));
-        //Parameter des Service-Call definieren
-        //IDs der Kleidung soll besorgt werden,
-        //die von dem Nutzer abgeholt werden soll
+        //Requests werden besorgt (Kleidungsstuecke die angefragt wurden und abgeholt werden sollen)
         myIntent.putExtra("payload","");
         myIntent.putExtra("method","GET");
         myIntent.putExtra("from","PROFILE");
-        myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId);
+        myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId + "/requests");
         //Service-Call starten
+        action = "profile";
         startService(myIntent);
     }
 
@@ -58,62 +94,50 @@ public class TimePlan extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             //Response vom Service erhalten
-            String profile = intent.getStringExtra("profile");
-            try {
-                JSONObject clothingIDS = new JSONObject(profile);
-                //JSONObject an die Funktion weitergeben
-                makeTimePlan(clothingIDS);
-            } catch (JSONException e) {
-                e.printStackTrace();
+            if(action.equals("profile")) {
+                String profile = intent.getStringExtra("profile");
+                try {
+                    JSONArray requestArray = new JSONArray(profile);
+                    for (int i = 0; requestArray.length() > i; i++) {
+                        JSONObject tmpRequest = new JSONObject(requestArray.get(i).toString());
+                        if (tmpRequest.getString("ouId").length() > 6) {
+                            myTransaktion tmpTrans = new myTransaktion(tmpRequest.getString("ouId"), tmpRequest.getString("cId"));
+                            Transaktionen.add(tmpTrans);
+                            textViewTimePlan.append("ouID: " + tmpTrans.getuID() + "\n" + "cID: " + tmpTrans.getcID() + "\n\n");
+                        }
+                    }
+                    //TimePlan Call mit der ArrayList der Transaktionen
+                    makeTimePlanPart1(Transaktionen);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }else if(action.equals("timeReceive")){
+                String profile = intent.getStringExtra("profile");
+                try{
+                    JSONObject profileJson = new JSONObject(profile);
+                    DateFormat format = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
+                    Date date1 = format.parse(profileJson.getString("txtWeekendTimeBegin"));
+                    Clean_Transaktionen.get(addIndex).setTimeFromWeekend(date1);
+                    Date date2 = format.parse(profileJson.getString("txtWeekendTimeEnd"));
+                    Clean_Transaktionen.get(addIndex).setTimeToWeekend(date2);
+                    Date date3 = format.parse(profileJson.getString("txtWeekTimeBegin"));
+                    Clean_Transaktionen.get(addIndex).setTimeFromWorkday(date3);
+                    Date date4 = format.parse(profileJson.getString("txtWeekTimeEnd"));
+                    Clean_Transaktionen.get(addIndex).setTimeToWorkday(date4);
+                    //textViewTimePlan.append("Times: " + profileJson.getString("txtWeekTimeBegin")+"\n");
+                    if(addIndex+1 == Clean_Transaktionen.size()){
+                        //makeTimePlanPart2(Clean_Transaktionen);
+                    }
+                }catch (JSONException e){
+                    e.printStackTrace();
+                }catch (ParseException e) {
+                    e.printStackTrace();
+                }
             }
-
         }
     };
 
-    /*
-    Soll ein Array erhalten mit den Clothing-IDS der
-    Objekte, die von einem User angenommen wurden und
-    abgeholt werden sollen.
-    */
-    public void makeTimePlan(JSONObject clothingIDS) throws JSONException {
-
-        //Array zum fuellen mit den IDs
-        ArrayList<myTransaktion> Transaktionen = new ArrayList<myTransaktion>();
-
-        //JSONObject in eigene Struktur transferieren und zum Array hinufuegen
-        try {
-            JSONArray cIDs = clothingIDS.getJSONArray("nameIDs");
-            for(int i=0;cIDs.length()>i;i++){
-                String cID = (String) cIDs.get(i);
-                myTransaktion tmpTrans = new myTransaktion(cID);
-                Transaktionen.add(tmpTrans);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        //Eigene Location
-        double myLongitude = 0;
-        double myLatitude = 0;
-
-        //Service wird gestartet um eigene Koordianten zu holen
-        GPStracker gpsTracker = new GPStracker(getApplicationContext());
-        Location myLocation = gpsTracker.getLocation();
-        if(myLocation != null){
-            myLongitude = myLocation.getLongitude();
-            myLatitude = myLocation.getLatitude();
-        }else{
-            Toast.makeText(getApplicationContext(),"Location unavailable",Toast.LENGTH_LONG).show();
-        }
-
-        /*
-        HTTPS-SERVICE CALL FOR USER-IDS
-        Fuer jede clothing-ID muss eine user-ID besorgt werden
-        */
-        //-> IDs und weitere Infos werden zu den "myTransaktion"-Objekten hinzugefuegt
-
-        //Neue ArrayList die nach "STEP 1" gefuellt sein soll
-        ArrayList<myTransaktion> Clean_Transaktionen = new ArrayList<myTransaktion>();
+    public void makeTimePlanPart1(ArrayList<myTransaktion> dirtyTransaktionen) {
 
         //////////////////////////////
         //STEP 1 Dulpilkate entfernen
@@ -123,24 +147,34 @@ public class TimePlan extends AppCompatActivity {
         /*Hat eine Complexity von O(n^2), aber die Laenge des Arrays
         wird sehr wahrscheinich unter der Groesse 10 bleiben */
 
-        while(Transaktionen.size()>0){
-            myTransaktion tmpTransaktion = Transaktionen.get(0);
+        while (dirtyTransaktionen.size() > 0) {
+            myTransaktion tmpTransaktion = dirtyTransaktionen.get(0);
             Clean_Transaktionen.add(tmpTransaktion);
-            Transaktionen.remove(0);
+            dirtyTransaktionen.remove(0);
 
-            for(int k = 0;k<Transaktionen.size();k++){
-                if(Transaktionen.get(k).getuID().equals(tmpTransaktion.getuID())){
-                    Transaktionen.remove(k);
+            for (int k = 0; k < dirtyTransaktionen.size(); k++) {
+                if (dirtyTransaktionen.get(k).getuID().equals(tmpTransaktion.getuID())) {
+                    dirtyTransaktionen.remove(k);
                     k--;
                 }
             }
         }
 
-        /*
-        HTTPS-SERVICE CALL FOR USER-ZEITEN
-        Fuer jede user-id sollen user-spezifische Zeiten besorgt werden
-        */
-        //->Zeiten werden den "myTransaktion"-Objekten in der "Clean_Transaktionen"-ArrayList hinzugefuegt
+        //Zeiten der User besorgen bevor die weitere Zeitplanung erfolgt
+        for (int i = 0; Clean_Transaktionen.size() > i; i++) {
+            Intent timeIntent = new Intent(getApplicationContext(), HttpsService.class);
+            timeIntent.putExtra("payload", "");
+            timeIntent.putExtra("method", "GET");
+            timeIntent.putExtra("from", "PROFILE");
+            timeIntent.putExtra("url", getString(R.string.DOMAIN) + "/user/" + Clean_Transaktionen.get(0).getuID());
+            //call http service
+            action = "timeReceive";
+            addIndex = i;
+            startService(timeIntent);
+        }
+    }
+
+    public void makeTimePlanPart2(ArrayList<myTransaktion> dirtyTransaktionen){
 
         //////////////////////////////
         //STEP 2 Zeiten nach sortieren
@@ -156,15 +190,15 @@ public class TimePlan extends AppCompatActivity {
         calendar.setTime(now);
         if(calendar.get(Calendar.DAY_OF_WEEK)>1 && calendar.get(Calendar.DAY_OF_WEEK)<7) weekend = false;
 
-        while(Clean_Transaktionen.size()>0){
+        while(dirtyTransaktionen.size()>0){
             Date earliestTime = null;
             long shortestPeriod = 0;
 
-            for(int i=0;Clean_Transaktionen.size()>i;i++){
+            for(int i=0;dirtyTransaktionen.size()>i;i++){
                 //Je nachdem ob es Wochenende ist oder nicht werden die Zeiten gewählt
-                Date tmpEarliestTime = weekend ? Clean_Transaktionen.get(i).getTimeFromWeekend() : Clean_Transaktionen.get(i).getTimeFromWorkday();
-                long tmpShortestPeriod = weekend ? Clean_Transaktionen.get(i).getTimeToWeekend().getTime() - Clean_Transaktionen.get(i).getTimeFromWeekend().getTime()
-                        : Clean_Transaktionen.get(i).getTimeToWorkday().getTime() - Clean_Transaktionen.get(i).getTimeFromWorkday().getTime();
+                Date tmpEarliestTime = weekend ? dirtyTransaktionen.get(i).getTimeFromWeekend() : dirtyTransaktionen.get(i).getTimeFromWorkday();
+                long tmpShortestPeriod = weekend ? dirtyTransaktionen.get(i).getTimeToWeekend().getTime() - dirtyTransaktionen.get(i).getTimeFromWeekend().getTime()
+                        : dirtyTransaktionen.get(i).getTimeToWorkday().getTime() - dirtyTransaktionen.get(i).getTimeFromWorkday().getTime();
 
                 //Abfrage ob neue fruehste und kuerzeste Zeit gefunden wurde
                 if((earliestTime == null && shortestPeriod == 0) ||
@@ -174,8 +208,8 @@ public class TimePlan extends AppCompatActivity {
                     index = i;
                 }
             }
-            ZeitClean_Transaktionen.add(Clean_Transaktionen.get(index));
-            Clean_Transaktionen.remove(index);
+            ZeitClean_Transaktionen.add(dirtyTransaktionen.get(index));
+            dirtyTransaktionen.remove(index);
         }
 
         ////////////////////////////////////////////////////////////
@@ -261,6 +295,7 @@ public class TimePlan extends AppCompatActivity {
 
     }
 
+    //Sucht in der ArrayList die kuerzeste Route zu den uebergebenen Koordinaten
     public int getShortestWay(double myLongitude, double myLatitude, ArrayList<myTransaktion> tmpArray){
         double shortestDistance = -1;
         int index = 0;
@@ -275,5 +310,47 @@ public class TimePlan extends AppCompatActivity {
             }
         }
         return index;
+    }
+
+    //Prueft ob die Permission vorhanden ist GPS zu nutzen
+    private void checkGPSPermission(){
+        if(ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION}, 101);
+        }
+    }
+
+    //Holt die aktuelle Position
+    private void getLocation(){
+        try{
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 5, this);
+        }catch(SecurityException e){
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        myLongitude = location.getLongitude();
+        myLatitude = location.getLatitude();
+        textViewTimePlan.append("Longitude: "+myLongitude+"\n"+"Latitude: "+myLatitude+"\n");
+    }
+
+    @Override
+    public void onStatusChanged(String s, int i, Bundle bundle) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String s) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String s) {
+        Toast.makeText(getApplicationContext(),"Enable GPS & Internet!",Toast.LENGTH_SHORT).show();
     }
 }

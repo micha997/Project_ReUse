@@ -1,11 +1,9 @@
 package com.th_koeln.steve.klamottenverteiler;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -68,10 +66,20 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
         btnSendProfile = (Button) findViewById(R.id.btnSendProfile);
         btnSendProfile.setOnClickListener(this);
 
- //       btnTimeSend = (Button) findViewById(R.id.btnChooseLocation);
-//        btnTimeSend.setOnClickListener(this);
+        btnTimeSend = (Button) findViewById(R.id.btnTimeSend);
+        btnTimeSend.setOnClickListener(this);
 
-        timePickerDialog();
+        btnTimeFromWeekend = (Button) findViewById(R.id.btnTimeFromWeekend);
+        btnTimeFromWeekend.setOnClickListener(this);
+
+        btnTimeToWeekend = (Button) findViewById(R.id.btnTimeToWeekend);
+        btnTimeToWeekend.setOnClickListener(this);
+
+        btnTimeFromWeekday = (Button) findViewById(R.id.btnTimeFromWeekday);
+        btnTimeFromWeekday.setOnClickListener(this);
+
+        btnTimeToWeekday = (Button) findViewById(R.id.btnTimeToWeekday);
+        btnTimeToWeekday.setOnClickListener(this);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
                 new IntentFilter("profile"));
@@ -127,83 +135,28 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
         }
     };
 
-    public void timePickerDialog(){
-        btnTimeFromWeekday = (Button) findViewById(R.id.btnTimeFromWeekday);
-        btnTimeToWeekday = (Button) findViewById(R.id.btnTimeToWeekday);
-        btnTimeFromWeekend = (Button) findViewById(R.id.btnTimeFromWeekend);
-        btnTimeToWeekend = (Button) findViewById(R.id.btnTimeToWeekend);
-
-        btnTimeFromWeekday.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                DIALOG_ID = 1;
-                showDialog(DIALOG_ID);
-            }
-        });
-
-        btnTimeToWeekday.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                DIALOG_ID = 2;
-                showDialog(DIALOG_ID);
-            }
-        });
-
-        btnTimeFromWeekend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                DIALOG_ID = 3;
-                showDialog(DIALOG_ID);
-            }
-        });
-
-        btnTimeToWeekend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                DIALOG_ID = 4;
-                showDialog(DIALOG_ID);
-            }
-        });
-    }
-
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
 
         @Override
         public void onReceive(Context context, Intent intent) {
             // get clothing results from HTTP-Service
-            String from = intent.getStringExtra("from");
-            if (from.equals("SEARCHPROFILEFAIL")) {
-                showDialog("Error","Could not get profile!");
-            } else if (from.equals("PUTPROFILEFAIL")) {
-                showDialog("Error","Could not get profile!");
-            } else {
-                String profile = intent.getStringExtra("profile");
-                try {
-                    JSONObject profileJson = new JSONObject(profile);
-                    etGender.setText(profileJson.getString("gender"));
-                    txtShowUserProfile.setText(profile.toString());
-                    //... fill user profile interface
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+            String profile = intent.getStringExtra("profile");
+            try {
+                JSONObject profileJson = new JSONObject(profile);
+                JSONObject timeJson = new JSONObject(profileJson.getString("time"));
+                etGender.setText(profileJson.getString("gender"));
+                btnTimeFromWeekday.setText("Von "+timeJson.getString("txtWeekTimeBegin"));
+                btnTimeToWeekday.setText("Bis "+timeJson.getString("txtWeekTimeEnd"));
+                btnTimeFromWeekend.setText("Von "+timeJson.getString("txtWeekendTimeBegin"));
+                btnTimeToWeekend.setText("Bis "+timeJson.getString("txtWeekendTimeEnd"));
+                txtShowUserProfile.setText(profile.toString());
+                //... fill user profile interface
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
 
         }
     };
-
-    private void showDialog(String title, String message) {
-        AlertDialog alertDialog = new AlertDialog.Builder(EditProfile.this).create();
-        alertDialog.setTitle(title);
-        alertDialog.setMessage(message);
-        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-        alertDialog.show();
-    }
-
 
     @Override
     public void onClick(View view) {
@@ -229,12 +182,14 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
                 break;
 
             case R.id.btnTimeSend:
+                JSONObject times = new JSONObject();
                 JSONObject newProfile = new JSONObject();
                 try {
-                    newProfile.put("txtWeekTimeBegin", txtWeekTimeBegin);
-                    newProfile.put("txtWeekTimeEnd", txtWeekTimeEnd);
-                    newProfile.put("txtWeekendTimeBegin", txtWeekendTimeBegin);
-                    newProfile.put("txtWeekendTimeEnd", txtWeekendTimeEnd);
+                    times.put("txtWeekTimeBegin", txtWeekTimeBegin);
+                    times.put("txtWeekTimeEnd", txtWeekTimeEnd);
+                    times.put("txtWeekendTimeBegin", txtWeekendTimeBegin);
+                    times.put("txtWeekendTimeEnd", txtWeekendTimeEnd);
+                    newProfile.put("time",times);
                     // define http service call
                     myIntent = new Intent(getApplicationContext(), HttpsService.class);
                     // define parameters for Service-Call
@@ -247,7 +202,26 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                break;
 
+            case R.id.btnTimeFromWeekday:
+                DIALOG_ID = 1;
+                showDialog(DIALOG_ID);
+                break;
+
+            case R.id.btnTimeToWeekday:
+                DIALOG_ID = 2;
+                showDialog(DIALOG_ID);
+                break;
+
+            case R.id.btnTimeFromWeekend:
+                DIALOG_ID = 3;
+                showDialog(DIALOG_ID);
+                break;
+
+            case R.id.btnTimeToWeekend:
+                DIALOG_ID = 4;
+                showDialog(DIALOG_ID);
                 break;
 
         }

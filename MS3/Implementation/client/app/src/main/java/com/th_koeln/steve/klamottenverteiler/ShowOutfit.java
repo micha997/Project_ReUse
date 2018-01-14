@@ -55,12 +55,7 @@ public class ShowOutfit extends AppCompatActivity implements View.OnClickListene
     private ArrayAdapter<String> shoesAdapter;
 
 
-    private Button btnSendHeadRequest;
-    private Button btnSendLayer1Request;
-    private Button btnSendLayer2Request;
-    private Button btnSendLayer3Request;
-    private Button btnSendBottomRequest;
-    private Button btnSendShoesRequest;
+    private Button btnSendClothingRequest;
     private Button btnSubscribeMissingClothing;
 
     private String model;
@@ -81,18 +76,8 @@ public class ShowOutfit extends AppCompatActivity implements View.OnClickListene
         spinnerShoes = (Spinner) findViewById(R.id.spinnerShoes);
         spinnerMissingClothing = (Spinner) findViewById(R.id.spinnerMissingClothing);
 
-        btnSendHeadRequest = (Button) findViewById(R.id.btnSendHeadRequest);
-        btnSendHeadRequest.setOnClickListener(this);
-        btnSendLayer1Request = (Button) findViewById(R.id.btnSendLayer1Request);
-        btnSendLayer1Request.setOnClickListener(this);
-        btnSendLayer2Request = (Button) findViewById(R.id.btnSendLayer2Request);
-        btnSendLayer2Request.setOnClickListener(this);
-        btnSendLayer3Request = (Button) findViewById(R.id.btnSendLayer3Request);
-        btnSendLayer3Request.setOnClickListener(this);
-        btnSendBottomRequest = (Button) findViewById(R.id.btnSendBottomRequest);
-        btnSendBottomRequest.setOnClickListener(this);
-        btnSendShoesRequest = (Button) findViewById(R.id.btnSendShoesRequest);
-        btnSendShoesRequest.setOnClickListener(this);
+        btnSendClothingRequest = (Button) findViewById(R.id.btnSendClothingRequest);
+        btnSendClothingRequest.setOnClickListener(this);
         btnSubscribeMissingClothing = (Button) findViewById(R.id.btnSubscribeMissingClothing);
         btnSubscribeMissingClothing.setOnClickListener(this);
 
@@ -202,32 +187,17 @@ public class ShowOutfit extends AppCompatActivity implements View.OnClickListene
     public void onClick(View view) {
         switch (view.getId()){
 
-            case R.id.btnSendHeadRequest:
+            case R.id.btnSendClothingRequest:
                 if(spinnerHead.getSelectedItem() !=null)
                     sendRequest(spinnerHead.getSelectedItem().toString());
-                break;
-
-            case R.id.btnSendLayer1Request:
                 if(spinnerLayer1.getSelectedItem() !=null)
                     sendRequest(spinnerLayer1.getSelectedItem().toString());
-                break;
-
-            case R.id.btnSendLayer2Request:
                 if(spinnerLayer2.getSelectedItem() !=null)
                     sendRequest(spinnerLayer2.getSelectedItem().toString());
-                break;
-
-            case R.id.btnSendLayer3Request:
                 if(spinnerLayer3.getSelectedItem() !=null)
                     sendRequest(spinnerLayer3.getSelectedItem().toString());
-                break;
-
-            case R.id.btnSendBottomRequest:
                 if(spinnerBottom.getSelectedItem() !=null)
                     sendRequest(spinnerBottom.getSelectedItem().toString());
-                break;
-
-            case R.id.btnSendShoesRequest:
                 if(spinnerShoes.getSelectedItem() !=null)
                     sendRequest(spinnerShoes.getSelectedItem().toString());
                 break;

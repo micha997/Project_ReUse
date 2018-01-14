@@ -13,10 +13,10 @@ public class UserInterface extends AppCompatActivity implements View.OnClickList
     private Button btnSearchClothingUserInterface;
     private Button btnLogout;
     private Button btnMyClothing;
-   // private Button btnShowPrefer;
+    // private Button btnShowPrefer;
     private Button btnChooseContext;
     private Button btnEditProfile;
-    private Button btnShowRequests;
+    private Button btnTimePlan;
     private FirebaseAuth firebaseAuth;
 
 
@@ -43,9 +43,8 @@ public class UserInterface extends AppCompatActivity implements View.OnClickList
         btnEditProfile = (Button) findViewById(R.id.btnEditProfile);
         btnEditProfile.setOnClickListener(this);
 
-        btnShowRequests = (Button) findViewById(R.id.btnRequests);
-        btnShowRequests.setOnClickListener(this);
-
+        btnTimePlan = (Button) findViewById(R.id.btnTimePlan);
+        btnTimePlan.setOnClickListener(this);
 
         firebaseAuth=FirebaseAuth.getInstance();
 
@@ -54,11 +53,6 @@ public class UserInterface extends AppCompatActivity implements View.OnClickList
         }
 
         //btnShowPrefer = (Button) findViewById(R.id.btnShowPrefer);
-    }
-
-    @Override
-    public void onBackPressed() {
-        moveTaskToBack(true);
     }
 
     @Override
@@ -92,6 +86,10 @@ public class UserInterface extends AppCompatActivity implements View.OnClickList
 
             case R.id.btnRequests:
                 startActivity(new Intent(getApplicationContext(), ShowRequest.class));
+                break;
+
+            case R.id.btnTimePlan:
+                startActivity(new Intent(getApplicationContext(),TimePlan.class));
                 break;
 
         }
