@@ -8,10 +8,12 @@ const postKlamotten = function(database) {
             if (err) {
                 console.log("Failed to add clothing!");
                 return res.status(500).send("Clothing could not be added to the database!");
+            } else {
+              console.log("Successfully added clothing!");
+              res.sendStatus(201);
             }
-            console.log("Successfully added clothing!");
         });
-        res.sendStatus(201);
+
     };
 };
 

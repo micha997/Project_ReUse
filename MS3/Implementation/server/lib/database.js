@@ -6,6 +6,7 @@ const calcOutfit = require('./calcOutfit');
 const sendPushNotification = require('./sendPushNotification');
 const MongoClient = mongo.MongoClient;
 const uuidv4 = require('uuid/v4');
+const async = require("async");
 
 const database = {
     initialize(connectionString, callback) {
@@ -137,7 +138,6 @@ const database = {
                   }
                 }
             }
-            console.log(uId);
             this.mappings.findOne({
                 type: "userprofile",
                 uId: uId
@@ -205,7 +205,6 @@ const database = {
         if (!callback) {
             throw new Error('callback is missing.');
         }
-        console.log(body);
         this.mappings.update({
             type: "userprofile",
             "requests.id": id,
@@ -217,7 +216,6 @@ const database = {
 
             }
           })
-          console.log(body);
           if (body.status == "accepted") {
             this.mappings.findOne({
                 uId: body.uId,
@@ -375,72 +373,112 @@ const database = {
         })
     },
     addClothing(clothing, callback) {
-        if (!clothing) {
-            throw new Error('Clothing is missing.');
-        }
-        if (!callback) {
-            throw new Error('Callback is missing.');
-        }
-        clothing = JSON.parse(clothing);
+      if (!clothing) {
+          throw new Error('Clothing is missing.');
+      }
+      if (!callback) {
+          throw new Error('Callback is missing.');
+      }
+      clothing = JSON.parse(clothing);
 
-        const mapping = {
-            id: uuidv4(),
-            longitude: clothing["longitude"],
-            latitude: clothing["latitude"],
-            size: clothing["size"],
-            art: clothing["art"],
-            color: clothing["colour"],
-            style: clothing["style"],
-            gender: clothing["gender"],
-            fabric: clothing["fabric"],
-            notes: clothing["notes"],
-            brand: clothing["brand"],
-            date: Date.now(),
-            uId: clothing["uId"],
-            type: "clothing",
-            image: clothing["image"]
-        };
-        //write mapping to Database
-        this.mappings.insertOne(mapping, err => {
-            if (err) {
-                return callback(err);
-            }
+      const mapping = {
+          id: uuidv4(),
+          longitude: clothing["longitude"],
+          latitude: clothing["latitude"],
+          size: clothing["size"],
+          art: clothing["art"],
+          color: clothing["colour"],
+          style: clothing["style"],
+          gender: clothing["gender"],
+          fabric: clothing["fabric"],
+          notes: clothing["notes"],
+          brand: clothing["brand"],
+          date: Date.now(),
+          uId: clothing["uId"],
+          type: "clothing",
+          image: clothing["image"]
+      };
 
-            var fits = calcOutfit(null, mapping, true);
-
-            this.mappings.find({
-                type: "userprofile",
-            }).toArray((err, mappings) => {
-
-                if (err) {
-                    return callback(err);
-                }
-                for (var single_mapping in mappings) {
-                    if (mappings[single_mapping].subscription != null) {
-                        for (var single_subscription in mappings[single_mapping].subscription) {
-                            //console.log("Jeweils eine: " + mappings[single_mapping].subscription[single_subscription].type + "_" + mappings[single_mapping].subscription[single_subscription].missing + "\n");
-                            //console.log("Fits: " + fits.model + "\n\n");
-
-                            var uId = mappings[single_mapping].uId;
-                            if (fits.model == mappings[single_mapping].subscription[single_subscription].type + "_" + mappings[single_mapping].subscription[single_subscription].missing) {
-                                this.mappings.findOne({
-                                    uId: mappings[single_mapping].uId,
-                                    type: "token"
-                                }, (err, mappings) => {
-                                    if (err) {
-                                        return callback(err);
-                                    }
-
-                                    sendPushNotification(mappings.token, uId, mapping, fits, "missing");
-                                })
-                            }
-                        }
-                    }
-
-                }
-            })
+      async.waterfall([
+          async.apply(insertClothing, this.mappings),
+          searchFits,
+          async.apply(findUsers, this.mappings),
+          async.apply(sendPush, this.mappings),
+      ], function (err) {
+          if (err=="1") {
+            return callback(err);
+          } else {
             callback(null);
+          }
+      });
+
+      function insertClothing(mappings, callback) {
+        mappings.insertOne(mapping, err => {
+                 if (err) {
+                     callback("1");
+                 } else {
+                      callback(null, mappings, mapping);
+                 }
+             })
+
+      }
+
+      function searchFits(mappings, mapping, callback) {
+                var fits = calcOutfit(null, mapping, true);
+                callback(null, mapping, fits);
+      }
+
+      function findUsers(mappings, mapping, fits, callback) {
+
+        function queryCollection(mappings, callback){
+        	mappings.find({    type: "userprofile" }).toArray(function(err, users) {
+                if (err) {
+                  callback("2");
+                } else if (users.length > 0) {
+                    callback(users);
+                }
+            });
+        }
+
+        queryCollection(mappings, function(users){
+              callback(null, mapping, fits, users);
+            //You can do more stuff with the result here
         });
+      }
+
+      function sendPush(mappings, mapping, fits, users, callback) {
+        //callback(null, 'done');
+        try {
+        for (var single_mapping in users) {
+               if (users[single_mapping].subscription != null) {
+                   for (var single_subscription in users[single_mapping].subscription) {
+                       if (fits.model == users[single_mapping].subscription[single_subscription].type + "_" + users[single_mapping].subscription[single_subscription].missing) {
+                           mappings.find({
+                               uId: users[single_mapping].uId,
+                               type: "token"
+                           }).toArray(function(err, users) {
+                               if (err) {
+                                 callback("2");
+                               } else {
+                                 var i=0;
+                                 for (var map in users) {
+                                   sendPushNotification(users[map].token, "0", mapping, fits, "missing");
+                                 }
+                               }
+                           })
+
+                       }
+                   }
+               }
+
+           }
+           callback(null);
+           } catch (e) {
+             callback("2");
+           }
+
+      }
+
     },
     postRequest(cId, body, callback) {
         if (!cId) {
@@ -472,7 +510,6 @@ const database = {
             if (err) {
                 return callback(err);
             }
-            console.log("SUCHE NACH TOKEN VON:" + body.ouId);
             this.mappings.findOne({
                 uId: body.uId,
                 type: "token"
@@ -480,7 +517,6 @@ const database = {
                 if (err) {
                     return callback(err);
                 }
-                console.log("SUCHERGEBNIS:" + mappings.token);
                 sendPushNotification(mappings.token, cId, body.ouId, "", "postRequest");
                 callback(null);
             });
@@ -576,7 +612,6 @@ const database = {
             }
 
         });
-        console.log("Suche Token von: " + uId);
         this.mappings.findOne({
             uId: mapping["to"],
             type: "token"

@@ -84,13 +84,13 @@ var wintermodel = {
         },
         wintermodel_shoes: {
             respiratory_activity_low: 0,
-            respiratory_activity_high: 0,
-            warmth_low: 0,
-            warmth_high: 0,
-            moisture_pickup_low: 10,
-            moisture_pickup_high: 10,
-            art: ["shoes","schuhe"],
-            model: "shoes"
+            respiratory_activity_high: 10,
+            warmth_low: 8,
+            warmth_high: 10,
+            moisture_pickup_low: 0,
+            moisture_pickup_high: 5,
+            art: ["schuhe"],
+            model: "wintermodel_shoes"
         }
 
     }
@@ -193,7 +193,8 @@ var wintermodel = {
     if (single) {
         for (var single_model in models) {
             for (var single_layer in models[single_model]) {
-                 res = calcLayerClothing(models[single_model][single_layer], clothing, charac, single);
+
+                res = calcLayerClothing(models[single_model][single_layer], clothing, charac, single);
                 if (res != null) {
                     fits=res;
                 }
@@ -249,7 +250,6 @@ var wintermodel = {
         if ((model.respiratory_activity_low <= charac[single_charac].respiratory_activity && model.respiratory_activity_high >= charac[single_charac].respiratory_activity) || (model.respiratory_activity_high == 0 && model.respiratory_activity_low == 0)) {
             if ((model.warmth_low <= charac[single_charac].warmth && model.warmth_high >= charac[single_charac].warmth) || (model.warmth_high == 0 && model.warmth_low == 0)) {
                 if ((model.moisture_pickup_low <= charac[single_charac].moisture_pickup && model.moisture_pickup_high >= charac[single_charac].moisture_pickup) || (model.moisture_pickup_high == 0 && model.moisture_pickup_low == 0)) {
-
                     for (var art in model.art) {
                         if (single && clothing.art == model.art[art] && clothing.fabric == charac[single_charac].name) {
                             const fits = {
