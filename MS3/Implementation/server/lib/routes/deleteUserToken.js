@@ -9,10 +9,11 @@ const deleteUserToken = function(database) {
             if (err) {
                 console.log("Failed to add clothing!");
                 return res.status(500).send("Token could not be added to the database!");
+            } else {
+              console.log("Successfully added Token!");
+              res.sendStatus(201);
             }
-            console.log("Successfully added Token!");
         });
-        res.sendStatus(201);
     };
 };
 

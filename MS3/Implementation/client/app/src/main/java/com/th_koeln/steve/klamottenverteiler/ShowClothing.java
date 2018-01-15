@@ -62,27 +62,31 @@ public class ShowClothing extends AppCompatActivity {
         btnGetClothing.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                JSONObject request = new JSONObject();
+
                 try {
                     JSONObject clothingJson = new JSONObject(clothing);
+                    if (clothingJson.getString("uId").equals(ouId)) {
+                        showDialog("Error", "Choosen clothing allready belongs to you!");
+                    } else {
+                        JSONObject request = new JSONObject();
+                        request.put("uId", ouId);
+                        request.put("ouId", clothingJson.getString("uId"));
 
-                    request.put("uId", ouId);
-                    request.put("ouId", clothingJson.getString("uId"));
-
-                    Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
-                    myIntent.putExtra("payload",request.toString());
-                    myIntent.putExtra("method","POST");
-                    myIntent.putExtra("from", "NEWREQUEST");
-                    myIntent.putExtra("url",getString(R.string.DOMAIN) + "/clothing/"+ clothingJson.getString("id"));
-                    startService(myIntent);
+                        Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
+                        myIntent.putExtra("payload", request.toString());
+                        myIntent.putExtra("method", "POST");
+                        myIntent.putExtra("from", "NEWREQUEST");
+                        myIntent.putExtra("url", getString(R.string.DOMAIN) + "/clothing/" + clothingJson.getString("id"));
+                        startService(myIntent);
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
-                //call http service
-
             }
-        });
+
+
+
+            });
 
     }
 

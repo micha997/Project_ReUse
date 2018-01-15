@@ -11,11 +11,12 @@ const getUserClothing = function(database) {
             res.setHeader("Content-Type", "application/json");
             if (err) {
                 return res.status(500).end();
+            } else {
+              for (var single_map in mappings) {
+                  delete mappings[single_map].image;
+              }
+              return res.send(mappings);
             }
-            for (var single_map in mappings) {
-                delete mappings[single_map].image;
-            }
-            res.send(mappings);
         })
 
     };

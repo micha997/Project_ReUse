@@ -216,6 +216,7 @@ public class HttpsService extends IntentService {
                         case "SHOWREQUESTS":
                             intent = new Intent("showrequests");
                             intent.putExtra("clothing", stringBuilder.toString());
+                            intent.putExtra("success", "0");
                             intent.putExtra("from", "SHOWREQUESTS");
                             break;
 
@@ -228,6 +229,11 @@ public class HttpsService extends IntentService {
                         case "ADDCLOTHING":
                             intent = new Intent("addclothing");
                             intent.putExtra("from", "ADDCLOTHING");
+                            intent.putExtra("success", "1");
+                            break;
+                        case "PUTREQUEST":
+                            intent = new Intent("showrequests");
+                            intent.putExtra("from", "PUTREQUEST");
                             intent.putExtra("success", "1");
                             break;
 
@@ -312,6 +318,7 @@ public class HttpsService extends IntentService {
                         case "SHOWREQUESTS":
                             intent = new Intent("showrequests");
                             intent.putExtra("from", "SHOWREQUESTSFAIL");
+                            intent.putExtra("success", "0");
                             break;
 
 

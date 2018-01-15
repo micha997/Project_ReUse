@@ -14,15 +14,16 @@ const getUserOutfit = function(database, choise) {
             res.setHeader("Content-Type", "application/json");
             if (err) {
                 return res.status(500).end();
+            } else {
+              var mappings_new = [];
+              console.log(mappings);
+              for (var single_map in mappings) {
+                  if (mappings_new.indexOf(mappings[single_map].oId) == -1 ) {
+                    mappings_new.push(mappings[single_map].oId);
+                  }
+               }
+              return res.status(201).send(mappings_new);
             }
-            var mappings_new = [];
-            console.log(mappings);
-            for (var single_map in mappings) {
-                if (mappings_new.indexOf(mappings[single_map].oId) == -1 ) {
-                  mappings_new.push(mappings[single_map].oId);
-                }
-             }
-            res.status(201).send(mappings_new);
         })
 
 

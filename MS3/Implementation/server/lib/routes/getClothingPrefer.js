@@ -14,19 +14,16 @@ const getClothingPrefer = function(database) {
             res.setHeader("Content-Type", "application/json");
             if (err) {
                 return res.status(500).end();
+            } else {
+              database.getAllClothingLocation(req.params.latitude, req.params.longitude, req.params.vicinity, (err, maps) => {
+                  res.setHeader("Content-Type", "application/json");
+                  if (err) {
+                      return res.status(500).end();
+                  }
+                  maps = searchPreferredClothing(mappings, maps);
+                  return res.status(201).send(maps);
+              })
             }
-
-            database.getAllClothingLocation(req.params.latitude, req.params.longitude, req.params.vicinity, (err, maps) => {
-                res.setHeader("Content-Type", "application/json");
-                if (err) {
-                    return res.status(500).end();
-                }
-                maps = searchPreferredClothing(mappings, maps);
-                res.status(201).send(maps);
-            })
-
-
-
         })
     };
 };

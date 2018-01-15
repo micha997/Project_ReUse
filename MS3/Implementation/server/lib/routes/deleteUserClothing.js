@@ -9,10 +9,12 @@ const deleteUserClothing = function(database) {
             if (err) {
                 console.log("Failed to delete clothing!");
                 return res.status(500).send("clothing could not be deleted from database!");
+            } else {
+              console.log("Successfully deleted clothing!");
+              return res.sendStatus(201);
             }
-            console.log("Successfully deleted clothing!");
         });
-        res.sendStatus(201);
+
     };
 };
 

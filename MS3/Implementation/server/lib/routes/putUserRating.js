@@ -11,10 +11,13 @@ const putUserRating = function(database) {
             if (err) {
                 console.log("Failed to edit Userprofile!");
                 return res.status(500).send("Userprofile could not be edited!");
+            } else {
+              console.log("Successfully edited Userprofile!");
+              return res.sendStatus(201);
             }
-            console.log("Successfully edited Userprofile!");
+
         });
-        res.sendStatus(201);
+
     };
 };
 

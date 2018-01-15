@@ -4,30 +4,40 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content" >
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="My Requests:" />
 
-    <TextView
-        android:id="@+id/txtShowMyRequests"
+        <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+    <RadioButton
+        android:id="@+id/rbOwnRequest"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="TextView" />
+        android:layout_weight="1"
+        android:text="My requests"
+        android:checked="true"/>
 
-    <TextView
+    <RadioButton
+        android:id="@+id/rbForeignRequest"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Foreign Requests:" />
+        android:layout_weight="1"
+        android:text="Foreign reguests" />
+        </RadioGroup>
 
-    <TextView
-        android:id="@+id/txtShowForeignRequests"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="TextView" />
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <ListView
+            android:id="@+id/lvShowRequests"
+            android:layout_width="match_parent"
+            android:layout_height="158dp" />
+    </ScrollView>
 
     <Spinner
         android:id="@+id/spinOpenRequests"
@@ -59,14 +69,40 @@
         android:id="@+id/spinRequestsWaiting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+
     <Button
         android:id="@+id/btnConfirmTransaction"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Confirm Transaction"/>
+        android:text="Confirm Transaction" />
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="My Requests:" />
+
+    <TextView
+        android:id="@+id/txtShowMyRequests"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="TextView" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Foreign Requests:" />
+
+    <TextView
+        android:id="@+id/txtShowForeignRequests"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="TextView" />
+
 </LinearLayout>
-
-
-
-
 </ScrollView>
+
+
+
+<!--
+</ScrollView>-->

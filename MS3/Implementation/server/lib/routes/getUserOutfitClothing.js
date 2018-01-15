@@ -12,8 +12,9 @@ const getUserOutfitClothing = function(database, choise) {
             res.setHeader("Content-Type", "application/json");
             if (err) {
                 return res.status(500).end();
+            } else {
+              return res.status(201).send(mappings);
             }
-            res.status(201).send(mappings);
         })
     };
 };

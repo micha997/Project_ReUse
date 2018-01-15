@@ -17,6 +17,7 @@ public class UserInterface extends AppCompatActivity implements View.OnClickList
     private Button btnChooseContext;
     private Button btnEditProfile;
     private Button btnTimePlan;
+    private Button btnRequests;
     private FirebaseAuth firebaseAuth;
 
 
@@ -45,6 +46,9 @@ public class UserInterface extends AppCompatActivity implements View.OnClickList
 
         btnTimePlan = (Button) findViewById(R.id.btnTimePlan);
         btnTimePlan.setOnClickListener(this);
+
+        btnRequests = (Button) findViewById(R.id.btnRequests);
+        btnRequests.setOnClickListener(this);
 
         firebaseAuth=FirebaseAuth.getInstance();
 

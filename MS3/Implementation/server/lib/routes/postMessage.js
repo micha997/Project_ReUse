@@ -8,10 +8,13 @@ const postMessage = function(database) {
             if (err) {
                 console.log("Failed to add message!");
                 return res.status(500).send("Message could not be added to the database!");
+            } else {
+              console.log("Successfully added message!");
+              return res.sendStatus(201);
             }
-            console.log("Successfully added message!");
+
         });
-        res.sendStatus(201);
+
     };
 };
 

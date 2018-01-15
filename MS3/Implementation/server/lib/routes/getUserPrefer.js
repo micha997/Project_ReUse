@@ -13,9 +13,10 @@ const getUserPrefer = function(database) {
             res.setHeader("Content-Type", "application/json");
             if (err) {
                 return res.status(500).end();
+            } else {
+              var prefs = calcPrefs(mappings);
+              return res.send(prefs);
             }
-            var prefs = calcPrefs(mappings);
-            res.send(prefs);
         })
 
     };

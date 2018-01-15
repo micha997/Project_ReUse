@@ -119,43 +119,88 @@ const database = {
             throw new Error('Callback is missing.');
         }
         // find all elements
-                    var requests = [];
 
-        this.mappings.find({
-            type: "userprofile",
-            "requests.ouId": uId
-        }).toArray((err, mapping) => {
-            if (err) {
-                return callback(err);
+
+        async.waterfall([
+            async.apply(findOwnRequests, this.mappings, uId),
+            async.apply(findOtherRequests, this.mappings),
+            async.apply(searchClothing,this.mappings)
+        ], function (err, result) {
+            if (err=="1") {
+              return callback(err);
+            } else {
+              return callback(null, result);
             }
+        });
 
-            for (var single_map in mapping) {
-                var obj = mapping[single_map].requests;
-                for (var single_request in obj) {
-                  if (obj[single_request].ouId == uId) {
-                    obj[single_request].from = "foreign";
-                   requests.push(obj[single_request]);
+        function findOwnRequests(mappings, uId, callback) {
+          mappings.find({
+              type: "userprofile",
+              "requests.ouId": uId
+          }).toArray((err, mapping) => {
+              if (err) {
+                callback("1", null);
+              } else {
+                callback(null, mapping);
+              }
+          })
+        }
+
+        function findOtherRequests(mappings, mapping, callback) {
+          var requests = [];
+
+              for (var single_map in mapping) {
+                  var obj = mapping[single_map].requests;
+                  for (var single_request in obj) {
+                    if (obj[single_request].ouId == uId) {
+                      obj[single_request].from = "foreign";
+                     requests.push(obj[single_request]);
+                    }
                   }
-                }
-            }
-            this.mappings.findOne({
-                type: "userprofile",
-                uId: uId
-            }, (err, mappings) => {
-                if (err) {
-                    return callback(err);
-                }
-                for (var single_ownReq in mappings.requests) {
-                  mappings.requests[single_ownReq].from = "own";
-                requests.push(mappings.requests[single_ownReq]);
-                }
-                //send results back to handler
-                callback(null, requests);
-            })
+              }
+              mappings.findOne({
+                  type: "userprofile",
+                  uId: uId
+              }, (err, mappings) => {
+                  if (err) {
+                      callback("1", null);
+                  }
+                  for (var single_ownReq in mappings.requests) {
+                    mappings.requests[single_ownReq].from = "own";
+                    requests.push(mappings.requests[single_ownReq]);
+                  }
+                  //send results back to handler
+                  callback(null, requests);
+              })
+        }
+
+        function searchClothing(mappings, requests, callback) {
+
+              mappings.find({
+                  type: "clothing",
+              }).toArray((err, mapping) => {
+                  if (err) {
+                      callback("1", null);
+                  }
+
+                  for (var single_req in requests) {
+
+                    for (var single_clothing in mapping) {
+                      if (mapping[single_clothing].id == requests[single_req].cId)
+                      delete mapping[single_clothing].uId;
+                      delete mapping[single_clothing].id;
+                      var obj = Object.assign(requests[single_req],mapping[single_clothing] );
+                    }
+                  }
+                  console.log(requests);
+                      //
+                        // console.log(mapping.id);
 
 
-        })
-
+                  //send results back to handler
+                  callback(null, requests);
+              })
+        }
 
     },
 
@@ -205,28 +250,55 @@ const database = {
         if (!callback) {
             throw new Error('callback is missing.');
         }
-        this.mappings.update({
-            type: "userprofile",
-            "requests.id": id,
 
-        }, {
-            $set: {
-                "requests.$.status": body.status,
-                "requests.$.confirmed": body.confirmed
-
+        async.waterfall([
+            async.apply(findRequest, this.mappings, id, body),
+            async.apply(sendPush, this.mappings, body),
+        ], function (err, result) {
+            if (err=="1") {
+              return callback(err);
+            } else {
+              return callback(null, result);
             }
-          })
-          if (body.status == "accepted") {
-            this.mappings.findOne({
-                uId: body.uId,
-                type: "token"
-            }, (err, mappings) => {
+        });
+
+        function findRequest(mappings, id, body, callback) {
+          mappings.update({
+              type: "userprofile",
+              "requests.id": id,
+
+          }, {
+              $set: {
+                  "requests.$.status": body.status,
+                  "requests.$.confirmed": body.confirmed
+
+              }
+            }, (err) => {
+              if (err) {
+                callback("1");
+              } else {
+
+
+                callback(null)
+              }
+            })
+          }
+
+          function sendPush(mappings, body, callback) {
+            if (body.status == "accepted") {
+              mappings.findOne({
+                  uId: body.uId,
+                  type: "token"
+              }, (err, mappings) => {
                 if (err) {
-                    return callback(err);
+                    callback(null);
+                } else {
+                  sendPushNotification(mappings.token, body.uId, mappings, "", "accepted");
+                  callback(null);
                 }
 
-                sendPushNotification(mappings.token, body.uId, mappings, "", "accepted");
-            })
+              })
+            }
         }
     },
     putClothing(cId, put, callback) {
@@ -510,6 +582,7 @@ const database = {
             if (err) {
                 return callback(err);
             }
+            console.log(body.uId);
             this.mappings.findOne({
                 uId: body.uId,
                 type: "token"

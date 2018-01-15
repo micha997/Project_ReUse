@@ -9,12 +9,12 @@ const putClothing = function(database) {
 
         database.putClothing(req.params.cId, req.body, err => {
             if (err) {
-                console.log("Failed to edit clothing!");
-                return res.status(500).send("clothing could not be edited!");
+                console.log("Failed to edit request!");
+                return res.status(500).send("request could not be edited!");
             }
-            console.log("Successfully edited clothing!");
+            console.log("Successfully edited resquest!");
         });
-        res.sendStatus(201);
+        return res.sendStatus(201);
     };
 };
 

@@ -11,9 +11,10 @@ const getAll = function(database) {
             res.setHeader("Content-Type", "application/json");
             if (err) {
                 return res.status(500).end();
+            } else {
+              console.log(mappings);
+              return res.status(201).send(mappings);
             }
-            console.log(mappings);
-            res.status(201).send(mappings);
         })
         /*for (var single_map in mappings) {
             delete mappings[single_map].image;

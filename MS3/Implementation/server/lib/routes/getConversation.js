@@ -11,13 +11,16 @@ const getConversation = function(database) {
             res.setHeader("Content-Type", "application/json");
             if (err) {
                 return res.status(500).end();
+            } else {
+              mappings.sort(function(a, b) {
+                return parseFloat(a.time) - parseFloat(b.time);
+              })
+            return res.status(201).send(mappings);
             }
-            mappings.sort(function(a, b) {
-              return parseFloat(a.time) - parseFloat(b.time);
-            });
-            res.status(201).send(mappings);
-        })
+          })
+
+        }
     };
-};
+
 
 module.exports = getConversation;

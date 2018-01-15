@@ -7,12 +7,15 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -42,11 +45,15 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
     private Button btnStartChat;
     private Button btnConfirmTransaction;
     private Button btnAcceptRequest;
-
+    private RadioButton rbOwnRequests;
+    private RadioButton rbForeignRequests;
+    private ArrayList<Request> foreignRequestList = new ArrayList<>();
+    private ArrayList<Request> ownRequestList = new ArrayList<>();
     private Spinner spinActiveRequests;
     private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private final String uId= firebaseAuth.getCurrentUser().getUid();
     private Spinner spinRequestsWaiting;
+    private ListView lvShowRequests;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -71,6 +78,14 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
         btnTransSuccess = (Button) findViewById(R.id.btnTransSuccess);
         btnTransSuccess.setOnClickListener(this);
 
+        lvShowRequests = (ListView) findViewById(R.id.lvShowRequests);
+
+        rbOwnRequests = (RadioButton) findViewById(R.id.rbOwnRequest);
+        rbOwnRequests.setOnClickListener(this);
+
+        rbForeignRequests = (RadioButton) findViewById(R.id.rbForeignRequest);
+        rbForeignRequests.setOnClickListener(this);
+
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
                 new IntentFilter("showrequests"));
 
@@ -79,6 +94,8 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
         myIntent.putExtra("from","SHOWREQUESTS");
         myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId + "/requests");
         startService(myIntent);
+
+
 
     }
 
@@ -116,47 +133,78 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            String from = intent.getStringExtra("from");
-            if (from.equals("SHOWREQUESTSFAIL")) {
-                showDialog("Error","Could not get request!");
+            String success = intent.getStringExtra("success");
+            if (success.equals("1")) {
+                showDialog("Success!", "Successfully edited status of Request!");
             } else {
 
-                String requests = intent.getStringExtra("clothing");
+                String from = intent.getStringExtra("from");
+                if (from.equals("SHOWREQUESTSFAIL")) {
+                    showDialog("Error", "Could not get request!");
+                } else {
 
-                try {
-                    requestJsonArray = new JSONArray(requests);
-                    for (int i = 0; i < requestJsonArray.length(); i++) {
-                        JSONObject requestJsonObject = requestJsonArray.getJSONObject(i);
-                        if (requestJsonObject.getString("from").equals("own")) {
-                            txtShowMyRequests.append(requestJsonObject.toString());
+                    String requests = intent.getStringExtra("clothing");
 
-                        } else if (requestJsonObject.getString("from").equals("foreign")) {
-                            txtShowForeignRequests.append(requestJsonObject.toString());
-                            if (requestJsonObject.getString("status").equals("open"))
-                                ids.add(requestJsonObject.getString("id").toString());
+                    try {
+
+                        requestJsonArray = new JSONArray(requests);
+                        for (int i = 0; i < requestJsonArray.length(); i++) {
+                            JSONObject requestJsonObject = requestJsonArray.getJSONObject(i);
+                            if (requestJsonObject.getString("from").equals("own")) {
+                                Request ownnRequest= new Request(requestJsonObject.getString("id").toString(),
+                                        requestJsonObject.getString("art").toString(),requestJsonObject.getString("size").toString(),
+                                        requestJsonObject.getString("brand").toString(),requestJsonObject.getString("status").toString());
+                                ownRequestList.add(ownnRequest);
+                                txtShowMyRequests.append(requestJsonObject.toString());
+
+                            } else if (requestJsonObject.getString("from").equals("foreign")) {
+                                Request foreignRequest= new Request(requestJsonObject.getString("id").toString(),
+                                        requestJsonObject.getString("art").toString(),requestJsonObject.getString("size").toString(),
+                                        requestJsonObject.getString("brand").toString(),requestJsonObject.getString("status").toString());
+                                foreignRequestList.add(foreignRequest);
+                                txtShowForeignRequests.append(requestJsonObject.toString());
+                                if (requestJsonObject.getString("status").equals("open")) {
+                                    ids.add(requestJsonObject.getString("id").toString());
+                                }
+                            } else if (requestJsonObject.getString("status").equals("accepted")) {
+                                activeRequests.add(requestJsonObject.getString("id").toString());
+                            } else if (requestJsonObject.getString("status").equals("waiting") && (!requestJsonObject.getString("confirmed").equals(uId))) {
+                                requestsWaiting.add(requestJsonObject.getString("id").toString());
+                            }
+
                         }
-                        if (requestJsonObject.getString("status").equals("accepted"))
-                            activeRequests.add(requestJsonObject.getString("id").toString());
-                        if (requestJsonObject.getString("status").equals("waiting") && (!requestJsonObject.getString("confirmed").equals(uId)))
-                            requestsWaiting.add(requestJsonObject.getString("id").toString());
+
+                        requestAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, activeRequests);
+                        spinActiveRequests.setAdapter(requestAdapter);
+
+                        requestAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, ids);
+                        spinOpenRequests.setAdapter(requestAdapter);
+
+                        requestAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, requestsWaiting);
+                        spinRequestsWaiting.setAdapter(requestAdapter);
+
+                        if (rbForeignRequests.isChecked()) {
+                            fillListView(foreignRequestList);
+
+                        } else {
+                            fillListView(ownRequestList);
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
 
-                    requestAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, activeRequests);
-                    spinActiveRequests.setAdapter(requestAdapter);
-
-                    requestAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, ids);
-                    spinOpenRequests.setAdapter(requestAdapter);
-
-                    requestAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, requestsWaiting);
-                    spinRequestsWaiting.setAdapter(requestAdapter);
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
                 }
-
             }
         }
     };
+
+    private void fillListView(ArrayList<Request> requests) {
+        RequestListAdapter reqAdapter;
+        reqAdapter = new RequestListAdapter(getApplicationContext(), R.layout.list_requests,requests );
+        lvShowRequests.setAdapter(reqAdapter);
+
+    }
 
 
     private void showDialog(String title, String message) {
@@ -217,11 +265,16 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
 
             case R.id.btnAcceptRequest:
                 setStatus("accepted", spinOpenRequests.getSelectedItem().toString());
-
                 break;
 
             case R.id.btnTransSuccess:
                 setStatus("waiting", spinActiveRequests.getSelectedItem().toString());
+                break;
+            case R.id.rbOwnRequest:
+                fillListView(ownRequestList);
+                break;
+            case R.id.rbForeignRequest:
+                fillListView(foreignRequestList);
                 break;
         }
     }

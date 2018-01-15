@@ -12,8 +12,9 @@ const getUserProfile = function(database) {
             res.setHeader("Content-Type", "application/json");
             if (err) {
                 return res.status(500).end();
+            } else {
+              return res.send(mappings);
             }
-            res.send(mappings);
         })
 
     };

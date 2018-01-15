@@ -11,10 +11,12 @@ const putRequest = function(database) {
             if (err) {
                 console.log("Failed to edit clothing!");
                 return res.status(500).send("clothing could not be edited!");
+            } else {
+              console.log("Successfully edited clothing!");
+              return res.sendStatus(201);
             }
-            console.log("Successfully edited clothing!");
         });
-        res.sendStatus(201);
+
     };
 };
 

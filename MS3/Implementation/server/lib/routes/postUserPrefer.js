@@ -8,11 +8,13 @@ const postUserPrefer = function(database) {
             if (err) {
                 console.log("Failed to add prefer!");
                 return res.status(500).send("prefer could not be added to the database!");
+            } else {
+              console.log("Successfully added prefer!");
+              return res.sendStatus(201);
             }
-            console.log("Successfully added prefer!");
         }));
 
-        res.sendStatus(201);
+
     };
 };
 
