@@ -11,13 +11,17 @@ import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.ContextMenu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
@@ -32,51 +36,22 @@ import java.util.ArrayList;
  * Created by Frank on 07.01.2018.
  */
 
-public class ShowRequest extends AppCompatActivity implements View.OnClickListener {
-    private TextView txtShowMyRequests;
-    private Spinner spinOpenRequests;
-    private ArrayList<String> ids = new ArrayList();
-    private ArrayList<String> activeRequests = new ArrayList();
-    private ArrayList<String> requestsWaiting = new ArrayList();
-    private ArrayAdapter<String> requestAdapter;
+public class ShowRequest extends AppCompatActivity implements View.OnClickListener  {
     private JSONArray requestJsonArray;
-    private TextView txtShowForeignRequests;
-    private Button btnTransSuccess;
-    private Button btnStartChat;
-    private Button btnConfirmTransaction;
-    private Button btnAcceptRequest;
     private RadioButton rbOwnRequests;
     private RadioButton rbForeignRequests;
     private ArrayList<Request> foreignRequestList = new ArrayList<>();
     private ArrayList<Request> ownRequestList = new ArrayList<>();
-    private Spinner spinActiveRequests;
     private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private final String uId= firebaseAuth.getCurrentUser().getUid();
-    private Spinner spinRequestsWaiting;
     private ListView lvShowRequests;
+    private boolean menu_first;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_requests);
 
-        txtShowMyRequests = (TextView) findViewById(R.id.txtShowMyRequests);
-        txtShowForeignRequests = (TextView) findViewById(R.id.txtShowForeignRequests);
-        spinOpenRequests = (Spinner) findViewById(R.id.spinOpenRequests);
-        spinActiveRequests = (Spinner) findViewById(R.id.spinActiveRequests);
-        spinRequestsWaiting = (Spinner) findViewById(R.id.spinRequestsWaiting);
-
-        btnStartChat = (Button) findViewById(R.id.btnStartChat);
-        btnStartChat.setOnClickListener(this);
-
-        btnConfirmTransaction = (Button) findViewById(R.id.btnConfirmTransaction);
-        btnConfirmTransaction.setOnClickListener(this);
-
-        btnAcceptRequest = (Button) findViewById(R.id.btnAcceptRequest);
-        btnAcceptRequest.setOnClickListener(this);
-
-        btnTransSuccess = (Button) findViewById(R.id.btnTransSuccess);
-        btnTransSuccess.setOnClickListener(this);
 
         lvShowRequests = (ListView) findViewById(R.id.lvShowRequests);
 
@@ -85,6 +60,7 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
 
         rbForeignRequests = (RadioButton) findViewById(R.id.rbForeignRequest);
         rbForeignRequests.setOnClickListener(this);
+        registerForContextMenu(lvShowRequests);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
                 new IntentFilter("showrequests"));
@@ -97,6 +73,125 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
 
 
 
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        if (v.getId() == R.id.lvShowRequests) {
+            ListView lv = (ListView) v;
+            AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) menuInfo;
+            Request obj = (Request) lv.getItemAtPosition(acmi.position);
+            if (obj.getStatus().equals("open") && obj.getFrom().equals("foreign")) {
+                menu.add("Accept");
+                menu.add("Decline");
+            } else if (obj.getStatus().equals("open") && obj.getFrom().equals("own")) {
+                menu.add("Delete");
+            } else if (obj.getStatus().equals("accepted") && obj.getFrom().equals("own")) {
+                menu.add("Chat");
+                menu.add("Delete");
+                menu.add("Success");
+            } else if (obj.getStatus().equals("accepted") && obj.getFrom().equals("foreign")) {
+                menu.add("Chat");
+                menu.add("Decline");
+                menu.add("Success");
+            } else if (obj.getStatus().equals("accepted") && obj.getFrom().equals("foreign")) {
+                menu.add("Chat");
+                menu.add("Decline");
+                menu.add("Success");
+            } else if (obj.getStatus().equals("waiting") && !obj.getConfirmed().equals(uId)) {
+                menu.add("Confirm");
+            } else if (obj.getStatus().equals("confirmed")) {
+                menu.add("Rate User");
+                menu.add("Delete");
+            }
+            for (int i = 0; i < menu.size(); ++i) {
+                MenuItem item = menu.getItem(i);
+                item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        onContextItemSelected(item);
+                        return true;
+                    }
+                });
+            }
+            menu_first=true;
+        }
+
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        if (menu_first) {
+            menu_first=false;
+            final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+
+            if (info.targetView.getParent() != findViewById(R.id.lvShowRequests))
+                return super.onContextItemSelected(item);
+
+            String title = (String) item.getTitle();
+            int menuItemIndex = info.position;
+            if (rbForeignRequests.isChecked()) {
+                Request menuItems = foreignRequestList.get(menuItemIndex);
+                String name = menuItems.getName();
+                if (title.equals("Decline")) {
+                    sendDelete(menuItems.getOuId(), name);
+                }
+                if (title.equals("Delete")) {
+                    sendDelete(menuItems.getOuId(), name);
+                }
+                if (title.equals("Accept")) {
+                    setStatus("accepted", name);
+                }
+                if (title.equals("Chat")) {
+                    Intent myIntent = new Intent(getApplicationContext(), Chat.class);
+                    myIntent.putExtra("rId", menuItems.getName());
+                    myIntent.putExtra("to", menuItems.getOuId());
+                    myIntent.putExtra("from", uId);
+                    startActivity(myIntent);
+                }
+                if (title.equals("Success")) {
+                    setStatus("waiting", menuItems.getName());
+                }
+                if (title.equals("Confirm")) {
+                    setStatus("confirmed", name);
+                }
+                if (title.equals("Rate User")) {
+                    Intent myIntent;
+                    myIntent = new Intent(getApplicationContext(), RateUser.class);
+                    myIntent.putExtra("tId", menuItems.getName());
+                    myIntent.putExtra("ouId", menuItems.getOuId());
+                    startActivity(myIntent);
+                }
+            } else {
+                Request menuItems = (Request) ownRequestList.get(menuItemIndex);
+                String name = menuItems.getName();
+                if (title.equals("Delete")) {
+                    sendDelete(uId, name);
+                }
+                if (title.equals("Chat")) {
+                    Intent myIntent = new Intent(getApplicationContext(), Chat.class);
+                    myIntent.putExtra("rId", menuItems.getName());
+                    myIntent.putExtra("to", menuItems.getOuId());
+                    myIntent.putExtra("from", uId);
+                    startActivity(myIntent);
+                }
+                if (title.equals("Success")) {
+                    setStatus("waiting", menuItems.getName());
+                }
+                if (title.equals("Confirm")) {
+                    setStatus("confirmed", name);
+                }
+                if (title.equals("Rate User")) {
+                    Intent myIntent;
+                    myIntent = new Intent(getApplicationContext(), RateUser.class);
+                    myIntent.putExtra("tId", menuItems.getName());
+                    myIntent.putExtra("ouId", menuItems.getOuId());
+                    startActivity(myIntent);
+                }
+            }
+
+        }
+        return true;
     }
 
     private JSONObject setStatus(String status, String spin) {
@@ -128,6 +223,14 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
         return null;
         }
 
+        private void sendDelete(String uId, String id) {
+            Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
+            myIntent.putExtra("method","DELETE");
+            myIntent.putExtra("from","DELETEREQUEST");
+            myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId + "/requests/" + id);
+            startService(myIntent);
+        }
+
 
         private BroadcastReceiver mReceiver = new BroadcastReceiver() {
 
@@ -135,7 +238,9 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
         public void onReceive(Context context, Intent intent) {
             String success = intent.getStringExtra("success");
             if (success.equals("1")) {
-                showDialog("Success!", "Successfully edited status of Request!");
+                showDialog("Success!", "Successfully edited status of request!");
+            } else if(success.equals("2")) {
+                showDialog("Success!", "Successfully deleted request!");
             } else {
 
                 String from = intent.getStringExtra("from");
@@ -153,35 +258,17 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
                             if (requestJsonObject.getString("from").equals("own")) {
                                 Request ownnRequest= new Request(requestJsonObject.getString("id").toString(),
                                         requestJsonObject.getString("art").toString(),requestJsonObject.getString("size").toString(),
-                                        requestJsonObject.getString("brand").toString(),requestJsonObject.getString("status").toString());
+                                        requestJsonObject.getString("brand").toString(),requestJsonObject.getString("status").toString(),requestJsonObject.getString("from").toString(), requestJsonObject.getString("ouId"),requestJsonObject.getString("confirmed"));
                                 ownRequestList.add(ownnRequest);
-                                txtShowMyRequests.append(requestJsonObject.toString());
 
                             } else if (requestJsonObject.getString("from").equals("foreign")) {
                                 Request foreignRequest= new Request(requestJsonObject.getString("id").toString(),
                                         requestJsonObject.getString("art").toString(),requestJsonObject.getString("size").toString(),
-                                        requestJsonObject.getString("brand").toString(),requestJsonObject.getString("status").toString());
+                                        requestJsonObject.getString("brand").toString(),requestJsonObject.getString("status").toString(),requestJsonObject.getString("from").toString(), requestJsonObject.getString("uId"),requestJsonObject.getString("confirmed"));
                                 foreignRequestList.add(foreignRequest);
-                                txtShowForeignRequests.append(requestJsonObject.toString());
-                                if (requestJsonObject.getString("status").equals("open")) {
-                                    ids.add(requestJsonObject.getString("id").toString());
-                                }
-                            } else if (requestJsonObject.getString("status").equals("accepted")) {
-                                activeRequests.add(requestJsonObject.getString("id").toString());
-                            } else if (requestJsonObject.getString("status").equals("waiting") && (!requestJsonObject.getString("confirmed").equals(uId))) {
-                                requestsWaiting.add(requestJsonObject.getString("id").toString());
                             }
 
                         }
-
-                        requestAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, activeRequests);
-                        spinActiveRequests.setAdapter(requestAdapter);
-
-                        requestAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, ids);
-                        spinOpenRequests.setAdapter(requestAdapter);
-
-                        requestAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, requestsWaiting);
-                        spinRequestsWaiting.setAdapter(requestAdapter);
 
                         if (rbForeignRequests.isChecked()) {
                             fillListView(foreignRequestList);
@@ -223,53 +310,6 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-
-            case R.id.btnStartChat:
-                Intent myIntent = new Intent(getApplicationContext(),Chat.class);
-
-
-                myIntent.putExtra("rId", spinActiveRequests.getSelectedItem().toString());
-                try {
-                    for (int i = 0; i < requestJsonArray.length(); i++) {
-                            if (requestJsonArray.getJSONObject(i).getString("id").equals(spinActiveRequests.getSelectedItem().toString())) {
-                                if (uId.equals(requestJsonArray.getJSONObject(i).getString("uId"))) {
-                                    myIntent.putExtra("to", requestJsonArray.getJSONObject(i).getString("ouId"));
-                                } else {
-                                    myIntent.putExtra("to", requestJsonArray.getJSONObject(i).getString("uId"));
-                                }
-                            }
-                    }
-                    myIntent.putExtra("from", uId);
-                    startActivity(myIntent);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                break;
-
-            case R.id.btnConfirmTransaction:
-                setStatus("confirmed", spinRequestsWaiting.getSelectedItem().toString());
-                myIntent = new Intent(getApplicationContext(), RateUser.class);
-                myIntent.putExtra("tId", spinRequestsWaiting.getSelectedItem().toString());
-                try {
-                    for (int i = 0; i < requestJsonArray.length(); i++) {
-
-                        if (requestJsonArray.getJSONObject(i).getString("id").equals(spinRequestsWaiting.getSelectedItem().toString())) {
-                            myIntent.putExtra("request",requestJsonArray.getJSONObject(i).toString());
-                        }
-                    }
-                    startActivity(myIntent);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                break;
-
-            case R.id.btnAcceptRequest:
-                setStatus("accepted", spinOpenRequests.getSelectedItem().toString());
-                break;
-
-            case R.id.btnTransSuccess:
-                setStatus("waiting", spinActiveRequests.getSelectedItem().toString());
-                break;
             case R.id.rbOwnRequest:
                 fillListView(ownRequestList);
                 break;

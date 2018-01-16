@@ -31,3 +31,4 @@ exports.postUserSearch = require('./postUserSearch');
 exports.postRequest = require('./postRequest');
 exports.getUserRequests = require('./getUserRequests');
 exports.putRequest = require('./putRequest');
+exports.deleteUserRequest = require('./deleteUserRequest');

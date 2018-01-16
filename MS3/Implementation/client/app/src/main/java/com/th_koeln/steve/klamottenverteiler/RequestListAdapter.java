@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 import java.util.List;
 
 /**
@@ -19,6 +21,8 @@ public class RequestListAdapter extends ArrayAdapter<Request> {
     private static final String TAG = "RequestAdapter";
     private Context mContext;
     private int mRessource;
+    private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+    private final String uId= firebaseAuth.getCurrentUser().getUid();
 
     public RequestListAdapter(Context context, int resource, List<Request> objects) {
         super(context, resource, objects);
@@ -36,8 +40,11 @@ public class RequestListAdapter extends ArrayAdapter<Request> {
         String size = getItem(position).getSize();
         String brand = getItem(position).getBrand();
         String status = getItem(position).getStatus();
+        String from = getItem(position).getFrom();
+        String ouId = getItem(position).getOuId();
+        String confirmed = getItem(position).getConfirmed();
 
-        Request request = new Request(name, art, size, brand,status);
+        Request request = new Request(name, art, size, brand, status, from, ouId, confirmed);
 
         LayoutInflater inflater = LayoutInflater.from(mContext);
         convertView = inflater.inflate(mRessource,parent,false);
@@ -51,7 +58,26 @@ public class RequestListAdapter extends ArrayAdapter<Request> {
         txtRequestArt.setText("Art: " + art);
         txtRequestSize.setText("Size: " + size);
         txtRequestBrand.setText("Brand: " + brand);
-        txtRequestStatus.setText("Status: " + status);
+
+        switch (status) {
+            case "open":
+                txtRequestStatus.setText("Status: " + "Waiting for response..");
+                break;
+            case "accepted":
+                txtRequestStatus.setText("Status: accepted");
+                break;
+            case "waiting":
+                if (confirmed.equals(uId)) {
+                    txtRequestStatus.setText("Status: Waiting for confirmation");
+                } else {
+                    txtRequestStatus.setText("Status: Waiting for your confirmation");
+                }
+                break;
+            default:
+                txtRequestStatus.setText(status);
+                break;
+        }
+
 
 
         return convertView;

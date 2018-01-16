@@ -67,7 +67,6 @@ public class RateUser extends AppCompatActivity {
         final String request = getIntent().getStringExtra("request");
 
         txtTransactionDetails.append(tId);
-        txtTransactionDetails.append(request);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
                 new IntentFilter("RATEUSER"));
@@ -75,23 +74,21 @@ public class RateUser extends AppCompatActivity {
         btnSendRating.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                String tId = getIntent().getStringExtra("tId");
+                String ouId = getIntent().getStringExtra("ouId");
                 try {
                     SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
                     Date now = new Date();
 
                     String strDate = sdfDate.format(now);
                     Date date = sdfDate.parse(strDate);
-                    JSONObject rating = new JSONObject(request);
+                    JSONObject rating = new JSONObject();
                     rating.put("choice", spinChooseRating.getSelectedItem().toString());
                     rating.put("comment", txtComment.getText().toString());
                     rating.put("time",date.getTime() );
-                    String ouId=null;
-                    if (uId.equals(rating.getString("ouId"))) {
-                       ouId = rating.getString("uId");
-                    } else {
-                       ouId = rating.getString("ouId");
-                    }
+                    rating.put("from", uId);
+                    rating.put("tId", tId);
+
                     Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
                     myIntent.putExtra("payload",rating.toString());
                     myIntent.putExtra("method","POST");
@@ -117,6 +114,8 @@ public class RateUser extends AppCompatActivity {
             String from = intent.getStringExtra("from");
             if (from.equals("POSTRATINGFAIL")) {
                 showDialog("Error","Could not add rating to Server!");
+            } else if (from.equals("POSTRATING")) {
+                showDialog("Success","Successfully added rating!");
             }
 
         }

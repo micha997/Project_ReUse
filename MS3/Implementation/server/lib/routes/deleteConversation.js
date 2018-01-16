@@ -3,7 +3,6 @@
 const deleteConversation = function(database) {
 
     return function(req, res) {
-        console.log("hi");
         // call database
         database.deleteConversation(req.params.uId, req.params.ouId, err => {
             if (err) {

@@ -236,6 +236,16 @@ public class HttpsService extends IntentService {
                             intent.putExtra("from", "PUTREQUEST");
                             intent.putExtra("success", "1");
                             break;
+                        case "DELETEREQUEST":
+                            intent = new Intent("showrequests");
+                            intent.putExtra("from", "PUTREQUEST");
+                            intent.putExtra("success", "2");
+                            break;
+                        case "POSTRATING":
+                            intent = new Intent("RATEUSER");
+                            intent.putExtra("from", "POSTRATING");
+                            break;
+
 
                     }
                     LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);

@@ -124,82 +124,84 @@ const database = {
         async.waterfall([
             async.apply(findOwnRequests, this.mappings, uId),
             async.apply(findOtherRequests, this.mappings),
-            async.apply(searchClothing,this.mappings)
-        ], function (err, result) {
-            if (err=="1") {
-              return callback(err);
+            async.apply(searchClothing, this.mappings)
+        ], function(err, result) {
+            if (err == "1") {
+                return callback(err);
             } else {
-              return callback(null, result);
+                return callback(null, result);
             }
         });
 
         function findOwnRequests(mappings, uId, callback) {
-          mappings.find({
-              type: "userprofile",
-              "requests.ouId": uId
-          }).toArray((err, mapping) => {
-              if (err) {
-                callback("1", null);
-              } else {
-                callback(null, mapping);
-              }
-          })
+            mappings.find({
+                type: "userprofile",
+                "requests.ouId": uId
+            }).toArray((err, mapping) => {
+                if (err) {
+                    callback("1", null);
+                } else {
+                    callback(null, mapping);
+                }
+            })
         }
 
         function findOtherRequests(mappings, mapping, callback) {
-          var requests = [];
+            var requests = [];
 
-              for (var single_map in mapping) {
-                  var obj = mapping[single_map].requests;
-                  for (var single_request in obj) {
+            for (var single_map in mapping) {
+                var obj = mapping[single_map].requests;
+                for (var single_request in obj) {
                     if (obj[single_request].ouId == uId) {
-                      obj[single_request].from = "foreign";
-                     requests.push(obj[single_request]);
+                        obj[single_request].from = "foreign";
+                        requests.push(obj[single_request]);
                     }
-                  }
-              }
-              mappings.findOne({
-                  type: "userprofile",
-                  uId: uId
-              }, (err, mappings) => {
-                  if (err) {
-                      callback("1", null);
-                  }
-                  for (var single_ownReq in mappings.requests) {
+                }
+            }
+            mappings.findOne({
+                type: "userprofile",
+                uId: uId
+            }, (err, mappings) => {
+                if (err) {
+                    callback("1", null);
+                }
+                for (var single_ownReq in mappings.requests) {
                     mappings.requests[single_ownReq].from = "own";
                     requests.push(mappings.requests[single_ownReq]);
-                  }
-                  //send results back to handler
-                  callback(null, requests);
-              })
+                }
+                //send results back to handler
+                console.log(requests);
+                callback(null, requests);
+            })
         }
 
         function searchClothing(mappings, requests, callback) {
 
-              mappings.find({
-                  type: "clothing",
-              }).toArray((err, mapping) => {
-                  if (err) {
-                      callback("1", null);
-                  }
+            mappings.find({
+                type: "clothing",
+            }).toArray((err, mapping) => {
+                if (err) {
+                    callback("1", null);
+                }
 
-                  for (var single_req in requests) {
+                for (var single_req in requests) {
 
                     for (var single_clothing in mapping) {
-                      if (mapping[single_clothing].id == requests[single_req].cId)
-                      delete mapping[single_clothing].uId;
-                      delete mapping[single_clothing].id;
-                      var obj = Object.assign(requests[single_req],mapping[single_clothing] );
+                        if (mapping[single_clothing].id == requests[single_req].cId)
+                            delete mapping[single_clothing].uId;
+                        delete mapping[single_clothing].id;
+                        delete mapping[single_clothing].uId;
+                        var obj = Object.assign(requests[single_req], mapping[single_clothing]);
                     }
-                  }
-                  console.log(requests);
-                      //
-                        // console.log(mapping.id);
+                }
+                console.log(requests);
+                //
+                // console.log(mapping.id);
 
 
-                  //send results back to handler
-                  callback(null, requests);
-              })
+                //send results back to handler
+                callback(null, requests);
+            })
         }
 
     },
@@ -220,7 +222,7 @@ const database = {
             type: "userprofile",
             uId: uId
         }, {
-            $set:  put
+            $set: put
         })
     },
     putUserRating(uId, id, put) {
@@ -254,50 +256,50 @@ const database = {
         async.waterfall([
             async.apply(findRequest, this.mappings, id, body),
             async.apply(sendPush, this.mappings, body),
-        ], function (err, result) {
-            if (err=="1") {
-              return callback(err);
+        ], function(err, result) {
+            if (err == "1") {
+                return callback(err);
             } else {
-              return callback(null, result);
+                return callback(null, result);
             }
         });
 
         function findRequest(mappings, id, body, callback) {
-          mappings.update({
-              type: "userprofile",
-              "requests.id": id,
+            mappings.update({
+                type: "userprofile",
+                "requests.id": id,
 
-          }, {
-              $set: {
-                  "requests.$.status": body.status,
-                  "requests.$.confirmed": body.confirmed
+            }, {
+                $set: {
+                    "requests.$.status": body.status,
+                    "requests.$.confirmed": body.confirmed
 
-              }
-            }, (err) => {
-              if (err) {
-                callback("1");
-              } else {
-
-
-                callback(null)
-              }
-            })
-          }
-
-          function sendPush(mappings, body, callback) {
-            if (body.status == "accepted") {
-              mappings.findOne({
-                  uId: body.uId,
-                  type: "token"
-              }, (err, mappings) => {
-                if (err) {
-                    callback(null);
-                } else {
-                  sendPushNotification(mappings.token, body.uId, mappings, "", "accepted");
-                  callback(null);
                 }
+            }, (err) => {
+                if (err) {
+                    callback("1");
+                } else {
 
-              })
+
+                    callback(null)
+                }
+            })
+        }
+
+        function sendPush(mappings, body, callback) {
+            if (body.status == "accepted") {
+                mappings.findOne({
+                    uId: body.uId,
+                    type: "token"
+                }, (err, mappings) => {
+                    if (err) {
+                        callback(null);
+                    } else {
+                        sendPushNotification(mappings.token, body.uId, mappings, "", "accepted");
+                        callback(null);
+                    }
+
+                })
             }
         }
     },
@@ -444,112 +446,115 @@ const database = {
             callback(null, mappings_new);
         })
     },
+
     addClothing(clothing, callback) {
-      if (!clothing) {
-          throw new Error('Clothing is missing.');
-      }
-      if (!callback) {
-          throw new Error('Callback is missing.');
-      }
-      clothing = JSON.parse(clothing);
+        if (!clothing) {
+            throw new Error('Clothing is missing.');
+        }
+        if (!callback) {
+            throw new Error('Callback is missing.');
+        }
+        clothing = JSON.parse(clothing);
 
-      const mapping = {
-          id: uuidv4(),
-          longitude: clothing["longitude"],
-          latitude: clothing["latitude"],
-          size: clothing["size"],
-          art: clothing["art"],
-          color: clothing["colour"],
-          style: clothing["style"],
-          gender: clothing["gender"],
-          fabric: clothing["fabric"],
-          notes: clothing["notes"],
-          brand: clothing["brand"],
-          date: Date.now(),
-          uId: clothing["uId"],
-          type: "clothing",
-          image: clothing["image"]
-      };
+        const mapping = {
+            id: uuidv4(),
+            longitude: clothing["longitude"],
+            latitude: clothing["latitude"],
+            size: clothing["size"],
+            art: clothing["art"],
+            color: clothing["colour"],
+            style: clothing["style"],
+            gender: clothing["gender"],
+            fabric: clothing["fabric"],
+            notes: clothing["notes"],
+            brand: clothing["brand"],
+            date: Date.now(),
+            uId: clothing["uId"],
+            type: "clothing",
+            image: clothing["image"]
+        };
 
-      async.waterfall([
-          async.apply(insertClothing, this.mappings),
-          searchFits,
-          async.apply(findUsers, this.mappings),
-          async.apply(sendPush, this.mappings),
-      ], function (err) {
-          if (err=="1") {
-            return callback(err);
-          } else {
-            callback(null);
-          }
-      });
+        async.waterfall([
+            async.apply(insertClothing, this.mappings),
+            searchFits,
+            async.apply(findUsers, this.mappings),
+            async.apply(sendPush, this.mappings),
+        ], function(err) {
+            if (err == "1") {
+                return callback(err);
+            } else {
+                callback(null);
+            }
+        });
 
-      function insertClothing(mappings, callback) {
-        mappings.insertOne(mapping, err => {
-                 if (err) {
-                     callback("1");
-                 } else {
-                      callback(null, mappings, mapping);
-                 }
-             })
-
-      }
-
-      function searchFits(mappings, mapping, callback) {
-                var fits = calcOutfit(null, mapping, true);
-                callback(null, mapping, fits);
-      }
-
-      function findUsers(mappings, mapping, fits, callback) {
-
-        function queryCollection(mappings, callback){
-        	mappings.find({    type: "userprofile" }).toArray(function(err, users) {
+        function insertClothing(mappings, callback) {
+            mappings.insertOne(mapping, err => {
                 if (err) {
-                  callback("2");
-                } else if (users.length > 0) {
-                    callback(users);
+                    callback("1");
+                } else {
+                    callback(null, mappings, mapping);
                 }
+            })
+
+        }
+
+        function searchFits(mappings, mapping, callback) {
+            var fits = calcOutfit(null, mapping, true);
+            callback(null, mapping, fits);
+        }
+
+        function findUsers(mappings, mapping, fits, callback) {
+
+            function queryCollection(mappings, callback) {
+                mappings.find({
+                    type: "userprofile"
+                }).toArray(function(err, users) {
+                    if (err) {
+                        callback("2");
+                    } else if (users.length > 0) {
+                        callback(users);
+                    }
+                });
+            }
+
+            queryCollection(mappings, function(users) {
+                callback(null, mapping, fits, users);
+                //You can do more stuff with the result here
             });
         }
 
-        queryCollection(mappings, function(users){
-              callback(null, mapping, fits, users);
-            //You can do more stuff with the result here
-        });
-      }
+        function sendPush(mappings, mapping, fits, users, callback) {
+            //callback(null, 'done');
+            try {
+                for (var single_mapping in users) {
+                    if (users[single_mapping].subscription != null) {
+                        for (var single_subscription in users[single_mapping].subscription) {
+                            if (fits.model == users[single_mapping].subscription[single_subscription].type + "_" + users[single_mapping].subscription[single_subscription].missing) {
+                                mappings.find({
+                                    uId: users[single_mapping].uId,
+                                    type: "token"
+                                }).toArray(function(err, users) {
+                                    if (err) {
+                                        callback("2");
+                                    } else {
+                                        var i = 0;
+                                        for (var map in users) {
+                                            sendPushNotification(users[map].token, "0", mapping, fits, "missing");
+                                        }
+                                    }
+                                })
 
-      function sendPush(mappings, mapping, fits, users, callback) {
-        //callback(null, 'done');
-        try {
-        for (var single_mapping in users) {
-               if (users[single_mapping].subscription != null) {
-                   for (var single_subscription in users[single_mapping].subscription) {
-                       if (fits.model == users[single_mapping].subscription[single_subscription].type + "_" + users[single_mapping].subscription[single_subscription].missing) {
-                           mappings.find({
-                               uId: users[single_mapping].uId,
-                               type: "token"
-                           }).toArray(function(err, users) {
-                               if (err) {
-                                 callback("2");
-                               } else {
-                                 var i=0;
-                                 for (var map in users) {
-                                   sendPushNotification(users[map].token, "0", mapping, fits, "missing");
-                                 }
-                               }
-                           })
+                            }
+                        }
+                    }
 
-                       }
-                   }
-               }
+                }
+                callback(null);
+            } catch (e) {
+                callback("2");
+            }
 
-           }
-           callback(null);
-           } catch (e) {
-             callback("2");
-           }
-
-      }
+        }
 
     },
     postRequest(cId, body, callback) {
@@ -567,7 +572,8 @@ const database = {
             cId: cId,
             uId: body.uId,
             ouId: body.ouId,
-            status: "open"
+            status: "open",
+            confirmed: "0"
         };
         //write mapping to Database
 
@@ -582,9 +588,8 @@ const database = {
             if (err) {
                 return callback(err);
             }
-            console.log(body.uId);
             this.mappings.findOne({
-                uId: body.uId,
+                uId: body.ouId,
                 type: "token"
             }, (err, mappings) => {
                 if (err) {
@@ -695,7 +700,7 @@ const database = {
 
             sendPushNotification(mappings.token, message["to"], message, "", "message");
         })
-                    callback(null);
+        callback(null);
     },
     postUserRating(uId, rating, callback) {
         if (!uId) {
@@ -710,9 +715,10 @@ const database = {
         const mapping = {
             id: uuidv4(),
             type: "rating",
-            from: rating["uId"],
+            from: rating["from"],
             choice: rating["choice"],
             comment: rating["comment"],
+            tId: rating["tId"],
             time: rating["time"]
         };
         //write mapping to Database
@@ -738,17 +744,47 @@ const database = {
             throw new Error('id is missing.');
         }
         // find all elements
-        this.mappings.remove({
-            'uId': id,
-            type: "token"
-        }), err => {
-            if (err) {
-                return callback(err);
+        this.mappings.update({
+                uId : uId,
+                type : "userprofile"
+            },
+            {
+                $pull : { requests : { id : id } }
+            }, err => {
+                console.log("yes");
+                if (err) {
+                    return callback(err);
+                }
+                //send results back to handler
+                callback(	null, mappings);
             }
-            //send results back to handler
-            callback(null, mappings);
-        }
+        );
     },
+    deleteUserRequest(uId, id, callback) {
+        if (!callback) {
+            throw new Error('Callback is missing.');
+        }
+        if (!id) {
+            throw new Error('id is missing.');
+        }
+
+
+        this.mappings.update({
+        uId : uId,
+        type : "userprofile"
+    },
+    {
+        $pull : { requests : { id : id } }
+    },
+    {},
+    err => {
+        if (err) {
+            return callback(err);
+        }
+        //send results back to handler
+        return callback(null);
+    })
+},
     deleteConversation(uId, ouId, callback) {
         if (!callback) {
             throw new Error('Callback is missing.');
@@ -986,23 +1022,26 @@ const database = {
         this.mappings.findOne({
             type: "userprofile",
             uId: uId,
-          }, (err, mappings) => {
+        }, (err, mappings) => {
             if (err) {
                 return callback(err);
             }
 
-            this.mappings.find({type: "userprofile",
-            "messages.from": ouId,"messages.to": uId,}).toArray((err, mapping) => {
+            this.mappings.find({
+                type: "userprofile",
+                "messages.from": ouId,
+                "messages.to": uId,
+            }).toArray((err, mapping) => {
                 if (err) {
                     return callback(err);
                 }
-                var allMessages=[];
+                var allMessages = [];
                 for (var single_mapping in mapping) {
-                  for (var one_message in mapping[single_mapping].messages) {
-                    if (mapping[single_mapping].messages[one_message].to == uId) {
-                      allMessages.push(mapping[single_mapping].messages[one_message]);
+                    for (var one_message in mapping[single_mapping].messages) {
+                        if (mapping[single_mapping].messages[one_message].to == uId) {
+                            allMessages.push(mapping[single_mapping].messages[one_message]);
+                        }
                     }
-                  }
 
                 }
                 for (var single_Messages in mappings.messages) {

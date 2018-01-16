@@ -42,6 +42,8 @@ const getApp = function(database) {
     app.delete('/user/:uId', routes.deleteUserProfile(database));
     app.delete('/user/:uId/clothing', routes.deleteUserClothing(database));
     app.get('/user/:uId/requests', routes.getUserRequests(database));
+    app.delete('/user/:uId/requests/:id', routes.deleteUserRequest(database));
+
     app.put('/user/:uId/requests/:id', routes.putRequest(database));
     app.post('/user/:uId/rating', routes.postUserRating(database));
     app.get('/user/:uId/rating', routes.getUserRating(database));
