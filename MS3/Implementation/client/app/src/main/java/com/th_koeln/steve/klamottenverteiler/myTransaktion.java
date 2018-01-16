@@ -27,16 +27,23 @@ public class myTransaktion {
     //Zeitpunkt zum abholen
     Date timeToGet;
 
+    //Distanz vom letzten Punkt zu diesem in Meter
+    long distanceToMeFromLast;
+    //Zeit vom letzten Punkt zu diesem in Sekunden
+    long timeToMeFromLast;
+
     public myTransaktion(String userID, String clothingID){
         uID = userID;
         cID = clothingID;
-        longitude = 0;
-        latitude = 0;
+        longitude = -1;
+        latitude = -1;
         timeFromWorkday = null;
         timeToWorkday = null;
         timeFromWeekend = null;
         timeToWeekend = null;
         timeToGet = null;
+        distanceToMeFromLast = -1;
+        timeToMeFromLast = -1;
     }
 
     public String getuID(){
@@ -109,6 +116,22 @@ public class myTransaktion {
 
     public void setTimeToGet(Date ttG){
         timeToGet = ttG;
+    }
+
+    public void setDistanceToMeFromLast(long setDis){
+        distanceToMeFromLast = setDis;
+    }
+
+    public long getDistanceToMeFromLast(){
+        return distanceToMeFromLast;
+    }
+
+    public void setTimeToMeFromLast(long setTime){
+        timeToMeFromLast = setTime;
+    }
+
+    public long getTimeToMeFromLast(){
+        return timeToMeFromLast;
     }
 
 
