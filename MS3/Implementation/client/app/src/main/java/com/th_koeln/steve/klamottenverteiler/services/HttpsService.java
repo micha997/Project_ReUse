@@ -171,6 +171,12 @@ public class HttpsService extends IntentService {
                             intent.putExtra("from", "SEARCH");
                             break;
 
+                        case "GMAPS":
+                            intent = new Intent("maps");
+                            intent.putExtra("mapsData",stringBuilder.toString());
+                            intent.putExtra("from","GMAPS");
+                            break;
+
                         case "SEARCHPREFER":
                             intent = new Intent("prefer");
                             intent.putExtra("prefer", stringBuilder.toString());
