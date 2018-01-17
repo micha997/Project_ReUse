@@ -60,8 +60,8 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
 
     private Geocoder geocoder;
 
-    private double latitude;
-    private double longitude;
+    private double latitude= 0;
+    private double longitude=0;
     private String city = null;
     private String result;
 
@@ -103,36 +103,39 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
 
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == PLACE_PICKER_REQUEST) {
-            if (resultCode == RESULT_OK) {
-                // get Place Picker location
-                Place place = PlacePicker.getPlace(getApplicationContext(), data);
-                latitude = place.getLatLng().latitude;
-                longitude = place.getLatLng().longitude;
-            }
-        }
-        if (requestCode == PICK_IMAGE) {
-            try {
-                InputStream inputStream = getApplicationContext().getContentResolver().openInputStream(data.getData());
-                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-                int nRead;
-                byte[] byteData = new byte[16384];
-
-                while ((nRead = inputStream.read(byteData, 0, byteData.length)) != -1) {
-                    buffer.write(byteData, 0, nRead);
+        try {
+            if (requestCode == PLACE_PICKER_REQUEST) {
+                if (resultCode == RESULT_OK) {
+                    // get Place Picker location
+                    Place place = PlacePicker.getPlace(getApplicationContext(), data);
+                    latitude = place.getLatLng().latitude;
+                    longitude = place.getLatLng().longitude;
                 }
+            }
+            if (requestCode == PICK_IMAGE) {
+
+                    InputStream inputStream = getApplicationContext().getContentResolver().openInputStream(data.getData());
+                    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+                    int nRead;
+                    byte[] byteData = new byte[16384];
+
+
+                    while ((nRead = inputStream.read(byteData, 0, byteData.length)) != -1) {
+                        buffer.write(byteData, 0, nRead);
+                    }
+
                 buffer.flush();
 
-                byte imageData[] = buffer.toByteArray();
-                inputStream.read(imageData);
-                result = Base64.encodeToString(imageData, Base64.DEFAULT);
-                imgImage.setImageBitmap(BitmapFactory.decodeByteArray(imageData, 0, imageData.length));
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+                    byte imageData[] = buffer.toByteArray();
+                    inputStream.read(imageData);
+                    result = Base64.encodeToString(imageData, Base64.DEFAULT);
+                    imgImage.setImageBitmap(BitmapFactory.decodeByteArray(imageData, 0, imageData.length));
+
             }
-        }
+
+            } catch (IOException e) {
+                showDialog("Error", "Could not get your location.");
+            }
     }
 
     @Override
@@ -144,11 +147,15 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
                     Intent intent = new PlacePicker.IntentBuilder().build(AddClothing.this);
                     startActivityForResult(intent, AddClothing.PLACE_PICKER_REQUEST);
                 } catch (GooglePlayServicesRepairableException e) {
-                    e.printStackTrace();
+                    new AlertDialog.Builder(AddClothing.this)
+                            .setTitle("Error")
+                            .setMessage("Connection to maps failed!")
+                            .setCancelable(false)
+                            .show();
                 } catch (GooglePlayServicesNotAvailableException e) {
                     new AlertDialog.Builder(AddClothing.this)
                             .setTitle("Error")
-                            .setMessage("Connection to Maps failed!")
+                            .setMessage("Connection to maps failed!")
                             .setCancelable(false)
                             .show();
                 }
@@ -164,38 +171,41 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
                 String notes = etNotes.getText().toString();
                 String brand = etBrand.getText().toString();
 
-                // build JSON object for clothing post
-                JSONObject kleidung = new JSONObject();
-                try {
-                    kleidung.put("size",size);
-                    kleidung.put("art",art);
-                    kleidung.put("style",style);
-                    kleidung.put("gender",gender);
-                    kleidung.put("colours", colour);
-                    kleidung.put("brand", brand);
-                    kleidung.put("fabric", fabric);
-                    kleidung.put("notes", notes);
-                    kleidung.put("longitude", longitude);
-                    kleidung.put("latitude",latitude);
-                    kleidung.put("city",city);
-                    kleidung.put("image",result);
-                    kleidung.put("uId", uiD);
-                    // define http service call
-                    Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
-                    // define parameters for Service-Call
-                    myIntent.putExtra("payload",kleidung.toString());
-                    myIntent.putExtra("method","POST");
-                    myIntent.putExtra("from","ADDCLOTHING");
-                    myIntent.putExtra("url",getString(R.string.DOMAIN) + "/klamotten");
-                    //call http service
-                    startService(myIntent);
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                if(art != null && !art.isEmpty() && size!= null && !size.isEmpty() && longitude != 0 && latitude != 0 ) {
+                    // build JSON object for clothing post
+                    JSONObject kleidung = new JSONObject();
+                    try {
+                        kleidung.put("size",size);
+                        kleidung.put("art",art);
+                        kleidung.put("style",style);
+                        kleidung.put("gender",gender);
+                        kleidung.put("colours", colour);
+                        kleidung.put("brand", brand);
+                        kleidung.put("fabric", fabric);
+                        kleidung.put("notes", notes);
+                        kleidung.put("longitude", longitude);
+                        kleidung.put("latitude",latitude);
+                        kleidung.put("city",city);
+                        kleidung.put("image",result);
+                        kleidung.put("uId", uiD);
+                        // define http service call
+                        Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
+                        // define parameters for Service-Call
+                        myIntent.putExtra("payload",kleidung.toString());
+                        myIntent.putExtra("method","POST");
+                        myIntent.putExtra("from","ADDCLOTHING");
+                        myIntent.putExtra("url",getString(R.string.DOMAIN) + "/klamotten");
+                        //call http service
+                        progress.setTitle("Please wait!");
+                        progress.setMessage("Trying to add clothing..");
+                        progress.show();
+                        startService(myIntent);
+                    } catch (JSONException e) {
+                        showDialog("Error", "Could not add clothing.");
+                    }
+                } else {
+                    showDialog("Error", "Some of the following values missing: \n Art \n Size \n Location");
                 }
-
-                progress.setTitle("Please wait!");
-                progress.setMessage("Trying to add clothing..");
-                progress.show();
 
                 break;
 

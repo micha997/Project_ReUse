@@ -69,8 +69,6 @@ public class Chat extends AppCompatActivity {
         txtChat = (TextView) findViewById(R.id.txtChat);
         txtChat.setMovementMethod(new ScrollingMovementMethod());
 
-
-
         rId = getIntent().getStringExtra("rId");
         message_to = getIntent().getStringExtra("to");
         message_from = getIntent().getStringExtra("from");
@@ -114,14 +112,10 @@ public class Chat extends AppCompatActivity {
                     myIntent.putExtra("from","POSTMESSAGE");
                     startService(myIntent);
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                    showDialog("Error", "Can not proceed your entries ");
                 } catch (ParseException e) {
-                    e.printStackTrace();
+                    showDialog("Error", "Can not proceed your entries ");
                 }
-
-
-
-
             }
         });
     }
@@ -168,7 +162,7 @@ public class Chat extends AppCompatActivity {
                     }
                 } catch (JSONException e) {
 
-                    e.printStackTrace();
+                    showDialog("Error", "Can not proceed your messages");
 
                 }
             }

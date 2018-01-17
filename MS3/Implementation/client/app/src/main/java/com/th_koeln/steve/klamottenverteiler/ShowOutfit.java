@@ -1,7 +1,9 @@
 package com.th_koeln.steve.klamottenverteiler;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -84,31 +86,6 @@ public class ShowOutfit extends AppCompatActivity implements View.OnClickListene
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
                 new IntentFilter("showdetails"));
 
-        //txtShowOutfit.setText("");
-
-
-
-        btnSubscribeMissingClothing.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                JSONObject subscribe = new JSONObject();
-                try {
-                    subscribe.put("model", model );
-                    subscribe.put("missing",spinnerMissingClothing.getSelectedItem().toString());
-
-                    Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
-                    myIntent.putExtra("payload", subscribe.toString());
-                    myIntent.putExtra("method","POST");
-                    myIntent.putExtra("from","SUBSCRIBECLOTHING");
-                    myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId + "/search");
-                    startService(myIntent);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-            }
-        });
-
         try {
             String outfit= getIntent().getStringExtra("outfit");
             JSONObject outfitsArray = new JSONObject(outfit);
@@ -178,7 +155,7 @@ public class ShowOutfit extends AppCompatActivity implements View.OnClickListene
             spinnerShoes.setAdapter(shoesAdapter);
 
         } catch (JSONException e) {
-            e.printStackTrace();
+            showDialog("Error", "Could not process outfit data!");
         }
 
     }
@@ -216,7 +193,7 @@ public class ShowOutfit extends AppCompatActivity implements View.OnClickListene
                         myIntent.putExtra("url", getString(R.string.DOMAIN) + "/user/" + uId + "/search");
                         startService(myIntent);
                     } catch (JSONException e) {
-                        e.printStackTrace();
+                        showDialog("Error", "Could not subscribe for missing clothing!");
                     }
                 }
                 break;
@@ -250,8 +227,21 @@ public class ShowOutfit extends AppCompatActivity implements View.OnClickListene
                 myIntent.putExtra("url",getString(R.string.DOMAIN) + "/clothing/"+ clothingJson.getString("id"));
                 startService(myIntent);
             } catch (JSONException e) {
-                e.printStackTrace();
+                showDialog("Error", "Could not process clothing data!");
             }
         }
     };
+
+    private void showDialog(String title, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(ShowOutfit.this).create();
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        alertDialog.show();
+    }
 }

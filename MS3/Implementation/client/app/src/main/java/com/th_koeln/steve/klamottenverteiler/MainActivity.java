@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
                      //call http service
                      startService(myIntent);
                  } catch (JSONException e) {
-                     e.printStackTrace();
+                     showDialog("Error", "Could not add your profile!");
                  }
              } else {
                  try {

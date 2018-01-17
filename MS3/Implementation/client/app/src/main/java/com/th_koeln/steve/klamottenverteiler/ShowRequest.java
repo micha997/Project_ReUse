@@ -71,7 +71,12 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
         myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId + "/requests");
         startService(myIntent);
 
-
+        lvShowRequests.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                view.showContextMenu();
+            }
+        });
 
     }
 
@@ -99,10 +104,15 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
                 menu.add("Decline");
                 menu.add("Success");
             } else if (obj.getStatus().equals("waiting") && !obj.getConfirmed().equals(uId)) {
+                menu.add("Chat");
                 menu.add("Confirm");
-            } else if (obj.getStatus().equals("confirmed")) {
-                menu.add("Rate User");
+            } else if (obj.getStatus().equals("waiting") && obj.getConfirmed().equals(uId)) {
+                menu.add("Chat");
                 menu.add("Delete");
+            } else if (obj.getStatus().equals("confirmed")) {
+                menu.add("Chat");
+                menu.add("Delete");
+                menu.add("Rate User");
             }
             for (int i = 0; i < menu.size(); ++i) {
                 MenuItem item = menu.getItem(i);
@@ -217,7 +227,7 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
             myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId + "/requests/" + spin);
             startService(myIntent);
         } catch (JSONException e1) {
-            e1.printStackTrace();
+            showDialog("Error", "Could not set status of clothing!");
         }
 
         return null;
@@ -278,7 +288,7 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
                         }
 
                     } catch (JSONException e) {
-                        e.printStackTrace();
+                        showDialog("Error", "Could not process request data!");
                     }
 
                 }

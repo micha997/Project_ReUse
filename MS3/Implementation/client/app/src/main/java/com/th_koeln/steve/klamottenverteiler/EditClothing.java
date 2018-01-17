@@ -67,7 +67,7 @@ public class EditClothing extends AppCompatActivity {
                     //call http service
                     startService(myIntent);
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                    showDialog("Error", "Could not process your entries!");
                 }
 
             }
@@ -103,7 +103,7 @@ public class EditClothing extends AppCompatActivity {
                     txtFabric.setText(clothingJson.getString("fabric"));
                     txtShowClothing.setText(clothingJson.toString());
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                    showDialog("Error", "Could not process your entries!");
                 }
             }
 

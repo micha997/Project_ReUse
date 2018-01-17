@@ -52,9 +52,9 @@ public class ShowClothing extends AppCompatActivity {
         try {
             JSONObject request = new JSONObject(clothing);
             txtClothing.setText(clothing);
-            txtClothing.append("Meine ID: " + uId);
         } catch (JSONException e) {
-            e.printStackTrace();
+            showDialog("Error", "Could not process clothing data!");
+
         }
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
                 new IntentFilter("showclothing"));
@@ -80,7 +80,7 @@ public class ShowClothing extends AppCompatActivity {
                         startService(myIntent);
                     }
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                    showDialog("Error", "Could not get clothing data!");
                 }
             }
 

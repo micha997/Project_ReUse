@@ -74,9 +74,10 @@ public class RateUser extends AppCompatActivity {
         btnSendRating.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String tId = getIntent().getStringExtra("tId");
-                String ouId = getIntent().getStringExtra("ouId");
                 try {
+                    String tId = getIntent().getStringExtra("tId");
+                    String ouId = getIntent().getStringExtra("ouId");
+
                     SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
                     Date now = new Date();
 
@@ -96,9 +97,9 @@ public class RateUser extends AppCompatActivity {
                     myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + ouId + "/rating");
                     startService(myIntent);
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                    showDialog("Error", "Could not process your entries!");
                 } catch (ParseException e) {
-                    e.printStackTrace();
+                    showDialog("Error", "Could not process your entries!");
                 }
             }
         });

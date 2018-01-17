@@ -71,7 +71,7 @@ public class map_results extends FragmentActivity implements OnMapReadyCallback,
                 marker.setTag(row.getString("id"));
             }
         } catch (JSONException e) {
-            e.printStackTrace();
+            showDialog("Error", "Obtained clothing data could not be processed!");
         }
     }
 

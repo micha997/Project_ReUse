@@ -119,9 +119,11 @@ public class SearchClothing extends AppCompatActivity implements View.OnClickLis
                     myIntent = new PlacePicker.IntentBuilder().build(SearchClothing.this);
                     startActivityForResult(myIntent, SearchClothing.PLACE_PICKER_REQUEST);
                 } catch (GooglePlayServicesRepairableException e) {
-                    e.printStackTrace();
+                    showDialog("Error", "Could not open Place Picker Service!");
                 } catch (GooglePlayServicesNotAvailableException e) {
-                    e.printStackTrace();
+                    showDialog("Error", "Could not open Place Picker Service!");
+                } catch (Exception e) {
+                    showDialog("Error", "Could not open Place Picker Service!");
                 }
                 break;
 

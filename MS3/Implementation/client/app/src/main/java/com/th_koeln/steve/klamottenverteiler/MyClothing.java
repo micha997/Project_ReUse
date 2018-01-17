@@ -96,8 +96,8 @@ public class MyClothing extends AppCompatActivity {
             if (from.equals("MYCLOTHINGFAIL")) {
                 showDialog("Error","Could not get clothing from Server!");
             } else {
-                String clothing = intent.getStringExtra("clothing");
                 try {
+                String clothing = intent.getStringExtra("clothing");
                     JSONArray clothingJsonArray = new JSONArray(clothing);
                     for (int i = 0; i < clothingJsonArray.length(); i++) {
                         JSONObject clothingJsonObject = clothingJsonArray.getJSONObject(i);
@@ -106,7 +106,7 @@ public class MyClothing extends AppCompatActivity {
                     clothingAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, ids);
                     spinChooseClothing.setAdapter(clothingAdapter);
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                    showDialog("Error", "Can not process obtained data!");
                 }
             }
 
