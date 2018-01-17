@@ -92,7 +92,7 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
         btnAddClothingUserInterface = (Button) findViewById(R.id.btnAddClothing);
         btnAddClothingUserInterface.setOnClickListener(this);
 
-        btnChooseImage = (Button) findViewById(R.id.btnAddClothing);
+        btnChooseImage = (Button) findViewById(R.id.btnChooseImage);
         btnChooseImage.setOnClickListener(this);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,

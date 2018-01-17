@@ -6,11 +6,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -37,24 +41,31 @@ public class ShowClothing extends AppCompatActivity {
     private String ouId = null;
     private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private final String uId= firebaseAuth.getCurrentUser().getUid();
+    private ImageView imgShowClothingPicture;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_showclothing);
         txtClothing = (TextView) findViewById(R.id.txtClothing);
-        imgClothingDetails = (ImageView) findViewById(R.id.imgCLothingDetail);
+
         btnGetClothing = (Button) findViewById(R.id.btnGetClothing);
         FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         ouId= firebaseAuth.getCurrentUser().getUid();
 
+        imgShowClothingPicture=(ImageView) findViewById(R.id.imgShowClothingPicture);
+
         clothing = getIntent().getStringExtra("clothing");
+
         try {
             JSONObject request = new JSONObject(clothing);
             txtClothing.setText(clothing);
+            txtClothing.append("Meine ID: " + uId);
+            byte[] decodedBytes = Base64.decode(request.getString("image"), 0);
+            Bitmap clothingPicture = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+            imgShowClothingPicture.setImageBitmap(clothingPicture);
         } catch (JSONException e) {
             showDialog("Error", "Could not process clothing data!");
-
         }
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
                 new IntentFilter("showclothing"));
@@ -80,7 +91,7 @@ public class ShowClothing extends AppCompatActivity {
                         startService(myIntent);
                     }
                 } catch (JSONException e) {
-                    showDialog("Error", "Could not get clothing data!");
+                    e.printStackTrace();
                 }
             }
 

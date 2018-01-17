@@ -21,6 +21,15 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.firebase.auth.FirebaseAuth;
 import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 /**
  * Created by steve on 01.11.17.
  */
@@ -67,19 +76,41 @@ public class SearchClothing extends AppCompatActivity implements View.OnClickLis
 
             String from = intent.getStringExtra("from");
             if (from.equals("SEARCHFAIL")) {
-                showDialog("Error","Could not get clothing!");
+                showDialog("Error", "Could not get clothing!");
             } else if (from.equals("SEARCHPREFCLOTHINGFAIL")) {
-                showDialog("Error","Could not get clothing!");
+                showDialog("Error", "Could not get clothing!");
             } else {
-                // get clothing results from HTTP-Service
-                String clothinglist = intent.getStringExtra("clothing");
+                try {
+                    // get clothing results from HTTP-Service
+                    String clothinglist = intent.getStringExtra("clothing");
+                    JSONArray clothinglistJsonArray = new JSONArray(clothinglist);
+
+                    for (int i = 0; i < clothinglistJsonArray.length(); i++) {
+
+                        if (!clothinglistJsonArray.getJSONObject(i).isNull("image")) {
+                            String filename = "img" + i;
+                            String string = clothinglistJsonArray.getJSONObject(i).getString("image");
+                            FileOutputStream outputStream;
+
+                            outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
+                            outputStream.write(string.getBytes());
+                            outputStream.close();
+                            clothinglistJsonArray.getJSONObject(i).put("imagepath", filename);
+                            clothinglistJsonArray.getJSONObject(i).remove("image");
+                        }
+
+                    }
+                    Intent myIntent = new Intent(getApplicationContext(), map_results.class);
+                    myIntent.putExtra("clothing_list", clothinglistJsonArray.toString());
+                    startActivity(myIntent);
+                } catch (JSONException e) {
+                    showDialog("Error", "Could not process clothing data!");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
                 // send clothing results to Google Maps activity
-                Intent myIntent = new Intent(getApplicationContext(),map_results.class);
-                myIntent.putExtra("clothing_list", clothinglist);
-                startActivity(myIntent);
             }
-
         }
     };
 

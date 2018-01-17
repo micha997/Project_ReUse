@@ -141,6 +141,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         if (view == btnLogin) {
             userLogin();
         } else if (view == tvLogin) {
+            finish();
             startActivity(new Intent(this, MainActivity.class));
         }
 
@@ -180,36 +181,40 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 
     private void sendTokenToServer() {
         final FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
+        try {
+            mUser.getToken(true)
+                    .addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
 
-        mUser.getToken(true)
-                .addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+                        public void onComplete(@NonNull Task<GetTokenResult> task) {
 
-                    public void onComplete(@NonNull Task<GetTokenResult> task) {
+                            if (task.isSuccessful()) {
 
-                        if (task.isSuccessful()) {
+                                String idToken = FirebaseInstanceId.getInstance().getToken();
+                                uID = mUser.getUid();
 
-                            String idToken = FirebaseInstanceId.getInstance().getToken();
-                            uID = mUser.getUid();
+                                try {
+                                    Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
+                                    JSONObject token = new JSONObject();
+                                    token.put("token", idToken);
+                                    myIntent.putExtra("payload", token.toString());
+                                    myIntent.putExtra("method", "POST");
+                                    myIntent.putExtra("from", "NEW_TOKEN");
+                                    myIntent.putExtra("url", getString(R.string.DOMAIN) + "/users/" + uID + "/token/" + idToken);
+                                    //call http service
+                                    startService(myIntent);
 
-                            try {
-                                Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
-                                JSONObject token = new JSONObject();
-                                token.put("token",idToken);
-                                myIntent.putExtra("payload",token.toString());
-                                myIntent.putExtra("method","POST");
-                                myIntent.putExtra("from", "NEW_TOKEN");
-                                myIntent.putExtra("url",getString(R.string.DOMAIN) + "/users/"+ uID + "/token/" + idToken);
-                                //call http service
-                                startService(myIntent);
+                                } catch (JSONException e) {
 
-                            } catch (JSONException e) {
+                                    showDialog("Error", "Could not send your usertoken!");
+                                    ;
 
-                                showDialog("Error", "Could not send your usertoken!");;
-
+                                }
                             }
                         }
-                    }
-                });
+                    });
+        } catch (NullPointerException e) {
+            showDialog("Error", "Could not send usertoken to server!");
+        }
     }
     private void showDialog(String title, String message) {
         AlertDialog alertDialog = new AlertDialog.Builder(Login.this).create();
