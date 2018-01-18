@@ -74,6 +74,7 @@ public class UserInterface extends AppCompatActivity implements View.OnClickList
             case R.id.btnLogout:
                 firebaseAuth.signOut();
                 startActivity(new Intent(getApplicationContext(),Login.class));
+                finish();
                 break;
 
             case R.id.btnChooseContext:

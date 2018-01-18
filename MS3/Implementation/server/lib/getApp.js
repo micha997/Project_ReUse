@@ -54,6 +54,7 @@ const getApp = function(database) {
 
     app.put('/user/:uId/clothing', routes.putClothing(database));
     app.get('/clothing/:cId', routes.getClothing(database));
+	app.get('/clothingOptions', routes.getClothingOptions());
     app.put('/clothing/:cId', routes.putClothing(database));
     app.post('/clothing/:cId', routes.postRequest(database));
     app.delete('/clothing/:cId', routes.deleteClothing(database));

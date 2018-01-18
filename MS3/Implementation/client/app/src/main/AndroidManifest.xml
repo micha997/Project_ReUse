@@ -41,6 +41,7 @@
         <activity android:name=".EditClothing" />
         <activity android:name=".MyClothing" />
         <activity android:name=".ShowOutfit" />
+        <activity android:name=".ClothingOptionsDetail" />
 
         <service android:name=".services.HttpsService"></service>
 

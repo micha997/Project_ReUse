@@ -59,8 +59,8 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         firebaseAuth = FirebaseAuth.getInstance();
 
         if (firebaseAuth.getCurrentUser() != null) {
-            finish();
             startActivity(new Intent(this, UserInterface.class));
+            finish();
         }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
@@ -141,8 +141,8 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         if (view == btnLogin) {
             userLogin();
         } else if (view == tvLogin) {
-            finish();
             startActivity(new Intent(this, MainActivity.class));
+            finish();
         }
 
     }
@@ -155,8 +155,10 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 
             sendTokenToServer();
             Toast.makeText(this, "You are now logged in", Toast.LENGTH_SHORT).show();
+            Intent in = new Intent(getApplicationContext(),UserInterface.class);
+            in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(in);
             finish();
-            startActivity(new Intent(getApplicationContext(),UserInterface.class));
 
         } else {
 

@@ -14,9 +14,13 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -24,7 +28,9 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.firebase.auth.FirebaseAuth;
 import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
+import com.th_koeln.steve.klamottenverteiler.services.ListViewHelper;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -32,38 +38,41 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Locale;
 
 /**
- * Created by steve on 31.10.17.
+ * Created by Michael on 17.01.18.
  */
 
 public class AddClothing extends AppCompatActivity implements View.OnClickListener {
 
     public static final int PICK_IMAGE = 1;
+    public static final int CHOOSE_OPTION = 77;
+    private int OPT = 1;
     private static int PLACE_PICKER_REQUEST;
 
-    private ImageView imgImage;
+    private ImageView imageViewPic;
 
-    private EditText etSize;
-    private EditText etArt;
-    private EditText etStyle;
-    private EditText etGender;
-    private EditText etColour;
-    private EditText etFabric;
-    private EditText etNotes;
-    private EditText etBrand;
+    private EditText editTextTitle;
+
+    private ListView listViewOptions;
+    private ArrayList<String> clothingOptionsLevel1 = new ArrayList<String>();
 
     private Button btnChooseLocation;
-    private Button btnChooseImage;
-    private Button btnAddClothingUserInterface;
+    private Button btnImageCapture;
+    private Button btnCreate;
 
     private Geocoder geocoder;
+
+    //Fuer das gewaehlte Item
+    private int choosenOption;
 
     private double latitude= 0;
     private double longitude=0;
     private String city = null;
     private String result;
+    private JSONArray clothingOptions;
 
     private ProgressDialog progress;
 
@@ -73,32 +82,57 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_clothing);
+        setContentView(R.layout.activity_add_clothing_2);
 
-        etSize = (EditText) findViewById(R.id.etSize);
-        etArt = (EditText) findViewById(R.id.etArt);
-        etStyle = (EditText) findViewById(R.id.etStyle);
-        etGender = (EditText) findViewById(R.id.etGender);
-        etColour = (EditText) findViewById(R.id.etColour);
-        imgImage = (ImageView) findViewById(R.id.imgImage);
-        etNotes = (EditText) findViewById(R.id.etNotes);
-        etFabric = (EditText) findViewById(R.id.etFabric);
-        etBrand = (EditText) findViewById(R.id.etBrand);
         geocoder = new Geocoder(this, Locale.getDefault());
+
+        listViewOptions = (ListView) findViewById(R.id.listViewOptions);
+
+        editTextTitle = (EditText) findViewById(R.id.editTextTitle);
 
         btnChooseLocation = (Button) findViewById(R.id.btnChooseLocation);
         btnChooseLocation.setOnClickListener(this);
 
-        btnAddClothingUserInterface = (Button) findViewById(R.id.btnAddClothing);
-        btnAddClothingUserInterface.setOnClickListener(this);
+        btnCreate = (Button) findViewById(R.id.btnCreate);
+        btnCreate.setOnClickListener(this);
 
-        btnChooseImage = (Button) findViewById(R.id.btnChooseImage);
-        btnChooseImage.setOnClickListener(this);
+        btnImageCapture = (Button) findViewById(R.id.btnImageCapture);
+        btnImageCapture.setOnClickListener(this);
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
-                new IntentFilter("addclothing"));
+        imageViewPic = (ImageView) findViewById(R.id.imageViewPic);
 
-         progress = new ProgressDialog(this);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("addclothing");
+        filter.addAction("clothingOptions");
+        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, filter);
+
+        Intent optionsIntent = new Intent(getApplicationContext(), HttpsService.class);
+        optionsIntent.putExtra("method","GET");
+        optionsIntent.putExtra("from","CLOTHINGOPTIONS");
+        optionsIntent.putExtra("url",getString(R.string.DOMAIN) + "/clothingOptions/");
+        startService(optionsIntent);
+
+        listViewOptions.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent showDetailActivity = new Intent(getApplicationContext(), ClothingOptionsDetail.class);
+                choosenOption = i;
+
+                try {
+                    JSONObject tmpObject = new JSONObject(clothingOptions.get(i).toString());
+                    JSONArray tmpArray = tmpObject.getJSONArray("options");
+                    JSONObject tmpObject2 = tmpArray.optJSONObject(0);
+                    if(tmpObject2==null){OPT = 2;}else{OPT = 1;}
+                    showDetailActivity.putExtra("items", tmpObject.toString());
+                    showDetailActivity.putExtra("option", OPT);
+                    startActivityForResult(showDetailActivity, CHOOSE_OPTION);
+                }catch(JSONException e){
+                    showDialog("Error", "Could not process request data!");
+                }
+            }
+        });
+
+        progress = new ProgressDialog(this);
     }
 
 
@@ -114,28 +148,38 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
             }
             if (requestCode == PICK_IMAGE) {
 
-                    InputStream inputStream = getApplicationContext().getContentResolver().openInputStream(data.getData());
-                    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-                    int nRead;
-                    byte[] byteData = new byte[16384];
+                InputStream inputStream = getApplicationContext().getContentResolver().openInputStream(data.getData());
+                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+                int nRead;
+                byte[] byteData = new byte[16384];
 
 
-                    while ((nRead = inputStream.read(byteData, 0, byteData.length)) != -1) {
-                        buffer.write(byteData, 0, nRead);
-                    }
+                while ((nRead = inputStream.read(byteData, 0, byteData.length)) != -1) {
+                    buffer.write(byteData, 0, nRead);
+                }
 
                 buffer.flush();
 
-                    byte imageData[] = buffer.toByteArray();
-                    inputStream.read(imageData);
-                    result = Base64.encodeToString(imageData, Base64.DEFAULT);
-                    imgImage.setImageBitmap(BitmapFactory.decodeByteArray(imageData, 0, imageData.length));
+                byte imageData[] = buffer.toByteArray();
+                inputStream.read(imageData);
+                result = Base64.encodeToString(imageData, Base64.DEFAULT);
+                imageViewPic.setImageBitmap(BitmapFactory.decodeByteArray(imageData, 0, imageData.length));
 
             }
 
-            } catch (IOException e) {
-                showDialog("Error", "Could not get your location.");
+            if(requestCode == CHOOSE_OPTION){
+                if(data!=null) {
+                    String StringResult = data.getStringExtra("StringResult");
+                    View tmpView = getViewByPosition(choosenOption, listViewOptions);
+                    TextView selectionTextView = (TextView) tmpView.findViewById(R.id.selectionTextView);
+                    selectionTextView.setText(StringResult);
+                    selectionTextView.setVisibility(View.VISIBLE);
+                }
             }
+
+        } catch (IOException e) {
+            showDialog("Error", "Could not get your location.");
+        }
     }
 
     @Override
@@ -161,17 +205,44 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
                 }
                 break;
 
-            case R.id.btnAddClothing:
-                String size = etSize.getText().toString();
-                String art = etArt.getText().toString();
-                String style = etStyle.getText().toString();
-                String gender = etGender.getText().toString();
-                String colour = etColour.getText().toString();
-                String fabric = etFabric.getText().toString();
-                String notes = etNotes.getText().toString();
-                String brand = etBrand.getText().toString();
+            case R.id.btnCreate:
 
-                if(art != null && !art.isEmpty() && size!= null && !size.isEmpty() && longitude != 0 && latitude != 0 ) {
+                String art="", gender="" , size="", style="", color="", fabric="", brand="";
+
+                for(int i=0;listViewOptions.getAdapter().getCount()>i;i++){
+                    View tmpView = getViewByPosition(i,listViewOptions);
+                    TextView nameTextView = (TextView) tmpView.findViewById(R.id.nameTextView);
+                    TextView selectionTextView = (TextView) tmpView.findViewById(R.id.selectionTextView);
+                    String tmpTopic = nameTextView.getText().toString();
+                    String tmpSelection = selectionTextView.getText().toString();
+
+                    switch(tmpTopic){
+                        case "Art":
+                            art = tmpSelection;
+                            break;
+                        case "Gender":
+                            gender = tmpSelection;
+                            break;
+                        case "Size":
+                            size = tmpSelection;
+                            break;
+                        case "Style":
+                            style = tmpSelection;
+                            break;
+                        case "Color":
+                            color = tmpSelection;
+                            break;
+                        case "Fabric":
+                            fabric = tmpSelection;
+                            break;
+                        case "Brand":
+                            brand = tmpSelection;
+                            break;
+                    }
+                }
+                String notes = editTextTitle.getText().toString();
+
+                if(art != "" && !art.isEmpty() && size!= "" && !size.isEmpty() && longitude != 0 && latitude != 0 ) {
                     // build JSON object for clothing post
                     JSONObject kleidung = new JSONObject();
                     try {
@@ -179,7 +250,7 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
                         kleidung.put("art",art);
                         kleidung.put("style",style);
                         kleidung.put("gender",gender);
-                        kleidung.put("colours", colour);
+                        kleidung.put("colours", color);
                         kleidung.put("brand", brand);
                         kleidung.put("fabric", fabric);
                         kleidung.put("notes", notes);
@@ -199,17 +270,17 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
                         progress.setTitle("Please wait!");
                         progress.setMessage("Trying to add clothing..");
                         progress.show();
-                        startService(myIntent);
+                        //startService(myIntent);
                     } catch (JSONException e) {
                         showDialog("Error", "Could not add clothing.");
                     }
                 } else {
+                    Toast.makeText(getApplicationContext(),"Da fehlt",Toast.LENGTH_SHORT).show();
                     showDialog("Error", "Some of the following values missing: \n Art \n Size \n Location");
                 }
-
                 break;
 
-            case R.id.btnChooseImage:
+            case R.id.btnImageCapture:
                 Intent intent = new Intent();
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -223,18 +294,41 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            String success = intent.getStringExtra("success");
 
-            progress.dismiss();
-            if (success.equals("1")) {
-                showDialog("Success!", "Successfully added clothing!");
-            } else {
-                showDialog("Error!", "Failed to add clothing!");
+            if(intent.getStringExtra("from").equals("ADDCLOTHING")) {
+                String success = intent.getStringExtra("success");
+
+                progress.dismiss();
+                if (success.equals("1")) {
+                    showDialog("Success!", "Successfully added clothing!");
+                } else {
+                    showDialog("Error!", "Failed to add clothing!");
+                }
+            }
+
+            if(intent.getStringExtra("from").equals("CLOTHINGOPTIONS")){
+                String rawData = intent.getStringExtra("optionsData");
+                try {
+                    clothingOptions = new JSONArray(rawData);
+                    for(int i=0;clothingOptions.length()>i;i++){
+                        JSONObject tmpObject = new JSONObject(clothingOptions.get(i).toString());
+                        clothingOptionsLevel1.add(tmpObject.getString("topic"));
+                    }
+                    fillListView(clothingOptionsLevel1);
+                }catch(JSONException e){
+                    showDialog("Error", "Could not process request data!");
+                }
             }
 
         }
     };
 
+    private void fillListView(ArrayList<String> options) {
+        ClothingOptionsAdapter optAdapter;
+        optAdapter = new ClothingOptionsAdapter(this, options);
+        listViewOptions.setAdapter(optAdapter);
+        ListViewHelper.getListViewSize(listViewOptions);
+    }
 
     private void showDialog(String title, String message) {
         AlertDialog alertDialog = new AlertDialog.Builder(AddClothing.this).create();
@@ -249,8 +343,15 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
         alertDialog.show();
     }
 
+    public View getViewByPosition(int pos, ListView listView) {
+        final int firstListItemPosition = listView.getFirstVisiblePosition();
+        final int lastListItemPosition = firstListItemPosition + listView.getChildCount() - 1;
+
+        if (pos < firstListItemPosition || pos > lastListItemPosition ) {
+            return listView.getAdapter().getView(pos, null, listView);
+        } else {
+            final int childIndex = pos - firstListItemPosition;
+            return listView.getChildAt(childIndex);
+        }
+    }
 }
-
-
-
-
