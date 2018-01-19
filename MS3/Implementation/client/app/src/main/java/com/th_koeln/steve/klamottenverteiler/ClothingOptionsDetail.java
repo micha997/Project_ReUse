@@ -3,6 +3,7 @@ package com.th_koeln.steve.klamottenverteiler;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.hardware.Camera;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -26,6 +27,8 @@ public class ClothingOptionsDetail extends AppCompatActivity {
     private ListView listViewOptionsDetail;
     private int OPT = 1;
     public static final int CHOOSE_OPTION = 77;
+    private String area = "";
+    private boolean isArt = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,11 +39,13 @@ public class ClothingOptionsDetail extends AppCompatActivity {
 
         Intent in = getIntent();
         String data = in.getStringExtra("items");
+        area = in.getStringExtra("area");
         final int whichOne = in.getIntExtra("option",-1);
 
         try{
             JSONObject clothingOptions = new JSONObject(data);
             optionsArray = new JSONArray(clothingOptions.getJSONArray("options").toString());
+            if(clothingOptions.getString("topic").equals("Art")){isArt = true;}else{isArt=false;}
             if(whichOne == 1){
                 for(int i=0;optionsArray.length()>i;i++){
                     JSONObject tmpObject = new JSONObject(optionsArray.get(i).toString());
@@ -72,8 +77,13 @@ public class ClothingOptionsDetail extends AppCompatActivity {
 
                     if(whichOne == 1) {
                         JSONObject tmpObject = new JSONObject(optionsArray.get(i).toString());
+                        if(isArt) {
+                            String tmpString = new String(tmpObject.getString("topic"));
+                            area = tmpString;
+                        }
                         showDetailActivity.putExtra("items", tmpObject.toString());
                         showDetailActivity.putExtra("option", OPT);
+                        showDetailActivity.putExtra("area", area);
                         startActivityForResult(showDetailActivity, CHOOSE_OPTION);
                     }
 
@@ -81,6 +91,7 @@ public class ClothingOptionsDetail extends AppCompatActivity {
                         Intent resultIntent = new Intent();
                         String text = new String(optionsArray.get(i).toString());
                         resultIntent.putExtra("StringResult",text);
+                        resultIntent.putExtra("area",area);
                         setResult(CHOOSE_OPTION,resultIntent);
                         finish();
                     }
@@ -115,8 +126,10 @@ public class ClothingOptionsDetail extends AppCompatActivity {
         if(requestCode == CHOOSE_OPTION){
             if(data!=null) {
                 String StringResult = data.getStringExtra("StringResult");
+                String AreaResult = data.getStringExtra("area");
                 Intent resultIntent = new Intent();
                 resultIntent.putExtra("StringResult", StringResult);
+                resultIntent.putExtra("area", AreaResult);
                 setResult(CHOOSE_OPTION, resultIntent);
                 finish();
             }

@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.graphics.BitmapFactory;
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
@@ -60,19 +61,22 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
     private ArrayList<String> clothingOptionsLevel1 = new ArrayList<String>();
 
     private Button btnChooseLocation;
-    private Button btnImageCapture;
+    private FloatingActionButton actionBtnAddPic;
+    private FloatingActionButton actionBtnRemovePic;
     private Button btnCreate;
 
     private Geocoder geocoder;
 
     //Fuer das gewaehlte Item
     private int choosenOption;
+    private String choosenArea;
 
     private double latitude= 0;
     private double longitude=0;
     private String city = null;
     private String result;
     private JSONArray clothingOptions;
+    private JSONArray removedSizeOptions = new JSONArray();
 
     private ProgressDialog progress;
 
@@ -96,8 +100,11 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
         btnCreate = (Button) findViewById(R.id.btnCreate);
         btnCreate.setOnClickListener(this);
 
-        btnImageCapture = (Button) findViewById(R.id.btnImageCapture);
-        btnImageCapture.setOnClickListener(this);
+        actionBtnAddPic = (FloatingActionButton) findViewById(R.id.actionBtnAddPic);
+        actionBtnAddPic.setOnClickListener(this);
+
+        actionBtnRemovePic = (FloatingActionButton) findViewById(R.id.actionBtnRemovePic);
+        actionBtnRemovePic.setOnClickListener(this);
 
         imageViewPic = (ImageView) findViewById(R.id.imageViewPic);
 
@@ -121,6 +128,7 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
                 try {
                     JSONObject tmpObject = new JSONObject(clothingOptions.get(i).toString());
                     JSONArray tmpArray = tmpObject.getJSONArray("options");
+                    choosenArea = tmpObject.getString("topic");
                     JSONObject tmpObject2 = tmpArray.optJSONObject(0);
                     if(tmpObject2==null){OPT = 2;}else{OPT = 1;}
                     showDetailActivity.putExtra("items", tmpObject.toString());
@@ -147,33 +155,61 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
                 }
             }
             if (requestCode == PICK_IMAGE) {
+                if(data!=null && resultCode == RESULT_OK) {
+                    actionBtnAddPic.setVisibility(View.GONE);
+                    actionBtnRemovePic.setVisibility(View.VISIBLE);
 
-                InputStream inputStream = getApplicationContext().getContentResolver().openInputStream(data.getData());
-                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-                int nRead;
-                byte[] byteData = new byte[16384];
+                    InputStream inputStream = getApplicationContext().getContentResolver().openInputStream(data.getData());
+                    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+                    int nRead;
+                    byte[] byteData = new byte[16384];
 
 
-                while ((nRead = inputStream.read(byteData, 0, byteData.length)) != -1) {
-                    buffer.write(byteData, 0, nRead);
+                    while ((nRead = inputStream.read(byteData, 0, byteData.length)) != -1) {
+                        buffer.write(byteData, 0, nRead);
+                    }
+
+                    buffer.flush();
+
+                    byte imageData[] = buffer.toByteArray();
+                    inputStream.read(imageData);
+                    result = Base64.encodeToString(imageData, Base64.DEFAULT);
+                    imageViewPic.setImageBitmap(BitmapFactory.decodeByteArray(imageData, 0, imageData.length));
                 }
-
-                buffer.flush();
-
-                byte imageData[] = buffer.toByteArray();
-                inputStream.read(imageData);
-                result = Base64.encodeToString(imageData, Base64.DEFAULT);
-                imageViewPic.setImageBitmap(BitmapFactory.decodeByteArray(imageData, 0, imageData.length));
-
             }
 
             if(requestCode == CHOOSE_OPTION){
                 if(data!=null) {
                     String StringResult = data.getStringExtra("StringResult");
+                    String area = data.getStringExtra("area");
                     View tmpView = getViewByPosition(choosenOption, listViewOptions);
                     TextView selectionTextView = (TextView) tmpView.findViewById(R.id.selectionTextView);
                     selectionTextView.setText(StringResult);
                     selectionTextView.setVisibility(View.VISIBLE);
+
+                    /*
+                    if(choosenArea.equals("Art")) {
+
+                        switch (area) {
+                            case "Kopfbedeckung":
+
+                                break;
+
+                            case "Oberbekleidung":
+                                break;
+
+                            case "Unterbekleidung":
+                                break;
+
+                            case "Fußbekleidung":
+                                break;
+
+                            case "Accessoires":
+
+                                break;
+                        }
+                    }
+                    */
                 }
             }
 
@@ -275,18 +311,23 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
                         showDialog("Error", "Could not add clothing.");
                     }
                 } else {
-                    Toast.makeText(getApplicationContext(),"Da fehlt",Toast.LENGTH_SHORT).show();
                     showDialog("Error", "Some of the following values missing: \n Art \n Size \n Location");
                 }
                 break;
 
-            case R.id.btnImageCapture:
+            case R.id.actionBtnAddPic:
                 Intent intent = new Intent();
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
                 break;
 
+            case R.id.actionBtnRemovePic:
+                result = null;
+                actionBtnAddPic.setVisibility(View.VISIBLE);
+                actionBtnRemovePic.setVisibility(View.GONE);
+                imageViewPic.setImageDrawable(null);
+                break;
         }
     }
 

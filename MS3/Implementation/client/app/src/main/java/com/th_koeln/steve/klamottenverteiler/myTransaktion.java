@@ -82,12 +82,30 @@ public class myTransaktion {
         return timeFromWorkday;
     }
 
+    public String getTimeFromWorkdayString(){
+        String hours="00",minutes="00";
+        if(timeFromWorkday!=null) {
+            hours = checkHoursMinutes(timeFromWorkday.getHours() + "");
+            minutes = checkHoursMinutes(timeFromWorkday.getMinutes() + "");
+        }
+        return hours+":"+minutes;
+    }
+
     public void setTimeFromWorkday(Date tfWork){
         timeFromWorkday = tfWork;
     }
 
     public Date getTimeToWorkday(){
         return timeToWorkday;
+    }
+
+    public String getTimeToWorkdayString(){
+        String hours="00",minutes="00";
+        if(timeToWorkday!=null) {
+            hours = checkHoursMinutes(timeToWorkday.getHours() + "");
+            minutes = checkHoursMinutes(timeToWorkday.getMinutes() + "");
+        }
+        return hours+":"+minutes;
     }
 
     public void setTimeToWorkday(Date ttWork){
@@ -98,6 +116,15 @@ public class myTransaktion {
         return timeFromWeekend;
     }
 
+    public String getTimeFromWeekendString(){
+        String hours="00",minutes="00";
+        if(timeFromWeekend!=null) {
+            hours = checkHoursMinutes(timeFromWeekend.getHours() + "");
+            minutes = checkHoursMinutes(timeFromWeekend.getMinutes() + "");
+        }
+        return hours+":"+minutes;
+    }
+
     public void setTimeFromWeekend(Date tfWeek){
         timeFromWeekend = tfWeek;
     }
@@ -106,12 +133,30 @@ public class myTransaktion {
         return timeToWeekend;
     }
 
+    public String getTimeToWeekendString(){
+        String hours="00",minutes="00";
+        if(timeToWeekend!=null) {
+            hours = checkHoursMinutes(timeToWeekend.getHours() + "");
+            minutes = checkHoursMinutes(timeToWeekend.getMinutes() + "");
+        }
+        return hours+":"+minutes;
+    }
+
     public void setTimeToWeekend(Date ttWeek){
         timeToWeekend = ttWeek;
     }
 
     public Date getTimeToGet(){
         return timeToGet;
+    }
+
+    public String getTimeToGetString(){
+        String hours="Kein",minutes="Termin";
+        if(timeToGet!=null) {
+            hours = checkHoursMinutes(timeToGet.getHours() + "");
+            minutes = checkHoursMinutes(timeToGet.getMinutes() + "");
+        }
+        return hours+":"+minutes;
     }
 
     public void setTimeToGet(Date ttG){
@@ -134,5 +179,9 @@ public class myTransaktion {
         return timeToMeFromLast;
     }
 
+    public String checkHoursMinutes(String checkThis){
+        if(Integer.parseInt(checkThis)<10){checkThis = "0"+checkThis;}
+        return checkThis;
+    }
 
 }

@@ -29,7 +29,7 @@ clothingOptions.options.push(kategorieObj0, kategorieObj1,
 //Geschlecht
 var genderOptions = {topic:"Gender", options: []}
 
-genderOptions.options.push("Männlich Erwachsen","Weiblich Erwachsen","Männlich Kind","Weiblich Kind");
+genderOptions.options.push("Männlich Erwachsen","Weiblich Erwachsen","Unisex Erwachsen","Männlich Kind","Weiblich Kind","Unisex Kind");
 
 //Kleidungsgroessen
 var sizeOptions = {topic:"Size", options: []};

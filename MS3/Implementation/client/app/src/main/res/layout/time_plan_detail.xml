@@ -5,43 +5,40 @@
     android:layout_width="match_parent" android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/nameTextView"
+        android:id="@+id/idTextView"
         android:layout_width="wrap_content"
-        android:layout_height="70dp"
+        android:layout_height="40dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_marginLeft="14dp"
         android:layout_marginStart="14dp"
         android:gravity="fill_vertical"
-        android:text="Name"
-        android:textSize="18sp" />
+        android:text="ID"
+        android:textSize="14sp" />
 
     <TextView
-        android:id="@+id/selectionTextView"
+        android:id="@+id/availableTextView"
         android:layout_width="wrap_content"
-        android:layout_height="70dp"
-        android:layout_alignBottom="@+id/imageViewArrow"
-        android:layout_marginEnd="6dp"
-        android:layout_marginRight="6dp"
-        android:layout_toLeftOf="@+id/imageViewArrow"
-        android:layout_toStartOf="@+id/imageViewArrow"
-        android:alpha=".7"
+        android:layout_height="30dp"
+        android:layout_alignLeft="@+id/idTextView"
+        android:layout_alignStart="@+id/idTextView"
+        android:layout_below="@+id/idTextView"
         android:gravity="fill_vertical"
-        android:textSize="14sp"
-        android:visibility="gone" />
+        android:text="Available"
+        android:textSize="14sp" />
 
-    <ImageView
-        android:id="@+id/imageViewArrow"
+    <TextView
+        android:id="@+id/dateTextView"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/nameTextView"
-        android:layout_alignTop="@+id/nameTextView"
+        android:layout_height="30dp"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_marginBottom="0dp"
+        android:layout_alignTop="@+id/availableTextView"
         android:layout_marginEnd="14dp"
         android:layout_marginRight="14dp"
-        app:srcCompat="@drawable/ic_action_arrow_right" />
+        android:gravity="fill_vertical"
+        android:text="Date"
+        android:textSize="14sp" />
 
 </RelativeLayout>

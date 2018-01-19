@@ -2,6 +2,7 @@ package com.th_koeln.steve.klamottenverteiler;
 
 import android.*;
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -11,12 +12,17 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.KeyEvent;
+import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +31,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.th_koeln.steve.klamottenverteiler.R;
 import com.th_koeln.steve.klamottenverteiler.services.GPStracker;
 import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
+import com.th_koeln.steve.klamottenverteiler.services.ListViewHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,9 +48,12 @@ import java.util.Locale;
 
 public class TimePlan extends AppCompatActivity implements LocationListener {
 
-    private TextView textViewTimePlan;
-    private Button btnDoStuff;
+    private FloatingActionButton actionBtnUpdate;
     private LocationManager locationManager;
+    private ListView listViewTimePlan;
+
+    private ProgressDialog loadingProgress;
+    private Intent startIntent;
 
     private double myLongitude = 0;
     private double myLatitude = 0;
@@ -65,23 +75,32 @@ public class TimePlan extends AppCompatActivity implements LocationListener {
     //Neue ArrayList die nach "STEP 3" gefuellt sein soll
     private ArrayList<myTransaktion> WayClean_Transaktionen = new ArrayList<myTransaktion>();
     //Neue ArrayList die Requests ohne Zeiten speichert
-    private ArrayList<myTransaktion> AppendLater_Transaktionen = new ArrayList<myTransaktion>();
+    private ArrayList<myTransaktion> AppendLater_Transaktionen_NoTime = new ArrayList<myTransaktion>();
+    //Neue Arraylist die Duplikate (selbe userID) speichert
+    private ArrayList<myTransaktion> Same_Transaktionen = new ArrayList<myTransaktion>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_time_plan);
+        setContentView(R.layout.activity_time_plan_2);
 
         //Eigene User-ID besorgen
         FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         final String uId = firebaseAuth.getCurrentUser().getUid();
 
         //Objekte aus dem Layout
-        textViewTimePlan = (TextView) findViewById(R.id.textViewTimePlan);
-        btnDoStuff = (Button) findViewById(R.id.btnDoStuff);
+        actionBtnUpdate = (FloatingActionButton) findViewById(R.id.actionBtnUpdate);
+        listViewTimePlan = (ListView) findViewById(R.id.listViewTimePlan);
 
         //Permission Check
         checkGPSPermission();
+
+        //Loading Indicator
+        loadingProgress = new ProgressDialog(this);
+        loadingProgress.setTitle("Loading");
+        loadingProgress.setMessage("Zeitplan wird erstellt ...");
+        loadingProgress.setCancelable(true);
+        loadingProgress.show();
 
         //BroadcastReceiver
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
@@ -93,14 +112,31 @@ public class TimePlan extends AppCompatActivity implements LocationListener {
 
         //Intent mit einem Service-Call erstellen
         action = "profile";
-        Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
+        startIntent = new Intent(getApplicationContext(), HttpsService.class);
         //Requests werden besorgt (Kleidungsstuecke die angefragt wurden und abgeholt werden sollen)
-        myIntent.putExtra("payload","");
-        myIntent.putExtra("method","GET");
-        myIntent.putExtra("from","PROFILE");
-        myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId + "/requests");
+        startIntent.putExtra("payload","");
+        startIntent.putExtra("method","GET");
+        startIntent.putExtra("from","PROFILE");
+        startIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId + "/requests");
         //Service-Call starten
-        startService(myIntent);
+        startService(startIntent);
+
+        actionBtnUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //Wichtige Parameter neu initialisieren
+                gotGPSDATA = false;
+                Transaktionen = new ArrayList<myTransaktion>();
+                Clean_Transaktionen = new ArrayList<myTransaktion>();
+                ZeitClean_Transaktionen = new ArrayList<myTransaktion>();
+                WayClean_Transaktionen = new ArrayList<myTransaktion>();
+                AppendLater_Transaktionen_NoTime = new ArrayList<myTransaktion>();
+                Same_Transaktionen = new ArrayList<myTransaktion>();
+                action="profile";
+                startService(startIntent);
+                loadingProgress.show();
+            }
+        });
     }
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -117,7 +153,7 @@ public class TimePlan extends AppCompatActivity implements LocationListener {
                         if (tmpRequest.getString("ouId").length() > 6) {
                             myTransaktion tmpTrans = new myTransaktion(tmpRequest.getString("ouId"), tmpRequest.getString("cId"));
                             Transaktionen.add(tmpTrans);
-                            textViewTimePlan.append("ouID: " + tmpTrans.getuID() + "\n" + "cID: " + tmpTrans.getcID() + "\n\n");
+                            //textViewTimePlan.append("ouID: " + tmpTrans.getuID() + "\n" + "cID: " + tmpTrans.getcID() + "\n\n");
                         }
                     }
                     //TimePlan Call mit der ArrayList der Transaktionen
@@ -143,12 +179,14 @@ public class TimePlan extends AppCompatActivity implements LocationListener {
                         Date date4 = format.parse(timeJson.getString("txtWeekTimeEnd"));
                         Clean_Transaktionen.get(addIndex).setTimeToWorkday(date4);
 
+                        /*
                         String timeAppend = "";
                         timeAppend = "FromWeekend: " + Clean_Transaktionen.get(addIndex).getTimeFromWeekend() +"\n"
                                 + "ToWeekend: " + Clean_Transaktionen.get(addIndex).getTimeToWeekend() +"\n"
                                 + "FromWorkday: " + Clean_Transaktionen.get(addIndex).getTimeFromWorkday() +"\n"
                                 + "ToWorkday: " + Clean_Transaktionen.get(addIndex).getTimeToWorkday() +"\n";
                         textViewTimePlan.append(timeAppend);
+                        */
                     }
 
                     addIndex++;
@@ -177,10 +215,12 @@ public class TimePlan extends AppCompatActivity implements LocationListener {
                     ZeitClean_Transaktionen.get(addIndex).setLongitude(tmpLong);
                     ZeitClean_Transaktionen.get(addIndex).setLatitude(tmpLat);
 
+                    /*
                     String coordAppend = "";
                     coordAppend = "Coord Long: " + ZeitClean_Transaktionen.get(addIndex).getLongitude() +"\n"
                             + "Coord Lat: " + ZeitClean_Transaktionen.get(addIndex).getLatitude() +"\n";
                     textViewTimePlan.append(coordAppend);
+                    */
 
                     addIndex++;
                     if (addIndex == ZeitClean_Transaktionen.size()) {
@@ -211,8 +251,8 @@ public class TimePlan extends AppCompatActivity implements LocationListener {
                     WayClean_Transaktionen.get(addIndex).setDistanceToMeFromLast(distanceObj.getLong("value"));
                     WayClean_Transaktionen.get(addIndex).setTimeToMeFromLast(durationObj.getLong("value"));
 
-                    textViewTimePlan.append("Distance in Meter: " + WayClean_Transaktionen.get(addIndex).getDistanceToMeFromLast()+"\n");
-                    textViewTimePlan.append("Time in Sekunden: " + WayClean_Transaktionen.get(addIndex).getTimeToMeFromLast()+"\n");
+                    //textViewTimePlan.append("Distance in Meter: " + WayClean_Transaktionen.get(addIndex).getDistanceToMeFromLast()+"\n");
+                    //textViewTimePlan.append("Time in Sekunden: " + WayClean_Transaktionen.get(addIndex).getTimeToMeFromLast()+"\n");
 
                     addIndex++;
                     if (addIndex == WayClean_Transaktionen.size()) {
@@ -228,7 +268,7 @@ public class TimePlan extends AppCompatActivity implements LocationListener {
 
     public void makeTimePlanPart1(ArrayList<myTransaktion> dirtyTransaktionen) {
         //////////////////////////////
-        //STEP 1 Dulpilkate entfernen
+        //STEP 1 Dupilkate entfernen
         //////////////////////////////
 
         //Dulipikate von IDS werden gesucht und entfernt
@@ -242,6 +282,7 @@ public class TimePlan extends AppCompatActivity implements LocationListener {
 
             for (int k = 0; k < dirtyTransaktionen.size(); k++) {
                 if (dirtyTransaktionen.get(k).getuID().equals(tmpTransaktion.getuID())) {
+                    Same_Transaktionen.add(dirtyTransaktionen.get(k));
                     dirtyTransaktionen.remove(k);
                     k--;
                 }
@@ -275,7 +316,7 @@ public class TimePlan extends AppCompatActivity implements LocationListener {
         //Requests entfernen, die keine Zeiten angegeben haben
         for (int i = 0; dirtyTransaktionen.size() > i; i++) {
             if (dirtyTransaktionen.get(i).getTimeToWeekend() == null) {
-                AppendLater_Transaktionen.add(dirtyTransaktionen.get(i));
+                AppendLater_Transaktionen_NoTime.add(dirtyTransaktionen.get(i));
                 dirtyTransaktionen.remove(i);
                 i--;
             }
@@ -302,6 +343,8 @@ public class TimePlan extends AppCompatActivity implements LocationListener {
             ZeitClean_Transaktionen.add(dirtyTransaktionen.get(index));
             dirtyTransaktionen.remove(index);
         }
+
+        /*
         String reihenfolge = "";
         for(int i=0;ZeitClean_Transaktionen.size()>i;i++){
             if(weekend) {
@@ -315,6 +358,7 @@ public class TimePlan extends AppCompatActivity implements LocationListener {
             }
         }
         textViewTimePlan.append(reihenfolge);
+        */
 
         //Koordinaten der Kleidungsstuecke besorgen bevor die weitere Zeitplanung erfolgt
         addIndex = 0;
@@ -416,26 +460,68 @@ public class TimePlan extends AppCompatActivity implements LocationListener {
                     }
                 }
             }
-            //
+
+            //Termine in die Struktur speichern
             WayClean_Transaktionen.get(i).setTimeToGet(iSetTime);
             WayClean_Transaktionen.get(i+1).setTimeToGet(i1SetTime);
+
+            //Die vorherig festgelegten Termine ggf anpassen
+            if(i>0){
+                for(int k=0;i>k;k++){
+                    Date i_TimeToGet = WayClean_Transaktionen.get(i-(k+1)).getTimeToGet();
+                    Date i_TimeTo = weekend ? WayClean_Transaktionen.get(i-(k+1)).getTimeToWeekend()
+                            : WayClean_Transaktionen.get(i-(k+1)).getTimeToWorkday();
+                    Date i_TimeFrom = weekend ? WayClean_Transaktionen.get(i-(k+1)).getTimeFromWeekend()
+                            : WayClean_Transaktionen.get(i-(k+1)).getTimeFromWorkday();
+                    Date iTimeToGet = WayClean_Transaktionen.get(i-k).getTimeToGet();
+                    long i_DurationTo = WayClean_Transaktionen.get(i-k).getTimeToMeFromLast();
+                    int i_DurationToMinutes = (int)i_DurationTo/60;
+                    i_DurationToMinutes *= -1;
+                    cal.setTime(iTimeToGet);
+                    cal.add(Calendar.MINUTE,i_DurationToMinutes);
+                    Date tmpDate = cal.getTime();
+
+                    if(i_TimeFrom.before(tmpDate) && i_TimeTo.after(tmpDate)){
+                        WayClean_Transaktionen.get(i-(k+1)).setTimeToGet(tmpDate);
+                    }else if(i_TimeFrom.after(tmpDate) || i_TimeFrom.equals(tmpDate)){
+                        WayClean_Transaktionen.get(i-(k+1)).setTimeToGet(i_TimeFrom);
+                    }else if(i_TimeTo.before(tmpDate) || i_TimeTo.equals(tmpDate)){
+                        WayClean_Transaktionen.get(i-(k+1)).setTimeToGet(i_TimeTo);
+                    }
+                }
+            }
         }
         makeTimePlanPart5();
-
     }
 
     public void makeTimePlanPart5() {
         //////////////////////////////////////////////////////////////
         //STEP 5 Reihenfolge mit den angenommenen Angeboten abgleichen
+        //Im voraus entfernte Transaktionen werden wieder hinzugefuegt
         //////////////////////////////////////////////////////////////
 
-        for(int i=0;WayClean_Transaktionen.size()>i;i++){
-            textViewTimePlan.append("Termin: "+WayClean_Transaktionen.get(i).getTimeToGet()+"\n");
+        WayClean_Transaktionen.addAll(AppendLater_Transaktionen_NoTime);
+
+        for(int j = 0;Same_Transaktionen.size()>j;j++){
+            int maxSize = WayClean_Transaktionen.size();
+            boolean added = false;
+            for(int k = 0;maxSize>k;k++){
+                if(Same_Transaktionen.get(j).getuID().equals(WayClean_Transaktionen.get(k).getuID())&&!added){
+                    WayClean_Transaktionen.add(k+1,Same_Transaktionen.get(j));
+                    addSameData(k,k+1);
+                    added = true;
+                }
+            }
         }
 
-        //Fuer die Anzeige sollen alle angenommenen Angebote angezeigt werden
-        //Im vorhinein entfernte Dulplikate, wegen der userID, sollen nun
-        //wieder eingefuegt werden
+        /*
+        for(int i=0;WayClean_Transaktionen.size()>i;i++){
+            textViewTimePlan.append("cID: "+WayClean_Transaktionen.get(i).getcID()+"\n");
+            textViewTimePlan.append("Termin: "+WayClean_Transaktionen.get(i).getTimeToGet()+"\n");
+        }
+        */
+        fillListView(WayClean_Transaktionen);
+        loadingProgress.dismiss();
     }
 
     public void checkWeekdayWeekend(){
@@ -471,6 +557,20 @@ public class TimePlan extends AppCompatActivity implements LocationListener {
         return index;
     }
 
+    //Uebertraegt Daten der einen "myTransaktion" Struktur in die andere
+    public void addSameData(int i1, int i2){
+        myTransaktion tmpTransaktion = WayClean_Transaktionen.get(i1);
+        tmpTransaktion.setcID(WayClean_Transaktionen.get(i2).getcID());
+        WayClean_Transaktionen.set(i2, tmpTransaktion);
+    }
+
+    private void fillListView(ArrayList<myTransaktion> options) {
+        TimePlanAdapter tpAdapter;
+        tpAdapter = new TimePlanAdapter(this, options);
+        listViewTimePlan.setAdapter(tpAdapter);
+        ListViewHelper.getListViewSize(listViewTimePlan);
+    }
+
     //Prueft ob die Permission vorhanden ist GPS zu nutzen
     private void checkGPSPermission(){
         if(ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION)
@@ -497,7 +597,7 @@ public class TimePlan extends AppCompatActivity implements LocationListener {
         myLatitude = location.getLatitude();
         if(!gotGPSDATA) {
             gotGPSDATA = true;
-            textViewTimePlan.append("Longitude: " + myLongitude + "\n" + "Latitude: " + myLatitude + "\n");
+            //textViewTimePlan.append("Longitude: " + myLongitude + "\n" + "Latitude: " + myLatitude + "\n");
 
             tmpLongitude = myLongitude;
             tmpLatitude = myLatitude;
