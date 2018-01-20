@@ -242,7 +242,7 @@ const database = {
             }
         })
     },
-    putRequest(body, uId, id, callback) {
+    putRequest(body, uId, id, firebase, callback) {
         if (!body) {
             throw new Error('body is missing.');
         }
@@ -255,7 +255,7 @@ const database = {
 
         async.waterfall([
             async.apply(findRequest, this.mappings, id, body),
-            async.apply(sendPush, this.mappings, body),
+            async.apply(sendPush, this.mappings, body, firebase),
         ], function(err, result) {
             if (err == "1") {
                 return callback(err);
@@ -286,7 +286,7 @@ const database = {
             })
         }
 
-        function sendPush(mappings, body, callback) {
+        function sendPush(mappings, body, firebase, callback) {
             if (body.status == "accepted") {
                 mappings.findOne({
                     uId: body.uId,
@@ -295,7 +295,7 @@ const database = {
                     if (err) {
                         callback(null);
                     } else {
-                        sendPushNotification(mappings.token, body.uId, mappings, "", "accepted");
+                        sendPushNotification(mappings.token, body.uId, mappings, "", "accepted", firebase);
                         callback(null);
                     }
 
@@ -469,6 +469,8 @@ const database = {
             notes: clothing["notes"],
             brand: clothing["brand"],
             date: Date.now(),
+            postalCode: clothing["postalCode"],
+            city: clothing["city"],
             uId: clothing["uId"],
             type: "clothing",
             image: clothing["image"]
@@ -557,7 +559,7 @@ const database = {
         }
 
     },
-    postRequest(cId, body, callback) {
+    postRequest(cId, body, firebase, callback) {
         if (!cId) {
             throw new Error('id is missing.');
         }
@@ -573,7 +575,8 @@ const database = {
             uId: body.uId,
             ouId: body.ouId,
             status: "open",
-            confirmed: "0"
+            confirmed: "0",
+            closed: "0"
         };
         //write mapping to Database
 
@@ -595,7 +598,7 @@ const database = {
                 if (err) {
                     return callback(err);
                 }
-                sendPushNotification(mappings.token, cId, body.ouId, "", "postRequest");
+                sendPushNotification(mappings.token, cId, body.ouId, "", "postRequest", firebase);
                 callback(null);
             });
         });
@@ -657,7 +660,7 @@ const database = {
             callback(null);
         });
     },
-    postMessage(uId, message, callback) {
+    postMessage(uId, message, firebase, callback) {
         if (!uId) {
             throw new Error('id is missing.');
         }
@@ -698,7 +701,7 @@ const database = {
                 return callback(err);
             }
 
-            sendPushNotification(mappings.token, message["to"], message, "", "message");
+            sendPushNotification(mappings.token, message["to"], message, "", "message", firebase);
         })
         callback(null);
     },
@@ -733,8 +736,28 @@ const database = {
             if (err) {
                 return callback(err);
             }
-            callback(null);
+            this.mappings.update({
+                type: "userprofile",
+                "requests.id": rating["tId"],
+
+            }, {
+                $set: {
+                    "requests.$.status": "closed",
+                    "requests.$.closed": rating["from"]
+                }
+            }, (err) => {
+                if (err) {
+                    callback("1");
+                } else {
+                    callback(null)
+                }
+            })
+
         });
+
+
+
+
     },
     deleteUserToken(id, callback) {
         if (!callback) {
@@ -864,66 +887,6 @@ const database = {
             callback(null, mappings);
         }
     },
-    postUserPrefer(id, prefer, callback) {
-        if (!id) {
-            throw new Error('id is missing.');
-        }
-        if (!prefer) {
-            throw new Error('prefer is missing.');
-        }
-        if (!callback) {
-            throw new Error('Callback is missing.');
-        }
-
-        const mapping = {
-            id: uuidv4(),
-            uId: id,
-            prefer: prefer["prefer"],
-            color: prefer["color"],
-            size: prefer["size"],
-            style: prefer["style"],
-            art: prefer["art"],
-            type: "prefer"
-        };
-
-        //write mapping to Database
-        this.mappings.insertOne(mapping, err => {
-            if (err) {
-                return callback(err);
-            }
-            callback(null, mapping);
-        });
-
-        this.mappings.update({
-            type: "userprofile"
-        }, {
-            $inc: {
-                ['colors.' + prefer["color"]]: 1
-            }
-        })
-        this.mappings.update({
-            type: "userprofile"
-        }, {
-            $inc: {
-                ['style.' + prefer["style"]]: 1
-            }
-        })
-        this.mappings.update({
-            type: "userprofile"
-        }, {
-            $inc: {
-                ['art.' + prefer["art"]]: 1
-            }
-        })
-        this.mappings.update({
-            type: "userprofile"
-        }, {
-            $set: {
-                ['sizes.' + prefer["art"]]: prefer["size"]
-            }
-        })
-        // this.mappings.remove();
-    },
     postUser(uId, callback) {
         if (!uId) {
             throw new Error('uId is missing.');
@@ -931,41 +894,10 @@ const database = {
         if (!callback) {
             throw new Error('Callback is missing.');
         }
-        const sizes = {
-            tshirt: 0,
-            sweatshirt: 0,
-            trousers: 0,
-            shoes: 0,
-            hats: 0
-        }
-        const art = {
-            tshirt: 0,
-            sweatshirt: 0,
-            trousers: 0,
-            shoes: 0,
-            hats: 0
-        }
-        const colors = {
-            blue: 0,
-            yellow: 0,
-            red: 0,
-            black: 0,
-            gray: 0
-        }
-        const style = {
-            sport: 0,
-            casual: 0,
-            working: 0,
-            sleep: 0,
-            bathing: 0
-        }
         const mapping = {
             id: uuidv4(),
             uId: uId,
             gender: "?",
-            colors: colors,
-            style: style,
-            sizes: sizes,
             art: art,
             type: "userprofile"
         };
@@ -976,21 +908,6 @@ const database = {
             }
             callback(null);
         });
-    },
-    getUserPrefer(uId, callback) {
-        if (!callback) {
-            throw new Error('Callback is missing.');
-        }
-        // find all elements
-        this.mappings.findOne({
-            type: "userprofile"
-        }, (err, mappings) => {
-            if (err) {
-                return callback(err);
-            }
-            //send results back to handler
-            callback(null, mappings);
-        })
     },
     getUserToken(uId, callback) {
         if (!callback) {
@@ -1018,55 +935,59 @@ const database = {
         if (!ouId) {
             throw new Error('ouId is missing.');
         }
-        // find all elements
-        this.mappings.findOne({
-            type: "userprofile",
-            uId: uId,
-        }, (err, mappings) => {
-            if (err) {
+
+
+
+        async.waterfall([
+            async.apply(findOwnMessages, this.mappings, uId),
+            async.apply(findOtherMessages, this.mappings, uId, ouId)
+        ], function(err, result) {
+            if (err == "1") {
                 return callback(err);
+            } else {
+                return callback(null, result);
             }
+        });
 
-            this.mappings.find({
-                type: "userprofile",
-                "messages.from": ouId,
-                "messages.to": uId,
-            }).toArray((err, mapping) => {
-                if (err) {
-                    return callback(err);
+        function findOwnMessages(mappings, uId, callback) {
+          mappings.findOne({
+              type: "userprofile",
+              uId: uId,
+          }, (err, mappings) => {
+              if (err) {
+                callback("1", null);
+              } else {
+                    callback(null, ownMessages);
                 }
-                var allMessages = [];
-                for (var single_mapping in mapping) {
-                    for (var one_message in mapping[single_mapping].messages) {
-                        if (mapping[single_mapping].messages[one_message].to == uId) {
-                            allMessages.push(mapping[single_mapping].messages[one_message]);
-                        }
-                    }
-
-                }
-                for (var single_Messages in mappings.messages) {
-                    allMessages.push(mappings.messages[single_Messages]);
-                }
-                //send results back to handler
-                callback(null, allMessages);
             })
-        })
-
-
-    },
-    getClothingPrefer(uId, callback) {
-        if (!callback) {
-            throw new Error('Callback is missing.');
         }
-        // find all elements
-        this.mappings.find({}).toArray((err, mappings) => {
-            if (err) {
-                return callback(err);
-            }
-            //send results back to handler
-            callback(null, mappings);
+
+        function findOtherMessages(mappings, uId, ouId, ownMessages, callback) {
+          this.mappings.find({
+              type: "userprofile",
+              "messages.from": ouId,
+              "messages.to": uId,
+          }).toArray((err, mapping) => {
+              if (err) {
+                callback("1", null);
+              }
+              var allMessages = [];
+              for (var single_mapping in mapping) {
+                  for (var one_message in mapping[single_mapping].messages) {
+                      if (mapping[single_mapping].messages[one_message].to == uId) {
+                          allMessages.push(mapping[single_mapping].messages[one_message]);
+                      }
+                  }
+
+              }
+              for (var single_Messages in mappings.messages) {
+                  allMessages.push(mappings.messages[single_Messages]);
+              }
+              //send results back to handler
+              callback(null, allMessages);
         })
     }
+  }
 
 };
 

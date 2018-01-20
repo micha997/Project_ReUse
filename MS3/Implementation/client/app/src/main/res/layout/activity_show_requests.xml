@@ -11,13 +11,12 @@
 
 
 
-    <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center|left">
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+
+
+            <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center|left">
     <RadioButton
         android:id="@+id/rbOwnRequest"
         android:layout_width="wrap_content"
@@ -36,8 +35,16 @@
         android:layout_weight="1"
         android:text="Foreign reguests"
         android:layout_alignParentRight="true"/>
-        </RelativeLayout>
-        </RadioGroup>
+</RadioGroup>
+    <TextView
+        android:id="@+id/txtEmptyRequestList"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="No request available!"
+        android:textColor="#525252"
+        android:textSize="19.0sp"
+        android:visibility="gone" />
 
     <ScrollView
         android:layout_width="wrap_content"
@@ -49,6 +56,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             />
+
     </ScrollView>
 
 

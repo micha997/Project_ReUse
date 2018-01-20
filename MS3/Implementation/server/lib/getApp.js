@@ -3,8 +3,10 @@
 const express = require('express');
 const bodyParser = require('body-parser')
 
+
 var routes = require("./routes");
-const getApp = function(database) {
+
+const getApp = function(database, firebase) {
     // check Database
     if (!database) {
         throw new Error('Database is missing!');
@@ -23,17 +25,16 @@ const getApp = function(database) {
     }));
 
 
+
+
     // define routes
     app.get('/outfit/:art', routes.getOutfit(database, "false"));
-    app.get('/users/:id/prefer', routes.getUserPrefer(database));
-    app.post('/users/:id/prefer', routes.postUserPrefer(database));
     app.post('/user/:uId/search', routes.postUserSearch(database));
-    app.get('/users/:id/prefer/klamotten/:latitude/:longitude/:vicinity', routes.getClothingPrefer(database));
 
     app.get('/users/:id/token', routes.getUserToken(database));
     app.post('/users/:id/token/:token', routes.postUserToken(database));
     app.delete('/users/:id/token', routes.deleteUserToken(database));
-    app.post('/user/:uId/messages', routes.postMessage(database));
+    app.post('/user/:uId/messages', routes.postMessage(database,firebase));
     app.get('/user/:uId/messages/:ouId', routes.getConversation(database));
     app.delete('/user/:uId/messages/:ouId', routes.deleteConversation(database));
     app.get('/user/:uId/clothing/', routes.getUserClothing(database));
@@ -44,7 +45,7 @@ const getApp = function(database) {
     app.get('/user/:uId/requests', routes.getUserRequests(database));
     app.delete('/user/:uId/requests/:id', routes.deleteUserRequest(database));
 
-    app.put('/user/:uId/requests/:id', routes.putRequest(database));
+    app.put('/user/:uId/requests/:id', routes.putRequest(database, firebase));
     app.post('/user/:uId/rating', routes.postUserRating(database));
     app.get('/user/:uId/rating', routes.getUserRating(database));
     app.put('/user/:uId/rating/:id', routes.putUserRating(database));
@@ -56,7 +57,7 @@ const getApp = function(database) {
     app.get('/clothing/:cId', routes.getClothing(database));
 	app.get('/clothingOptions', routes.getClothingOptions());
     app.put('/clothing/:cId', routes.putClothing(database));
-    app.post('/clothing/:cId', routes.postRequest(database));
+    app.post('/clothing/:cId', routes.postRequest(database,firebase));
     app.delete('/clothing/:cId', routes.deleteClothing(database));
 
     app.post('/klamotten', routes.postKlamotten(database));

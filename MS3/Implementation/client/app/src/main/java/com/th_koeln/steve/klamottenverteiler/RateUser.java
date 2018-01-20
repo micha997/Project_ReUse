@@ -43,7 +43,7 @@ public class RateUser extends AppCompatActivity {
     private TextView txtTransactionDetails;
     private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private final String uId= firebaseAuth.getCurrentUser().getUid();
-
+    private JSONObject rating = new JSONObject();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -83,7 +83,7 @@ public class RateUser extends AppCompatActivity {
 
                     String strDate = sdfDate.format(now);
                     Date date = sdfDate.parse(strDate);
-                    JSONObject rating = new JSONObject();
+
                     rating.put("choice", spinChooseRating.getSelectedItem().toString());
                     rating.put("comment", txtComment.getText().toString());
                     rating.put("time",date.getTime() );
@@ -121,6 +121,7 @@ public class RateUser extends AppCompatActivity {
 
         }
     };
+
 
     private void showDialog(String title, String message) {
         AlertDialog alertDialog = new AlertDialog.Builder(RateUser.this).create();

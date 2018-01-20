@@ -14,8 +14,9 @@ public class Request {
     private String status;
     private String ouId;
     private String confirmed;
+    private String closed;
 
-    public Request(String name, String art, String size, String brand, String status, String from, String ouId, String confirmed) {
+    public Request(String name, String art, String size, String brand, String status, String from, String ouId, String confirmed, String closed) {
         this.name = name;
         this.art = art;
         this.size = size;
@@ -24,6 +25,16 @@ public class Request {
         this.from = from;
         this.ouId = ouId;
         this.confirmed = confirmed;
+        this.closed = closed;
+    }
+
+
+    public String getClosed() {
+        return closed;
+    }
+
+    public void setClosed(String closed) {
+        this.closed = closed;
     }
 
     public String getConfirmed() {

@@ -46,9 +46,6 @@ public class EditClothing extends AppCompatActivity {
         setContentView(R.layout.activity_edit_clothing);
         cId = getIntent().getStringExtra("cId");
 
-        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-        final String uId = firebaseAuth.getCurrentUser().getUid();
-
         txtFabric = (EditText) findViewById(R.id.txtFabric);
         btnPutClothing = (Button) findViewById(R.id.btnPutClothing);
         txtShowClothing = (TextView) findViewById(R.id.txtShowClothing);

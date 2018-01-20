@@ -1,6 +1,7 @@
 package com.th_koeln.steve.klamottenverteiler;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -46,6 +47,7 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
     private final String uId= firebaseAuth.getCurrentUser().getUid();
     private ListView lvShowRequests;
     private boolean menu_first;
+    private ProgressDialog progress;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -54,6 +56,7 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
 
 
         lvShowRequests = (ListView) findViewById(R.id.lvShowRequests);
+
 
         rbOwnRequests = (RadioButton) findViewById(R.id.rbOwnRequest);
         rbOwnRequests.setOnClickListener(this);
@@ -78,6 +81,11 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
             }
         });
 
+        progress = new ProgressDialog(this);
+        progress.setTitle("Please wait!");
+        progress.setMessage("Trying get your requests..");
+        progress.show();
+
     }
 
     @Override
@@ -88,7 +96,7 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
             Request obj = (Request) lv.getItemAtPosition(acmi.position);
             if (obj.getStatus().equals("open") && obj.getFrom().equals("foreign")) {
                 menu.add("Accept");
-                menu.add("Decline");
+                menu.add("Delete");
             } else if (obj.getStatus().equals("open") && obj.getFrom().equals("own")) {
                 menu.add("Delete");
             } else if (obj.getStatus().equals("accepted") && obj.getFrom().equals("own")) {
@@ -97,21 +105,24 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
                 menu.add("Success");
             } else if (obj.getStatus().equals("accepted") && obj.getFrom().equals("foreign")) {
                 menu.add("Chat");
-                menu.add("Decline");
+                menu.add("Delete");
                 menu.add("Success");
             } else if (obj.getStatus().equals("accepted") && obj.getFrom().equals("foreign")) {
                 menu.add("Chat");
-                menu.add("Decline");
+                menu.add("Delete");
                 menu.add("Success");
             } else if (obj.getStatus().equals("waiting") && !obj.getConfirmed().equals(uId)) {
                 menu.add("Chat");
                 menu.add("Confirm");
+                menu.add("Delete");
             } else if (obj.getStatus().equals("waiting") && obj.getConfirmed().equals(uId)) {
                 menu.add("Chat");
                 menu.add("Delete");
             } else if (obj.getStatus().equals("confirmed")) {
                 menu.add("Chat");
                 menu.add("Delete");
+                menu.add("Rate User");
+            } else if (obj.getStatus().equals("closed") && !obj.getClosed().equals(uId)) {
                 menu.add("Rate User");
             }
             for (int i = 0; i < menu.size(); ++i) {
@@ -140,63 +151,68 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
 
             String title = (String) item.getTitle();
             int menuItemIndex = info.position;
+            Intent myIntent;
             if (rbForeignRequests.isChecked()) {
+
                 Request menuItems = foreignRequestList.get(menuItemIndex);
                 String name = menuItems.getName();
-                if (title.equals("Decline")) {
-                    sendDelete(menuItems.getOuId(), name);
+
+                switch (title) {
+                    case "Delete":
+                        sendDelete(menuItems.getOuId(), name);
+                        break;
+                    case "Accept":
+                        setStatus("accepted", name);
+                        break;
+                    case "Chat":
+                        myIntent = new Intent(getApplicationContext(), Chat.class);
+                        myIntent.putExtra("rId", menuItems.getName());
+                        myIntent.putExtra("to", menuItems.getOuId());
+                        myIntent.putExtra("from", uId);
+                        startActivity(myIntent);
+                        break;
+                    case "Success":
+                        setStatus("waiting", menuItems.getName());
+                        break;
+                    case "Confirm":
+                        setStatus("confirmed", name);
+                        break;
+                    case "Rate User":
+                        myIntent = new Intent(getApplicationContext(), RateUser.class);
+                        myIntent.putExtra("tId", menuItems.getName());
+                        myIntent.putExtra("ouId", menuItems.getOuId());
+                        startActivity(myIntent);
+                        break;
                 }
-                if (title.equals("Delete")) {
-                    sendDelete(menuItems.getOuId(), name);
-                }
-                if (title.equals("Accept")) {
-                    setStatus("accepted", name);
-                }
-                if (title.equals("Chat")) {
-                    Intent myIntent = new Intent(getApplicationContext(), Chat.class);
-                    myIntent.putExtra("rId", menuItems.getName());
-                    myIntent.putExtra("to", menuItems.getOuId());
-                    myIntent.putExtra("from", uId);
-                    startActivity(myIntent);
-                }
-                if (title.equals("Success")) {
-                    setStatus("waiting", menuItems.getName());
-                }
-                if (title.equals("Confirm")) {
-                    setStatus("confirmed", name);
-                }
-                if (title.equals("Rate User")) {
-                    Intent myIntent;
-                    myIntent = new Intent(getApplicationContext(), RateUser.class);
-                    myIntent.putExtra("tId", menuItems.getName());
-                    myIntent.putExtra("ouId", menuItems.getOuId());
-                    startActivity(myIntent);
-                }
+
             } else {
+
                 Request menuItems = (Request) ownRequestList.get(menuItemIndex);
                 String name = menuItems.getName();
-                if (title.equals("Delete")) {
-                    sendDelete(uId, name);
-                }
-                if (title.equals("Chat")) {
-                    Intent myIntent = new Intent(getApplicationContext(), Chat.class);
-                    myIntent.putExtra("rId", menuItems.getName());
-                    myIntent.putExtra("to", menuItems.getOuId());
-                    myIntent.putExtra("from", uId);
-                    startActivity(myIntent);
-                }
-                if (title.equals("Success")) {
-                    setStatus("waiting", menuItems.getName());
-                }
-                if (title.equals("Confirm")) {
-                    setStatus("confirmed", name);
-                }
-                if (title.equals("Rate User")) {
-                    Intent myIntent;
-                    myIntent = new Intent(getApplicationContext(), RateUser.class);
-                    myIntent.putExtra("tId", menuItems.getName());
-                    myIntent.putExtra("ouId", menuItems.getOuId());
-                    startActivity(myIntent);
+
+                switch (title) {
+                    case "Delete":
+                        sendDelete(uId, name);
+                        break;
+                    case "Chat":
+                        myIntent = new Intent(getApplicationContext(), Chat.class);
+                        myIntent.putExtra("rId", menuItems.getName());
+                        myIntent.putExtra("to", menuItems.getOuId());
+                        myIntent.putExtra("from", uId);
+                        startActivity(myIntent);
+                        break;
+                    case "Success":
+                        setStatus("waiting", menuItems.getName());
+                        break;
+                    case "Confirm":
+                        setStatus("confirmed", name);
+                        break;
+                    case "Rate User":
+                        myIntent = new Intent(getApplicationContext(), RateUser.class);
+                        myIntent.putExtra("tId", menuItems.getName());
+                        myIntent.putExtra("ouId", menuItems.getOuId());
+                        startActivity(myIntent);
+                        break;
                 }
             }
 
@@ -250,7 +266,7 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
             if (success.equals("1")) {
                 showDialog("Success!", "Successfully edited status of request!");
             } else if(success.equals("2")) {
-                showDialog("Success!", "Successfully deleted request!");
+                showDialog("Success!", "Successfully deleted requests!");
             } else {
 
                 String from = intent.getStringExtra("from");
@@ -268,31 +284,40 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
                             if (requestJsonObject.getString("from").equals("own")) {
                                 Request ownnRequest= new Request(requestJsonObject.getString("id").toString(),
                                         requestJsonObject.getString("art").toString(),requestJsonObject.getString("size").toString(),
-                                        requestJsonObject.getString("brand").toString(),requestJsonObject.getString("status").toString(),requestJsonObject.getString("from").toString(), requestJsonObject.getString("ouId"),requestJsonObject.getString("confirmed"));
+                                        requestJsonObject.getString("brand").toString(),requestJsonObject.getString("status").toString(),requestJsonObject.getString("from").toString(), requestJsonObject.getString("ouId"),requestJsonObject.getString("confirmed"),requestJsonObject.getString("closed"));
                                 ownRequestList.add(ownnRequest);
 
                             } else if (requestJsonObject.getString("from").equals("foreign")) {
                                 Request foreignRequest= new Request(requestJsonObject.getString("id").toString(),
                                         requestJsonObject.getString("art").toString(),requestJsonObject.getString("size").toString(),
-                                        requestJsonObject.getString("brand").toString(),requestJsonObject.getString("status").toString(),requestJsonObject.getString("from").toString(), requestJsonObject.getString("uId"),requestJsonObject.getString("confirmed"));
+                                        requestJsonObject.getString("brand").toString(),requestJsonObject.getString("status").toString(),requestJsonObject.getString("from").toString(), requestJsonObject.getString("uId"),requestJsonObject.getString("confirmed"),requestJsonObject.getString("closed"));
                                 foreignRequestList.add(foreignRequest);
                             }
 
                         }
 
                         if (rbForeignRequests.isChecked()) {
-                            fillListView(foreignRequestList);
+
+                                fillListView(foreignRequestList);
+                                progress.dismiss();
+                            if (foreignRequestList.size() == 0)
+                                lvShowRequests.setEmptyView(findViewById(R.id.txtEmptyRequestList));
 
                         } else {
-                            fillListView(ownRequestList);
+                                fillListView(ownRequestList);
+                                progress.dismiss();
+                            if (ownRequestList.size() == 0)
+                                lvShowRequests.setEmptyView(findViewById(R.id.txtEmptyRequestList));
                         }
 
                     } catch (JSONException e) {
                         showDialog("Error", "Could not process request data!");
+                        progress.dismiss();
                     }
 
                 }
             }
+
         }
     };
 
@@ -322,9 +347,13 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
         switch (view.getId()) {
             case R.id.rbOwnRequest:
                 fillListView(ownRequestList);
+                if (ownRequestList.size() == 0)
+                    lvShowRequests.setEmptyView(findViewById(R.id.txtEmptyRequestList));
                 break;
             case R.id.rbForeignRequest:
                 fillListView(foreignRequestList);
+                if (foreignRequestList.size() == 0)
+                    lvShowRequests.setEmptyView(findViewById(R.id.txtEmptyRequestList));
                 break;
         }
     }

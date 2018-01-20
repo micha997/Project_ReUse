@@ -1,10 +1,10 @@
 'use strict';
 
-const postMessage = function(database) {
+const postMessage = function(database, firebase) {
 
     return function(req, res) {
         // call database
-        database.postMessage(req.params.uId, req.body, err => {
+        database.postMessage(req.params.uId, req.body, firebase, err => {
             if (err) {
                 console.log("Failed to add message!");
                 return res.status(500).send("Message could not be added to the database!");

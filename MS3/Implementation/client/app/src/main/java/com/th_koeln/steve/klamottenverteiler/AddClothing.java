@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.BitmapFactory;
+import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -27,6 +28,7 @@ import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
 import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
 import com.th_koeln.steve.klamottenverteiler.services.ListViewHelper;
@@ -40,6 +42,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -75,6 +78,8 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
     private double longitude=0;
     private String city = null;
     private String result;
+    private String postalCode;
+    private String streetName;
     private JSONArray clothingOptions;
     private JSONArray removedSizeOptions = new JSONArray();
 
@@ -152,6 +157,25 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
                     Place place = PlacePicker.getPlace(getApplicationContext(), data);
                     latitude = place.getLatLng().latitude;
                     longitude = place.getLatLng().longitude;
+                    Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+
+                    List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+                    if (addresses != null && addresses.size() > 0) {
+                        city = addresses.get(0).getLocality();
+                        postalCode = addresses.get(0).getPostalCode();
+                        streetName = addresses.get(0).getThoroughfare();
+                    }
+
+                    List<Address> listOfAddress = geocoder.getFromLocationName(streetName + " " + postalCode + " " + city, 1);
+                    if (listOfAddress.size()!=0) {
+                        Address newAddress = listOfAddress.get(0);
+
+                        longitude = newAddress.getLongitude();
+                        latitude = newAddress.getLatitude();
+                    } else {
+                        showDialog("Warning!","Could not find your Streetname." + "\n" + "Your exact location will be published.");
+
+                    }
                 }
             }
             if (requestCode == PICK_IMAGE) {
@@ -295,6 +319,7 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
                         kleidung.put("city",city);
                         kleidung.put("image",result);
                         kleidung.put("uId", uiD);
+                        kleidung.put("postalCode", postalCode);
                         // define http service call
                         Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
                         // define parameters for Service-Call
@@ -306,7 +331,7 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
                         progress.setTitle("Please wait!");
                         progress.setMessage("Trying to add clothing..");
                         progress.show();
-                        //startService(myIntent);
+                        startService(myIntent);
                     } catch (JSONException e) {
                         showDialog("Error", "Could not add clothing.");
                     }
