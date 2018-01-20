@@ -172,7 +172,7 @@ public class HttpsService extends IntentService {
                             break;
 
                         case "GMAPS":
-                            intent = new Intent("maps");
+                            intent = new Intent("gmaps");
                             intent.putExtra("mapsData",stringBuilder.toString());
                             intent.putExtra("from","GMAPS");
                             break;
