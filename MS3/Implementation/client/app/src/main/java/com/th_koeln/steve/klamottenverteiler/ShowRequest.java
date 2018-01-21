@@ -8,7 +8,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
@@ -16,13 +15,8 @@ import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.RadioButton;
-import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
@@ -121,9 +115,13 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
             } else if (obj.getStatus().equals("confirmed")) {
                 menu.add("Chat");
                 menu.add("Delete");
+                menu.add("Start User Rating");
+            } else if (obj.getStatus().equals("closed") && obj.getClosed().equals("foreign") && obj.getFrom().equals("own") && obj.getFinished().equals("0")) {
                 menu.add("Rate User");
-            } else if (obj.getStatus().equals("closed") && !obj.getClosed().equals(uId)) {
+            } else if (obj.getStatus().equals("closed") && obj.getClosed().equals("own")&& obj.getFrom().equals("foreign") && obj.getFinished().equals("0")) {
                 menu.add("Rate User");
+            } else if (obj.getFinished().equals("1")) {
+                menu.add("Delete");
             }
             for (int i = 0; i < menu.size(); ++i) {
                 MenuItem item = menu.getItem(i);
@@ -181,6 +179,16 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
                         myIntent = new Intent(getApplicationContext(), RateUser.class);
                         myIntent.putExtra("tId", menuItems.getName());
                         myIntent.putExtra("ouId", menuItems.getOuId());
+                        myIntent.putExtra("rFrom",menuItems.getFrom());
+                        myIntent.putExtra("finished","1");
+                        startActivity(myIntent);
+                        break;
+                    case "Start User Rating":
+                        myIntent = new Intent(getApplicationContext(), RateUser.class);
+                        myIntent.putExtra("tId", menuItems.getName());
+                        myIntent.putExtra("ouId", menuItems.getOuId());
+                        myIntent.putExtra("rFrom",menuItems.getFrom());
+                        myIntent.putExtra("finished","0");
                         startActivity(myIntent);
                         break;
                 }
@@ -211,6 +219,15 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
                         myIntent = new Intent(getApplicationContext(), RateUser.class);
                         myIntent.putExtra("tId", menuItems.getName());
                         myIntent.putExtra("ouId", menuItems.getOuId());
+                        myIntent.putExtra("finished","1");
+                        startActivity(myIntent);
+                        break;
+                    case "Start User Rating":
+                        myIntent = new Intent(getApplicationContext(), RateUser.class);
+                        myIntent.putExtra("tId", menuItems.getName());
+                        myIntent.putExtra("ouId", menuItems.getOuId());
+                        myIntent.putExtra("rFrom",menuItems.getFrom());
+                        myIntent.putExtra("finished","0");
                         startActivity(myIntent);
                         break;
                 }
@@ -284,13 +301,13 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
                             if (requestJsonObject.getString("from").equals("own")) {
                                 Request ownnRequest= new Request(requestJsonObject.getString("id").toString(),
                                         requestJsonObject.getString("art").toString(),requestJsonObject.getString("size").toString(),
-                                        requestJsonObject.getString("brand").toString(),requestJsonObject.getString("status").toString(),requestJsonObject.getString("from").toString(), requestJsonObject.getString("ouId"),requestJsonObject.getString("confirmed"),requestJsonObject.getString("closed"));
+                                        requestJsonObject.getString("brand").toString(),requestJsonObject.getString("status").toString(),requestJsonObject.getString("from").toString(), requestJsonObject.getString("ouId"),requestJsonObject.getString("confirmed"),requestJsonObject.getString("closed"),requestJsonObject.getString("finished"));
                                 ownRequestList.add(ownnRequest);
 
                             } else if (requestJsonObject.getString("from").equals("foreign")) {
                                 Request foreignRequest= new Request(requestJsonObject.getString("id").toString(),
                                         requestJsonObject.getString("art").toString(),requestJsonObject.getString("size").toString(),
-                                        requestJsonObject.getString("brand").toString(),requestJsonObject.getString("status").toString(),requestJsonObject.getString("from").toString(), requestJsonObject.getString("uId"),requestJsonObject.getString("confirmed"),requestJsonObject.getString("closed"));
+                                        requestJsonObject.getString("brand").toString(),requestJsonObject.getString("status").toString(),requestJsonObject.getString("from").toString(), requestJsonObject.getString("uId"),requestJsonObject.getString("confirmed"),requestJsonObject.getString("closed"), requestJsonObject.getString("finished"));
                                 foreignRequestList.add(foreignRequest);
                             }
 
@@ -339,7 +356,7 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
                         dialog.dismiss();
                     }
                 });
-        alertDialog.show();
+//        alertDialog.show();
     }
 
     @Override

@@ -16,9 +16,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.iid.FirebaseInstanceId;
 import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
 
 import org.json.JSONArray;
@@ -55,12 +52,6 @@ public class map_results extends FragmentActivity implements OnMapReadyCallback,
         // define map-element
         mMap = googleMap;
         mMap.setOnMarkerClickListener(this);
-/*        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-
-            }
-        });*/
         try {
             jsonArray = new JSONArray(clothing_list);
             // iterate result-JSONArray and Place Marker with extra information
@@ -103,39 +94,6 @@ public class map_results extends FragmentActivity implements OnMapReadyCallback,
         myIntent.putExtra("from","SHOWDETAILS");
         myIntent.putExtra("url",getString(R.string.DOMAIN) + "/clothing/" + cId);
         startService(myIntent);
-
-
-
-        /*String uId = FirebaseAuth.getInstance().getCurrentUser().getUid().toString();
-        JSONObject prefer = new JSONObject();
-        try {
-            prefer.put("prefer", tag.toString());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
-        // define parameters for Service-Call
-        /*for(int i = 0; jsonArray.length() > i; i++)
-        {
-            try {
-                JSONObject objects = jsonArray.getJSONObject(i);
-                if (objects.getString("id").equals(prefer.getString("prefer"))) {
-                    prefer.put("color",objects.getString("color"));
-                    prefer.put("size",objects.getString("size"));
-                    prefer.put("art",objects.getString("art"));
-                    prefer.put("style",objects.getString("style"));
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }*/
-
-        /*myIntent.putExtra("payload",prefer.toString());
-        myIntent.putExtra("method","POST");
-        myIntent.putExtra("from","POSTPREFER");
-        myIntent.putExtra("url",getString(R.string.DOMAIN) + "/users/" + uId + "/prefer");
-        //call http service
-        startService(myIntent);*/
         return false;
     }
 

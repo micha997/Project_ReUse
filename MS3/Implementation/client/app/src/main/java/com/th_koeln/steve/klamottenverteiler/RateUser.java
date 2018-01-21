@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
@@ -19,13 +18,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.th_koeln.steve.klamottenverteiler.R;
 import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -77,6 +73,8 @@ public class RateUser extends AppCompatActivity {
                 try {
                     String tId = getIntent().getStringExtra("tId");
                     String ouId = getIntent().getStringExtra("ouId");
+                    String rFrom = getIntent().getStringExtra("rFrom");
+                    String finished = getIntent().getStringExtra("finished");
 
                     SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
                     Date now = new Date();
@@ -89,6 +87,8 @@ public class RateUser extends AppCompatActivity {
                     rating.put("time",date.getTime() );
                     rating.put("from", uId);
                     rating.put("tId", tId);
+                    rating.put("rFrom",rFrom);
+                    rating.put("finished",finished);
 
                     Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
                     myIntent.putExtra("payload",rating.toString());

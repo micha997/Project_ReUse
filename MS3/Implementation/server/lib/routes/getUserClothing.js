@@ -12,9 +12,9 @@ const getUserClothing = function(database) {
             if (err) {
                 return res.status(500).end();
             } else {
-              for (var single_map in mappings) {
-                  delete mappings[single_map].image;
-              }
+
+              var profile = { href: "/user/" + req.params.uId};
+              mappings[0] = { _links : profile };
               return res.send(mappings);
             }
         })

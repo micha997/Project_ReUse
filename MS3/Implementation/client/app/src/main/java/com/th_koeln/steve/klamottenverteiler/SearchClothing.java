@@ -23,10 +23,7 @@ import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -37,7 +34,6 @@ public class SearchClothing extends AppCompatActivity implements View.OnClickLis
     private EditText etVicinity;
     private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private String uId = firebaseAuth.getCurrentUser().getUid();
-    private Button btnSearchPrefer;
     private Button btnSearch;
     private Button btnSearchLocation;
 
@@ -51,16 +47,13 @@ public class SearchClothing extends AppCompatActivity implements View.OnClickLis
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.acticity_search_clothing);
+        setContentView(R.layout.activity_search_clothing);
 
         btnSearchLocation = (Button) findViewById(R.id.btnSearchLocation);
         btnSearchLocation.setOnClickListener(this);
 
         btnSearch = (Button) findViewById(R.id.btnSearch);
         btnSearch.setOnClickListener(this);
-
-        btnSearchPrefer = (Button) findViewById(R.id.btnSearchPrefer);
-        btnSearchPrefer.setOnClickListener(this);
 
         etVicinity = (EditText) findViewById(R.id.eTvicinity);
 
@@ -167,19 +160,6 @@ public class SearchClothing extends AppCompatActivity implements View.OnClickLis
                 myIntent.putExtra("method","GET");
                 myIntent.putExtra("from","SEARCH");
                 myIntent.putExtra("url",getString(R.string.DOMAIN) +"/klamotten/"+ latitude + "/" + longitude + "/" + vicinity + "/" + uId);
-                //call http service
-                startService(myIntent);
-                break;
-
-            case R.id.btnSearchPrefer:
-                myIntent = new Intent(getApplicationContext(), HttpsService.class);
-                // get desired vicinity in km
-                vicinity = etVicinity.getText().toString();
-                // define parameters for Http-Service call
-                myIntent.putExtra("payload","");
-                myIntent.putExtra("method","GET");
-                myIntent.putExtra("from","SEARCHPREFCLOTHING");
-                myIntent.putExtra("url",getString(R.string.DOMAIN) +"/users/"+ uId + "/prefer/klamotten/"+ latitude + "/" + longitude + "/" + vicinity);
                 //call http service
                 startService(myIntent);
                 break;

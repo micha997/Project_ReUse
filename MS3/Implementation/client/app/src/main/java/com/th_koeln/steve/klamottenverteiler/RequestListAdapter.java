@@ -44,8 +44,9 @@ public class RequestListAdapter extends ArrayAdapter<Request> {
         String ouId = getItem(position).getOuId();
         String confirmed = getItem(position).getConfirmed();
         String closed = getItem(position).getClosed();
+        String finished = getItem(position).getFinished();
 
-        Request request = new Request(name, art, size, brand, status, from, ouId, confirmed, closed);
+        Request request = new Request(name, art, size, brand, status, from, ouId, confirmed, closed, finished);
 
         LayoutInflater inflater = LayoutInflater.from(mContext);
         convertView = inflater.inflate(mRessource,parent,false);
@@ -78,8 +79,6 @@ public class RequestListAdapter extends ArrayAdapter<Request> {
                 txtRequestStatus.setText(status);
                 break;
         }
-
-
 
         return convertView;
     }

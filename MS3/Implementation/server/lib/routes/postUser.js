@@ -6,10 +6,10 @@ const postUser = function(database) {
         // call database
         database.postUser(req.body.uId, err => {
             if (err) {
-                console.log("Failed to add prefer!");
-                return res.status(500).send("prefer could not be added to the database!");
+                console.log("Failed to add userprofile!");
+                return res.status(500).send("userprofile could not be added to the database!");
             } else {
-              console.log("Successfully added prefer!");
+              console.log("Successfully added userprofile!");
               return res.sendStatus(201);
             }
         });

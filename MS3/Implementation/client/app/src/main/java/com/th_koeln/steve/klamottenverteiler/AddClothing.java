@@ -22,13 +22,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
 import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
 import com.th_koeln.steve.klamottenverteiler.services.ListViewHelper;
@@ -38,7 +36,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;

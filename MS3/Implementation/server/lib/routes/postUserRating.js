@@ -12,9 +12,7 @@ const postUserRating = function(database) {
               console.log("Successfully added rating!");
               return res.sendStatus(201);
             }
-
         });
-
     };
 };
 

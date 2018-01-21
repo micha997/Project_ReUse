@@ -31,9 +31,7 @@ const getApp = function(database, firebase) {
     app.get('/outfit/:art', routes.getOutfit(database, "false"));
     app.post('/user/:uId/search', routes.postUserSearch(database));
 
-    app.get('/users/:id/token', routes.getUserToken(database));
     app.post('/users/:id/token/:token', routes.postUserToken(database));
-    app.delete('/users/:id/token', routes.deleteUserToken(database));
     app.post('/user/:uId/messages', routes.postMessage(database,firebase));
     app.get('/user/:uId/messages/:ouId', routes.getConversation(database));
     app.delete('/user/:uId/messages/:ouId', routes.deleteConversation(database));
@@ -44,6 +42,7 @@ const getApp = function(database, firebase) {
     app.delete('/user/:uId/clothing', routes.deleteUserClothing(database));
     app.get('/user/:uId/requests', routes.getUserRequests(database));
     app.delete('/user/:uId/requests/:id', routes.deleteUserRequest(database));
+    app.get('/clothing/:brand/:style/:color/:art/:size/:latitude/:longitude/:vicinity', routes.getCustomeClothing(database));
 
     app.put('/user/:uId/requests/:id', routes.putRequest(database, firebase));
     app.post('/user/:uId/rating', routes.postUserRating(database));
@@ -55,7 +54,7 @@ const getApp = function(database, firebase) {
 
     app.put('/user/:uId/clothing', routes.putClothing(database));
     app.get('/clothing/:cId', routes.getClothing(database));
-	app.get('/clothingOptions', routes.getClothingOptions());
+	  app.get('/clothingOptions', routes.getClothingOptions());
     app.put('/clothing/:cId', routes.putClothing(database));
     app.post('/clothing/:cId', routes.postRequest(database,firebase));
     app.delete('/clothing/:cId', routes.deleteClothing(database));

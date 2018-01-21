@@ -15,8 +15,11 @@ public class Request {
     private String ouId;
     private String confirmed;
     private String closed;
+    private String finished;
 
-    public Request(String name, String art, String size, String brand, String status, String from, String ouId, String confirmed, String closed) {
+
+
+    public Request(String name, String art, String size, String brand, String status, String from, String ouId, String confirmed, String closed, String finished) {
         this.name = name;
         this.art = art;
         this.size = size;
@@ -26,8 +29,16 @@ public class Request {
         this.ouId = ouId;
         this.confirmed = confirmed;
         this.closed = closed;
+        this.finished = finished;
     }
 
+    public String getFinished() {
+        return finished;
+    }
+
+    public void setFinished(String finished) {
+        this.finished = finished;
+    }
 
     public String getClosed() {
         return closed;

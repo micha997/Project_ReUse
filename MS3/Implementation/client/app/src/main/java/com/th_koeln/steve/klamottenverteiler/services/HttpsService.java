@@ -1,18 +1,12 @@
 package com.th_koeln.steve.klamottenverteiler.services;
 
-import android.app.AlertDialog;
 import android.app.IntentService;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.th_koeln.steve.klamottenverteiler.Chat;
-import com.th_koeln.steve.klamottenverteiler.EditProfile;
-import com.th_koeln.steve.klamottenverteiler.ShowClothing;
-import com.th_koeln.steve.klamottenverteiler.ShowOutfit;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,7 +20,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 
 import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
@@ -39,10 +32,11 @@ public class HttpsService extends IntentService {
     public HttpsService() {
         super("name");
     }
+
     private String response = null;
-    private int status=0;
     private String method;
     private String from;
+
     HttpURLConnection connection = null;
     Handler mHandler;
 

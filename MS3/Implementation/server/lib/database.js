@@ -32,6 +32,7 @@ const database = {
     getClothing(cId, callback) {
         if (!cId) {
             throw new Error('id is missing.');
+            callback(err);
         }
         if (!callback) {
             throw new Error('Callback is missing.');
@@ -48,12 +49,51 @@ const database = {
             callback(null, mappings);
         })
     },
+    getCustomeClothing(filter, latitude, longitude, vicinity, callback) {
+        if (!callback) {
+            throw new Error('Callback is missing.');
+        }
+        if (!latitude) {
+            throw new Error('latitude is missing.');
+            callback(err);
+        }
+        if (!longitude) {
+            throw new Error('longitude is missing.');
+            callback(err);
+        }
+        if (!vicinity) {
+            throw new Error('vicinity is missing.');
+            callback(err);
+        }
+        if (!filter) {
+            throw new Error('filter is missing.');
+            callback(err);
+        }
+        var type = {
+            type: "clothing"
+        };
+        // find all elements
+        this.mappings.find(
+            filter
+        ).toArray((err, mappings) => {
+            if (err) {
+                return callback(err);
+            }
+            console.log(latitude);
+            var clothing = calcClothingDistance(mappings, latitude, longitude, vicinity);
+
+            //send results back to handler
+            callback(null, clothing);
+        })
+    },
     getUserOutfitClothing(uId, oId, callback) {
         if (!uId) {
             throw new Error('id is missing.');
+            callback(err);
         }
         if (!oId) {
             throw new Error('id is missing.');
+            callback(err);
         }
         if (!callback) {
             throw new Error('Callback is missing.');
@@ -75,6 +115,7 @@ const database = {
     getUserOutfit(uId, callback) {
         if (!uId) {
             throw new Error('id is missing.');
+            callback(err);
         }
         if (!callback) {
             throw new Error('Callback is missing.');
@@ -95,6 +136,7 @@ const database = {
     getUserProfile(uId, callback) {
         if (!uId) {
             throw new Error('id is missing.');
+            callback(err);
         }
         if (!callback) {
             throw new Error('Callback is missing.');
@@ -114,6 +156,7 @@ const database = {
     getUserRequests(uId, callback) {
         if (!uId) {
             throw new Error('id is missing.');
+            callback(err);
         }
         if (!callback) {
             throw new Error('Callback is missing.');
@@ -170,7 +213,6 @@ const database = {
                     requests.push(mappings.requests[single_ownReq]);
                 }
                 //send results back to handler
-                console.log(requests);
                 callback(null, requests);
             })
         }
@@ -194,9 +236,6 @@ const database = {
                         var obj = Object.assign(requests[single_req], mapping[single_clothing]);
                     }
                 }
-                console.log(requests);
-                //
-                // console.log(mapping.id);
 
 
                 //send results back to handler
@@ -209,12 +248,14 @@ const database = {
     putUserProfile(uId, put, callback) {
         if (!uId) {
             throw new Error('id is missing.');
+            callback(err);
         }
         if (!callback) {
             throw new Error('Callback is missing.');
         }
         if (!put) {
             throw new Error('put is missing.');
+            callback(err);
         }
         // find all elements
 
@@ -225,12 +266,21 @@ const database = {
             $set: put
         })
     },
-    putUserRating(uId, id, put) {
+    putUserRating(uId, id, put, callback) {
+        if (!uId) {
+            throw new Error('id is missing.');
+            callback(err);
+        }
         if (!id) {
             throw new Error('id is missing.');
+            callback(err);
         }
         if (!put) {
             throw new Error('put is missing.');
+            callback(err);
+        }
+        if (!callback) {
+            throw new Error('callback is missing.');
         }
         this.mappings.update({
             type: "userprofile",
@@ -245,13 +295,24 @@ const database = {
     putRequest(body, uId, id, firebase, callback) {
         if (!body) {
             throw new Error('body is missing.');
+            callback(err);
         }
         if (!uId) {
             throw new Error('id is missing.');
+            callback(err);
+        }
+        if (!id) {
+            throw new Error('id is missing.');
+            callback(err);
+        }
+        if (!firebase) {
+            throw new Error('firebase is missing.');
+            callback(err);
         }
         if (!callback) {
             throw new Error('callback is missing.');
         }
+
 
         async.waterfall([
             async.apply(findRequest, this.mappings, id, body),
@@ -306,12 +367,14 @@ const database = {
     putClothing(cId, put, callback) {
         if (!cId) {
             throw new Error('id is missing.');
+            callback(err);
         }
         if (!callback) {
             throw new Error('Callback is missing.');
         }
         if (!put) {
             throw new Error('put is missing.');
+            callback(err);
         }
         // find all elements
         this.mappings.update({
@@ -324,6 +387,7 @@ const database = {
     getUserClothing(uId, callback) {
         if (!uId) {
             throw new Error('id is missing.');
+            callback(err);
         }
         if (!callback) {
             throw new Error('Callback is missing.');
@@ -360,6 +424,7 @@ const database = {
         }
         if (!uId) {
             throw new Error('id is missing.');
+            callback(err);
         }
         // find all elements
         this.mappings.findOne({
@@ -379,8 +444,16 @@ const database = {
         }
         if (!art) {
             throw new Error('art is missing.');
+            callback(err);
         }
-
+        if (!params) {
+            throw new Error('params is missing.');
+            callback(err);
+        }
+        if (!choise) {
+            throw new Error('choise is missing.');
+            callback(err);
+        }
         // find all elements
         this.mappings.find({
             type: "clothing"
@@ -390,17 +463,9 @@ const database = {
             }
             //send results back to handler
             if (choise == "true") {
-                var mappings_new = [];
-                for (var i = 0; i < mappings.length; i++) {
-                    // calc distance
-                    var distance = calcDistance(mappings[i].latitude, mappings[i].longitude, params.latitude, params.longitude);
-                    if (distance <= params.vicinity) {
-                        // add distance
-                        mappings[i].distance = distance;
-                        mappings_new.push(mappings[i]);
-                    }
-                }
-                mappings = mappings_new;
+
+                var mappings = calcClothingDistance(mappings, params.latitude, params.longitude, params.vicinity);
+
             }
             var clothing = calcOutfit("winter", mappings, false);
 
@@ -414,12 +479,15 @@ const database = {
         }
         if (!latitude) {
             throw new Error('latitude is missing.');
+            callback(err);
         }
         if (!longitude) {
             throw new Error('longitude is missing.');
+            callback(err);
         }
         if (!vicinity) {
             throw new Error('vicinity is missing.');
+            callback(err);
         }
         // find all elements
         this.mappings.find({
@@ -450,6 +518,7 @@ const database = {
     addClothing(clothing, callback) {
         if (!clothing) {
             throw new Error('Clothing is missing.');
+            callback(err);
         }
         if (!callback) {
             throw new Error('Callback is missing.');
@@ -562,13 +631,20 @@ const database = {
     postRequest(cId, body, firebase, callback) {
         if (!cId) {
             throw new Error('id is missing.');
+            callback(err);
         }
         if (!body) {
             throw new Error('body is missing.');
+            callback(err);
+        }
+        if (!firebase) {
+            throw new Error('firebase is missing.');
+            callback(err);
         }
         if (!callback) {
             throw new Error('Callback is missing.');
         }
+
         const mapping = {
             id: uuidv4(),
             cId: cId,
@@ -576,7 +652,8 @@ const database = {
             ouId: body.ouId,
             status: "open",
             confirmed: "0",
-            closed: "0"
+            closed: "0",
+            finished:"0"
         };
         //write mapping to Database
 
@@ -607,9 +684,11 @@ const database = {
     postUserToken(id, token, callback) {
         if (!id) {
             throw new Error('id is missing.');
+            callback(err);
         }
         if (!token) {
             throw new Error('Token is missing.');
+            callback(err);
         }
         if (!callback) {
             throw new Error('Callback is missing.');
@@ -631,9 +710,11 @@ const database = {
     postUserSearch(uId, body, callback) {
         if (!uId) {
             throw new Error('id is missing.');
+            callback(err);
         }
         if (!body) {
             throw new Error('body is missing.');
+            callback(err);
         }
         if (!callback) {
             throw new Error('Callback is missing.');
@@ -663,9 +744,15 @@ const database = {
     postMessage(uId, message, firebase, callback) {
         if (!uId) {
             throw new Error('id is missing.');
+            callback(err);
         }
         if (!message) {
             throw new Error('message is missing.');
+            callback(err);
+        }
+        if (!firebase) {
+            throw new Error('firebase is missing.');
+            callback(err);
         }
         if (!callback) {
             throw new Error('Callback is missing.');
@@ -708,9 +795,11 @@ const database = {
     postUserRating(uId, rating, callback) {
         if (!uId) {
             throw new Error('id is missing.');
+            callback(err);
         }
         if (!rating) {
             throw new Error('rating is missing.');
+            callback(err);
         }
         if (!callback) {
             throw new Error('Callback is missing.');
@@ -722,8 +811,11 @@ const database = {
             choice: rating["choice"],
             comment: rating["comment"],
             tId: rating["tId"],
-            time: rating["time"]
+            time: rating["time"],
+            rfrom: rating["rfrom"],
+            finished: rating["finished"]
         };
+        console.log(mapping);
         //write mapping to Database
         this.mappings.update({
             type: "userprofile",
@@ -743,7 +835,8 @@ const database = {
             }, {
                 $set: {
                     "requests.$.status": "closed",
-                    "requests.$.closed": rating["from"]
+                    "requests.$.closed": rating["rFrom"],
+                    "requests.$.finished": rating["finished"]
                 }
             }, (err) => {
                 if (err) {
@@ -754,34 +847,6 @@ const database = {
             })
 
         });
-
-
-
-
-    },
-    deleteUserToken(id, callback) {
-        if (!callback) {
-            throw new Error('Callback is missing.');
-        }
-        if (!id) {
-            throw new Error('id is missing.');
-        }
-        // find all elements
-        this.mappings.update({
-                uId : uId,
-                type : "userprofile"
-            },
-            {
-                $pull : { requests : { id : id } }
-            }, err => {
-                console.log("yes");
-                if (err) {
-                    return callback(err);
-                }
-                //send results back to handler
-                callback(	null, mappings);
-            }
-        );
     },
     deleteUserRequest(uId, id, callback) {
         if (!callback) {
@@ -789,34 +854,39 @@ const database = {
         }
         if (!id) {
             throw new Error('id is missing.');
+            callback(err);
         }
 
 
         this.mappings.update({
-        uId : uId,
-        type : "userprofile"
+                uId: uId,
+                type: "userprofile"
+            }, {
+                $pull: {
+                    requests: {
+                        id: id
+                    }
+                }
+            }, {},
+            err => {
+                if (err) {
+                    return callback(err);
+                }
+                //send results back to handler
+                return callback(null);
+            })
     },
-    {
-        $pull : { requests : { id : id } }
-    },
-    {},
-    err => {
-        if (err) {
-            return callback(err);
-        }
-        //send results back to handler
-        return callback(null);
-    })
-},
     deleteConversation(uId, ouId, callback) {
         if (!callback) {
             throw new Error('Callback is missing.');
         }
         if (!uId) {
             throw new Error('uId is missing.');
+            callback(err);
         }
         if (!ouId) {
             throw new Error('ouId is missing.');
+            callback(err);
         }
         // find all elements
         this.mappings.remove({
@@ -834,8 +904,9 @@ const database = {
         if (!callback) {
             throw new Error('Callback is missing.');
         }
-        if (!id) {
+        if (!uId) {
             throw new Error('id is missing.');
+            callback(err);
         }
         // find all elements
         this.mappings.remove({
@@ -853,8 +924,9 @@ const database = {
         if (!callback) {
             throw new Error('Callback is missing.');
         }
-        if (!id) {
+        if (!uId) {
             throw new Error('id is missing.');
+            callback(err);
         }
         // find all elements
         this.mappings.remove({
@@ -872,8 +944,9 @@ const database = {
         if (!callback) {
             throw new Error('Callback is missing.');
         }
-        if (!id) {
+        if (!uId) {
             throw new Error('id is missing.');
+            callback(err);
         }
         // find all elements
         this.mappings.remove({
@@ -890,6 +963,7 @@ const database = {
     postUser(uId, callback) {
         if (!uId) {
             throw new Error('uId is missing.');
+            callback(err);
         }
         if (!callback) {
             throw new Error('Callback is missing.');
@@ -898,7 +972,6 @@ const database = {
             id: uuidv4(),
             uId: uId,
             gender: "?",
-            art: art,
             type: "userprofile"
         };
         //write mapping to Database
@@ -909,31 +982,17 @@ const database = {
             callback(null);
         });
     },
-    getUserToken(uId, callback) {
-        if (!callback) {
-            throw new Error('Callback is missing.');
-        }
-        // find all elements
-        this.mappings.findOne({
-            uId: uId,
-            type: "token"
-        }, (err, mappings) => {
-            if (err) {
-                return callback(err);
-            }
-            //send results back to handler
-            callback(null, mappings);
-        })
-    },
     getConversation(uId, ouId, callback) {
         if (!callback) {
             throw new Error('Callback is missing.');
         }
         if (!uId) {
             throw new Error('uId is missing.');
+            callback(err);
         }
         if (!ouId) {
             throw new Error('ouId is missing.');
+            callback(err);
         }
 
 
@@ -950,46 +1009,62 @@ const database = {
         });
 
         function findOwnMessages(mappings, uId, callback) {
-          mappings.findOne({
-              type: "userprofile",
-              uId: uId,
-          }, (err, mappings) => {
-              if (err) {
-                callback("1", null);
-              } else {
-                    callback(null, ownMessages);
+            mappings.findOne({
+                type: "userprofile",
+                uId: uId,
+            }, (err, mappings) => {
+                if (err) {
+                    callback("1", null);
+                } else {
+                    callback(null, mappings);
                 }
             })
         }
 
         function findOtherMessages(mappings, uId, ouId, ownMessages, callback) {
-          this.mappings.find({
-              type: "userprofile",
-              "messages.from": ouId,
-              "messages.to": uId,
-          }).toArray((err, mapping) => {
-              if (err) {
-                callback("1", null);
-              }
-              var allMessages = [];
-              for (var single_mapping in mapping) {
-                  for (var one_message in mapping[single_mapping].messages) {
-                      if (mapping[single_mapping].messages[one_message].to == uId) {
-                          allMessages.push(mapping[single_mapping].messages[one_message]);
-                      }
-                  }
+          console.log(ownMessages);
+            mappings.find({
+                type: "userprofile",
+                "messages.from": ouId,
+                "messages.to": uId,
+            }).toArray((err, mapping) => {
+                if (err) {
+                    callback("1", null);
+                }
+                var allMessages = [];
+                for (var single_mapping in mapping) {
+                    for (var one_message in mapping[single_mapping].messages) {
+                        if (mapping[single_mapping].messages[one_message].to == uId) {
+                            allMessages.push(mapping[single_mapping].messages[one_message]);
+                        }
+                    }
 
-              }
-              for (var single_Messages in mappings.messages) {
-                  allMessages.push(mappings.messages[single_Messages]);
-              }
-              //send results back to handler
-              callback(null, allMessages);
-        })
-    }
-  }
+                }
+                for (var single_Messages in ownMessages.messages) {
+                    allMessages.push(ownMessages.messages[single_Messages]);
+                }
+                //send results back to handler
+                callback(null, allMessages);
+            })
+        }
+    },
 
 };
+
+function calcClothingDistance(mappings, latitude, longitude, vicinity) {
+    console.log("Lat: " + latitude + "Long: " + longitude + " vicinity: " + vicinity);
+    var mappings_new = [];
+    for (var i = 0; i < mappings.length; i++) {
+        // calc distance
+        var distance = calcDistance(mappings[i].latitude, mappings[i].longitude, latitude, longitude);
+        if (distance <= vicinity) {
+            // add distance
+            mappings[i].distance = distance;
+            mappings_new.push(mappings[i]);
+        }
+    }
+    return mappings_new;
+}
 
 
 

@@ -19,7 +19,7 @@ var wintermodel = {
             warmth_high: 0,
             moisture_pickup_low: 0,
             moisture_pickup_high: 0,
-            art: ["tshirt", "shirt"],
+            art: ["tshirt", "shirt", "T-Shirt"],
             model: "wintermodel_1layer"
         },
         wintermodel_layer1_alternative: {

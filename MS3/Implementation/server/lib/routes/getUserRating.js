@@ -13,6 +13,7 @@ const getUserRating = function(database) {
             if (err) {
                 return res.status(500).end();
             } else {
+              
               return res.status(201).send(mappings["rating"]);
             }
         })

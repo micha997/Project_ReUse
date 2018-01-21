@@ -12,9 +12,7 @@ const postMessage = function(database, firebase) {
               console.log("Successfully added message!");
               return res.sendStatus(201);
             }
-
         });
-
     };
 };
 
