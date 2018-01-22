@@ -31,6 +31,7 @@
         <activity android:name=".RateUser" />
         <activity android:name=".AddClothing" />
         <activity android:name=".map_results" />
+        <activity android:name=".ShowOnMap" />
         <activity android:name=".SearchClothing"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".ShowRequest" />
@@ -42,6 +43,8 @@
         <activity android:name=".MyClothing" />
         <activity android:name=".ShowOutfit" />
         <activity android:name=".ClothingOptionsDetail" />
+        <activity android:name=".SearchClothingFilter" />
+        <activity android:name=".TimePlan"/>
 
         <service android:name=".services.HttpsService"></service>
 
@@ -52,7 +55,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".TimePlan"></activity>
     </application>
 
 </manifest>

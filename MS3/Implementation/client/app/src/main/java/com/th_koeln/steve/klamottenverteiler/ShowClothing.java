@@ -39,6 +39,7 @@ public class ShowClothing extends AppCompatActivity implements View.OnClickListe
     private String clothingID;
     private String clothing;
     private String ouId = null;
+    private double lat, lng;
 
     private ImageView imgShowClothingPicture;
 
@@ -126,6 +127,10 @@ public class ShowClothing extends AppCompatActivity implements View.OnClickListe
                     if(!request.getString("brand").equals("") && !request.getString("brand").isEmpty() && !request.isNull("brand"))
                         textViewBrandDetail.setText(request.getString("brand"));
 
+                    lat = request.getDouble("latitude");
+                    lng = request.getDouble("longitude");
+
+
                 } catch (JSONException e) {
                     showDialog("Error", "Could not process clothing data!");
                 }
@@ -139,12 +144,10 @@ public class ShowClothing extends AppCompatActivity implements View.OnClickListe
         switch (view.getId()) {
 
             case R.id.btnShowLocation:
-                    /*
-                    Intent mapIntent = new Intent(getApplicationContext(), NEWMAPCLASS.class);
-                    mapIntent.putExtra("lng", );
-                    mapIntent.putExtra("lat", )
-                    startActivity(mapIntent);
-                    */
+                Intent mapIntent = new Intent(getApplicationContext(), ShowOnMap.class);
+                mapIntent.putExtra("lng", lng);
+                mapIntent.putExtra("lat", lat);
+                startActivity(mapIntent);
                 break;
 
             case R.id.btnSendRequest:
