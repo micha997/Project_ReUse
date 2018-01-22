@@ -1,6 +1,5 @@
-package com.th_koeln.steve.klamottenverteiler;
+package com.th_koeln.steve.klamottenverteiler.adapter;
 
-import android.app.LauncherActivity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,7 +7,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
+import com.th_koeln.steve.klamottenverteiler.R;
+import com.th_koeln.steve.klamottenverteiler.structures.myTransaktion;
 
 import java.util.ArrayList;
 import java.util.Calendar;

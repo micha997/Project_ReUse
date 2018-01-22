@@ -1,4 +1,4 @@
-package com.th_koeln.steve.klamottenverteiler;
+package com.th_koeln.steve.klamottenverteiler.adapter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -10,6 +10,8 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.th_koeln.steve.klamottenverteiler.R;
+import com.th_koeln.steve.klamottenverteiler.structures.Request;
 
 import java.util.List;
 

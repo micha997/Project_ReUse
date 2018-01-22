@@ -1,4 +1,4 @@
-package com.th_koeln.steve.klamottenverteiler;
+package com.th_koeln.steve.klamottenverteiler.structures;
 
 import java.util.Date;
 

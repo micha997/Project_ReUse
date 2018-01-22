@@ -23,8 +23,10 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.th_koeln.steve.klamottenverteiler.adapter.TimePlanAdapter;
 import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
 import com.th_koeln.steve.klamottenverteiler.services.ListViewHelper;
+import com.th_koeln.steve.klamottenverteiler.structures.myTransaktion;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -600,7 +602,6 @@ public class TimePlan extends AppCompatActivity implements LocationListener {
         TimePlanAdapter tpAdapter;
         tpAdapter = new TimePlanAdapter(this, options);
         listViewTimePlan.setAdapter(tpAdapter);
-        ListViewHelper.getListViewSize(listViewTimePlan);
     }
 
     //Prueft ob die Berechtigung vorhanden ist GPS zu nutzen

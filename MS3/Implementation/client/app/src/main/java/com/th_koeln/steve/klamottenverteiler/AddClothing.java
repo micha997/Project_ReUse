@@ -28,6 +28,7 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.firebase.auth.FirebaseAuth;
+import com.th_koeln.steve.klamottenverteiler.adapter.ClothingOptionsAdapter;
 import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
 import com.th_koeln.steve.klamottenverteiler.services.ListViewHelper;
 
@@ -278,6 +279,24 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
                             art = tmpSelection;
                             break;
                         case "Gender":
+                            if(tmpSelection != "" && !size.isEmpty()){
+                                switch(tmpSelection){
+                                    case "Männlich Erwachsen":
+                                    case "Männlich Kind":
+                                        tmpSelection = "M";
+                                        break;
+
+                                    case "Weiblich Erwachsen":
+                                    case "Weiblich Kind":
+                                        tmpSelection = "W";
+                                        break;
+
+                                    case "Unisex Erwachsen":
+                                    case "Unisex Kind":
+                                        tmpSelection = "U";
+                                        break;
+                                }
+                            }
                             gender = tmpSelection;
                             break;
                         case "Size":
@@ -299,7 +318,8 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
                 }
                 String notes = editTextTitle.getText().toString();
 
-                if(art != "" && !art.isEmpty() && size!= "" && !size.isEmpty() && longitude != 0 && latitude != 0 ) {
+                if(art != "" && !art.isEmpty() && size!= "" && !size.isEmpty() && notes!= ""
+                        && !notes.isEmpty() && longitude != 0 && latitude != 0 ) {
                     // build JSON object for clothing post
                     JSONObject kleidung = new JSONObject();
                     try {
@@ -333,7 +353,7 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
                         showDialog("Error", "Could not add clothing.");
                     }
                 } else {
-                    showDialog("Error", "Some of the following values missing: \n Art \n Size \n Location");
+                    showDialog("Fehlende Infos", "Pflichtfelder: \n- Title \n- Art \n- Size \n- Location");
                 }
                 break;
 

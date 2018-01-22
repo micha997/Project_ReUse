@@ -10,8 +10,8 @@ var kategorieObj3 = {topic:"Fußbekleidung", options: []};
 var kategorieObj4 = {topic:"Accessoires", options: []};
 
 kategorieObj0.options.push("Wollmütze","Hut","Mütze","Beanie","Cap");
-kategorieObj1.options.push("Pullover","Hoodie","Sweatshirt","T-Shirt","Jacke",
-                           "Hemd","Bluse","Mantel","Weste","Strickjacke","Anzug",
+kategorieObj1.options.push("Pullover","Hoodie","Sweatshirt","T-Shirt","Shirt","Jacke",
+                           "Hemd","Bluse","Wintermantel","Mantel","Weste","Strickjacke","Anzug",
                            "Blazer","Kleid","Bademantel","Regenjacke","Sonstiges");
 kategorieObj2.options.push("Jeans","Hose","Rock","Unterwäsche","Shorts","Leggings",
                            "Jogginghose","Badehose","Sonstiges");
@@ -69,8 +69,8 @@ colorOptions.options.push("Rot", "Gelb", "Grün", "Cyan", "Blau", "Magenta", "Ro
 //Kleidungsstoff
 var fabricOptions = {topic:"Fabric", options: []};
 
-fabricOptions.options.push("baumwolle","wolle","viskose","modal","polyester","leinen","polyacryl",
-                           "polyamid","seide","kaschmir","denim","leder","synthetik");
+fabricOptions.options.push("Baumwolle","Wolle","Viskose","Modal","Polyester","Leinen","Polyacryl",
+                           "Polyamid","Seide","Kaschmir","Denim","Leder","Synthetik");
 
 //Kleidungsmarke
 var brandOptions = {topic:"Brand", options: []};

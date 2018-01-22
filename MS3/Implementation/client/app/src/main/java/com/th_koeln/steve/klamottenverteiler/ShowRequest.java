@@ -19,7 +19,9 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.th_koeln.steve.klamottenverteiler.adapter.RequestListAdapter;
 import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
+import com.th_koeln.steve.klamottenverteiler.structures.Request;
 
 import org.json.JSONArray;
 import org.json.JSONException;

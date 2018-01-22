@@ -1,4 +1,4 @@
-package com.th_koeln.steve.klamottenverteiler;
+package com.th_koeln.steve.klamottenverteiler.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -6,6 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+
+import com.th_koeln.steve.klamottenverteiler.R;
 
 import java.util.ArrayList;
 

@@ -31,7 +31,8 @@
         <activity android:name=".RateUser" />
         <activity android:name=".AddClothing" />
         <activity android:name=".map_results" />
-        <activity android:name=".SearchClothing" />
+        <activity android:name=".SearchClothing"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".ShowRequest" />
         <activity android:name=".Chat" />
         <activity android:name=".ShowClothing" />

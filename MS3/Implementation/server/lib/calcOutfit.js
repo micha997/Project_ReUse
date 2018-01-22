@@ -9,7 +9,7 @@ var wintermodel = {
           warmth_high: 10,
           moisture_pickup_low: 0,
           moisture_pickup_high: 0,
-          art: ["wollmütze","mütze"],
+          art: ["Wollmütze","Mütze","Beanie"],
           model: "wintermodel_head"
         },
         wintermodel_layer1: {
@@ -19,7 +19,7 @@ var wintermodel = {
             warmth_high: 0,
             moisture_pickup_low: 0,
             moisture_pickup_high: 0,
-            art: ["tshirt", "shirt", "T-Shirt"],
+            art: ["T-Shirt", "Shirt","Hemd","Bluse"],
             model: "wintermodel_1layer"
         },
         wintermodel_layer1_alternative: {
@@ -29,7 +29,7 @@ var wintermodel = {
             warmth_high: 0,
             moisture_pickup_low: 0,
             moisture_pickup_high: 0,
-            art: ["tshirt", "shirt"],
+            art: ["T-Shirt", "Shirt","Hemd","Bluse"],
             model: "wintermodel_1layer_alternative"
         },
         wintermodel_layer2: {
@@ -39,7 +39,7 @@ var wintermodel = {
             warmth_high: 0,
             moisture_pickup_low: 0,
             moisture_pickup_high: 0,
-            art: ["tshirt", "shirt"],
+            art: ["Pullover","Hoodie","Sweatshirt","Weste","Strickjacke","Blazer"],
             model: "wintermodel_2layer"
         },
         wintermodel_layer2_alternative: {
@@ -49,7 +49,7 @@ var wintermodel = {
             warmth_high: 0,
             moisture_pickup_low: 0,
             moisture_pickup_high: 0,
-            art: ["tshirt", "shirt"],
+            art: ["Pullover","Hoodie","Sweatshirt","Weste","Strickjacke","Blazer"],
             model: "wintermodel_1layer_alternative"
         },
         wintermodel_layer3: {
@@ -59,7 +59,7 @@ var wintermodel = {
             warmth_high: 10,
             moisture_pickup_low: 0,
             moisture_pickup_high: 5,
-            art: ["wintermantel","mantel"],
+            art: ["Wintermantel","Mantel","Jacke"],
             model: "wintermodel_3layer"
         },
         wintermodel_layer3_alternative: {
@@ -69,7 +69,7 @@ var wintermodel = {
             warmth_high: 0,
             moisture_pickup_low: 5,
             moisture_pickup_high: 10,
-          art: ["wintermantel","mantel"],
+          art: ["Wintermantel","Mantel","Jacke"],
             model: "wintermodel_3layer_alternative"
         },
         wintermodel_bottom: {
@@ -79,7 +79,7 @@ var wintermodel = {
             warmth_high: 0,
             moisture_pickup_low: 0,
             moisture_pickup_high: 0,
-            art: ["hose", "jeans"],
+            art: ["Jeans","Hose","Leggings"],
             model: "wintermodel_bottom"
         },
         wintermodel_shoes: {
@@ -89,7 +89,7 @@ var wintermodel = {
             warmth_high: 10,
             moisture_pickup_low: 0,
             moisture_pickup_high: 5,
-            art: ["schuhe"],
+            art: ["Stiefel","Schuhe","Segelschuhe","Outdoorschuhe"],
             model: "wintermodel_shoes"
         }
 
@@ -107,79 +107,79 @@ var wintermodel = {
             }
 
     var charac = [{
-            name: "baumwolle",
+            name: "Baumwolle",
             warmth: 6,
             moisture_pickup: 2,
             respiratory_activity: 10
         },
         {
-            name: "wolle",
+            name: "Wolle",
             warmth: 9,
             moisture_pickup: 4,
             respiratory_activity: 9
         },
         {
-            name: "viskose",
+            name: "Viskose",
             warmth: 6,
             moisture_pickup: 3,
             respiratory_activity: 9
         },
         {
-            name: "modal",
+            name: "Modal",
             warmth: 6,
             moisture_pickup: 3,
             respiratory_activity: 9
         },
         {
-            name: "polyester",
+            name: "Polyester",
             warmth: 9,
             moisture_pickup: 9,
             respiratory_activity: 7
         },
         {
-            name: "leinen",
+            name: "Leinen",
             warmth: 4,
             moisture_pickup: 1,
             respiratory_activity: 10
         },
         {
-            name: "polyacryl",
+            name: "Polyacryl",
             warmth: 7,
             moisture_pickup: 8,
             respiratory_activity: 8
         },
         {
-            name: "polyamid",
+            name: "Polyamid",
             warmth: 7,
             moisture_pickup: 8,
             respiratory_activity: 4
         },
         {
-            name: "seide",
+            name: "Seide",
             warmth: 3,
             moisture_pickup: 7,
             respiratory_activity: 9
         },
         {
-            name: "kaschmir",
+            name: "Kaschmir",
             warmth: 10,
             moisture_pickup: 8,
             respiratory_activity: 8
         },
         {
-            name: "denim",
+            name: "Denim",
             warmth: 7,
             moisture_pickup: 4,
             respiratory_activity: 8
         },
         {
-            name: "leder",
+            name: "Leder",
             warmth: 8,
             moisture_pickup: 9,
             respiratory_activity: 8
         },
         {
-            name: "synthetik",
+            name: "Synthetik",
             warmth: 6,
             moisture_pickup: 10,
             respiratory_activity: 2
