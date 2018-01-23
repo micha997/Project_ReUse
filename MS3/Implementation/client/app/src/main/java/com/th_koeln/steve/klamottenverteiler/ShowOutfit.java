@@ -1,6 +1,7 @@
 package com.th_koeln.steve.klamottenverteiler;
 
 import android.app.AlertDialog;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -82,6 +83,10 @@ public class ShowOutfit extends AppCompatActivity implements View.OnClickListene
         btnSendClothingRequest.setOnClickListener(this);
         btnSubscribeMissingClothing = (Button) findViewById(R.id.btnSubscribeMissingClothing);
         btnSubscribeMissingClothing.setOnClickListener(this);
+
+
+
+
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
                 new IntentFilter("showdetails"));
@@ -183,9 +188,12 @@ public class ShowOutfit extends AppCompatActivity implements View.OnClickListene
                 if(spinnerMissingClothing.getSelectedItem() !=null) {
                     JSONObject subscribe = new JSONObject();
                     try {
+                        // Model vom fehlenden Kleidungsstück fehltfesthalten
                         subscribe.put("model", model);
+                        // Layer vom fehlenden Kleidunststück festhalten
                         subscribe.put("missing", spinnerMissingClothing.getSelectedItem().toString());
 
+                        // Sende Suchanfrage an Server
                         Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
                         myIntent.putExtra("payload", subscribe.toString());
                         myIntent.putExtra("method", "POST");
@@ -193,6 +201,7 @@ public class ShowOutfit extends AppCompatActivity implements View.OnClickListene
                         myIntent.putExtra("url", getString(R.string.DOMAIN) + "/user/" + uId + "/search");
                         startService(myIntent);
                     } catch (JSONException e) {
+                        // Suche konnte nicht eingetragen werden
                         showDialog("Error", "Could not subscribe for missing clothing!");
                     }
                 }
@@ -213,22 +222,28 @@ public class ShowOutfit extends AppCompatActivity implements View.OnClickListene
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            JSONObject request = new JSONObject();
-            try {
-                String clothing = intent.getStringExtra("clothing");
-                JSONObject clothingJson = new JSONObject(clothing);
-                request.put("uId", uId);
-                request.put("ouId", clothingJson.getString("uId"));
 
-                Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
-                myIntent.putExtra("payload",request.toString());
-                myIntent.putExtra("method","POST");
-                myIntent.putExtra("from", "NEWREQUEST");
-                myIntent.putExtra("url",getString(R.string.DOMAIN) + "/clothing/"+ clothingJson.getString("id"));
-                startService(myIntent);
-            } catch (JSONException e) {
-                showDialog("Error", "Could not process clothing data!");
-            }
+
+
+                JSONObject request = new JSONObject();
+                try {
+                    String clothing = intent.getStringExtra("clothing");
+                    JSONObject clothingJson = new JSONObject(clothing);
+                    // ID's der Benutzer festhalten
+                    request.put("uId", uId);
+                    request.put("ouId", clothingJson.getString("uId"));
+
+                    // Sende Suchanfrage zum Server
+                    Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
+                    myIntent.putExtra("payload",request.toString());
+                    myIntent.putExtra("method","POST");
+                    myIntent.putExtra("from", "NEWREQUEST");
+                    myIntent.putExtra("url",getString(R.string.DOMAIN) + "/clothing/"+ clothingJson.getString("id"));
+                    startService(myIntent);
+                } catch (JSONException e) {
+                    showDialog("Error", "Could not process clothing data!");
+                }
+
         }
     };
 

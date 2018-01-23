@@ -1,5 +1,21 @@
 package com.th_koeln.steve.klamottenverteiler;
 
+/**
+ * Diese Klasse ist für die Entgegennahme von neuen Kleidungsstücken verantwortlich.
+ * Hierfür werden zuerst Werte, die für die einzelnen Attribute vom Server geladen und anschließend
+ * innerhalb des User Interfaces dargestellt.
+ *
+ * Die Lokalität, an dem ein Kleidungsstück abgeholt werden kann,
+ * wird über Google Place Picker eingetragen. Nachdem der Benutzer eine Lokation gewählt hat,
+ * wird die exakte Position verschleiert, indem lediglich ein zufälliger Punkt, der in der Straße des Benutzers
+ * liegt, gespeichert wird.
+ *
+ * Das Bild des jeweiligen Kleidungsstück wird per "Get Content"-Methode geladen und anschließend
+ * für den Transport mithilfe von Base64 kodiert.
+ *
+ * Created by steve on 31.10.17.
+ */
+
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -43,9 +59,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * Created by Michael on 17.01.18.
- */
+
 
 public class AddClothing extends AppCompatActivity implements View.OnClickListener {
 
@@ -72,8 +86,8 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
     private int choosenOption;
     private String choosenArea;
 
-    private double latitude= 0;
-    private double longitude=0;
+    private double latitude=1000;
+    private double longitude=1000;
     private String city = null;
     private String result;
     private String postalCode;
@@ -151,12 +165,14 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
         try {
             if (requestCode == PLACE_PICKER_REQUEST) {
                 if (resultCode == RESULT_OK) {
-                    // get Place Picker location
+                    // Hole Place Picker Location
                     Place place = PlacePicker.getPlace(getApplicationContext(), data);
+                    // Original Position des Benutzers zwischenspeichern
                     latitude = place.getLatLng().latitude;
                     longitude = place.getLatLng().longitude;
                     Geocoder geocoder = new Geocoder(this, Locale.getDefault());
 
+                    // Stadt + Postleitzahl + Stadt des Benutzers herausfinden und speichern
                     List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
                     if (addresses != null && addresses.size() > 0) {
                         city = addresses.get(0).getLocality();
@@ -164,13 +180,18 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
                         streetName = addresses.get(0).getThoroughfare();
                     }
 
+                    // Exakte Position des Benutzers verschleichern.
+
+                    // Zufällige Position in der Straße des Benutzers abfragen
                     List<Address> listOfAddress = geocoder.getFromLocationName(streetName + " " + postalCode + " " + city, 1);
+                    // Wenn die Position nicht ermittelt werden konnte
                     if (listOfAddress.size()!=0) {
                         Address newAddress = listOfAddress.get(0);
-
+                        // Speicher neue Lokation
                         longitude = newAddress.getLongitude();
                         latitude = newAddress.getLatitude();
                     } else {
+                        // Benachrichtige den Benutzer, dass seine exakte Position veröffentlicht wird, wenn die Suche nach seiner Straße kein Ergebnis liefert
                         showDialog("Warning!","Could not find your Streetname." + "\n" + "Your exact location will be published.");
 
                     }
@@ -181,6 +202,7 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
                     actionBtnAddPic.setVisibility(View.GONE);
                     actionBtnRemovePic.setVisibility(View.VISIBLE);
 
+                    // Bildinformationen in Inputstream zwischenspeichern
                     InputStream inputStream = getApplicationContext().getContentResolver().openInputStream(data.getData());
                     ByteArrayOutputStream buffer = new ByteArrayOutputStream();
                     int nRead;
@@ -193,9 +215,12 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
 
                     buffer.flush();
 
+                    // Input Stream in byte Array umwandeln
                     byte imageData[] = buffer.toByteArray();
                     inputStream.read(imageData);
+                    // Byte Array mit Base64 kodieren
                     result = Base64.encodeToString(imageData, Base64.DEFAULT);
+                    // Bild anzeigen
                     imageViewPic.setImageBitmap(BitmapFactory.decodeByteArray(imageData, 0, imageData.length));
                 }
             }
@@ -246,6 +271,7 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
 
             case R.id.btnChooseLocation:
                 try {
+                    // Starte Place Picker
                     Intent intent = new PlacePicker.IntentBuilder().build(AddClothing.this);
                     startActivityForResult(intent, AddClothing.PLACE_PICKER_REQUEST);
                 } catch (GooglePlayServicesRepairableException e) {
@@ -317,10 +343,10 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
                     }
                 }
                 String notes = editTextTitle.getText().toString();
-
+                // Überprüfe ob notwendige Eingabe fehlt
                 if(art != "" && !art.isEmpty() && size!= "" && !size.isEmpty() && notes!= ""
-                        && !notes.isEmpty() && longitude != 0 && latitude != 0 ) {
-                    // build JSON object for clothing post
+                        && !notes.isEmpty() && longitude != 10000 && latitude != 10000 ) {
+                    // Erstelle Json Objekt der eingegebenen Daten
                     JSONObject kleidung = new JSONObject();
                     try {
                         kleidung.put("size",size);
@@ -337,14 +363,14 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
                         kleidung.put("image",result);
                         kleidung.put("uId", uiD);
                         kleidung.put("postalCode", postalCode);
-                        // define http service call
+
+                        // Sende Kleidungsstücke zum Server
                         Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
-                        // define parameters for Service-Call
                         myIntent.putExtra("payload",kleidung.toString());
                         myIntent.putExtra("method","POST");
                         myIntent.putExtra("from","ADDCLOTHING");
                         myIntent.putExtra("url",getString(R.string.DOMAIN) + "/klamotten");
-                        //call http service
+                        // Starte Progress-Dialog
                         progress.setTitle("Please wait!");
                         progress.setMessage("Trying to add clothing..");
                         progress.show();
@@ -380,7 +406,7 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
 
             if(intent.getStringExtra("from").equals("ADDCLOTHING")) {
                 String success = intent.getStringExtra("success");
-
+                // Schließe progress-dialog
                 progress.dismiss();
                 if (success.equals("1")) {
                     showDialog("Success!", "Successfully added clothing!");
@@ -412,6 +438,7 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
         listViewOptions.setAdapter(optAdapter);
         ListViewHelper.getListViewSize(listViewOptions);
     }
+
 
     private void showDialog(String title, String message) {
         AlertDialog alertDialog = new AlertDialog.Builder(AddClothing.this).create();

@@ -1,5 +1,13 @@
 package com.th_koeln.steve.klamottenverteiler;
 
+/**
+ * Chat ermöglicht die Kommunikation zwischen Benutzern, nachdem ein Nutzer sein Interesse an einem Kleidungsstück
+ * signalisiert hat und der Anbieter die Anfrage bestätigt hat. Zu Beginn wird der aktuelle Chatverlauf vom Server
+ * geladen und dem Benutzer präsentiert. Jede neue Nachricht wird dem Chatverlauf hinzugefügt und an den Server weitergeleitet.
+ *
+ * Created by Frank on 09.01.2018.
+ */
+
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -27,9 +35,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/**
- * Created by Frank on 09.01.2018.
- */
+
 
 public class Chat extends AppCompatActivity {
     private Button btnSendMessages;
@@ -74,6 +80,8 @@ public class Chat extends AppCompatActivity {
                 new IntentFilter("chat"));
 
         Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
+
+        // Nachrichtenverlauf abrufen
         myIntent.putExtra("method","GET");
         myIntent.putExtra("from","GETCONVERSATION");
         myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId + "/messages/" + getIntent().getStringExtra("to"));
@@ -82,28 +90,38 @@ public class Chat extends AppCompatActivity {
         btnSendMessages.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Gesendete Nachricht zum Chat hinzufügen
                 text = txtMessage.getText().toString();
                 txtChat.append("You: " + text + "\n");
+
                 JSONObject message = new JSONObject();
                 Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
+
+                // Aktuelles Datum millisekundengenau der Nachricht hinzufügen
                 SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
                 Date now = new Date();
 
                 String strDate = sdfDate.format(now);
                 try {
+                    // Nachrichten Daten zusammenfassen
                     Date date = sdfDate.parse(strDate);
                     message.put("time",date.getTime());
                     message.put("from", message_from);
                     message.put("to", message_to);
+
+
+                    message.put("message",text);
+                    message.put("attach","attach");
+                    message.put("rId",rId);
+
+                    // Sende Nachricht an zugehörige Adresse
                     if (message_from.equals(uId)) {
                         myIntent.putExtra("url", getString(R.string.DOMAIN) + "/user/" + message_from + "/messages");
                     } else {
                         myIntent.putExtra("url", getString(R.string.DOMAIN) + "/user/" + message_to + "/messages");
                     }
-                    message.put("message",text);
-                    message.put("attach","attach");
 
-                    message.put("rId",rId);
+                    // Sende neue Nachricht zum Server
                     myIntent.putExtra("payload", message.toString());
                     myIntent.putExtra("method","POST");
                     myIntent.putExtra("from","POSTMESSAGE");
@@ -131,20 +149,23 @@ public class Chat extends AppCompatActivity {
             String from = intent.getStringExtra("from");
 
             if (from.equals("GETCONVERSATIONFAIL")) {
+                // Nachrichtenverlauf konnte nicht geholt werden
                 showDialog("Error!", "Could not get Conversation!");
             } else if (from.equals("POSTMESSAGEFAIL")){
+                // Nachricht konnte nicht hinzugefügt werden
                 showDialog("Error!", "Could not add message!");
             } else {
+                // Verarbeitund von Nachrichten
                 String params = intent.getStringExtra("params");
                 try {
-
+                    // Füge neue Nachricht des Chatpartners zur Anzeige hinzu
                     if (from.equals("newMessage")) {
 
                         JSONObject message = new JSONObject(params);
                         txtChat.append("Partner: " + message.getString("message") + "\n");
 
                     } else if (from.equals("GETCONVERSATION")) {
-
+                        // Füge Chatverlauf zur anzeige hinzu
                         JSONArray messageArray = new JSONArray(params);
 
                         for (int i = 0; i < messageArray.length(); i++) {

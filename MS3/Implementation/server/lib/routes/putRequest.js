@@ -9,10 +9,10 @@ const putRequest = function(database, firebase) {
 
         database.putRequest(req.body, req.params.uId, req.params.id, firebase, err => {
             if (err) {
-                console.log("Failed to edit clothing!");
-                return res.status(500).send("clothing could not be edited!");
+                console.log("Failed to edit request!");
+                return res.status(500).send("request could not be edited!");
             } else {
-              console.log("Successfully edited clothing!");
+              console.log("Successfully edited request!");
               return res.sendStatus(201);
             }
         });

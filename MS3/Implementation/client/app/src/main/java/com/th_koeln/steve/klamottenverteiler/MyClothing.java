@@ -1,5 +1,15 @@
 package com.th_koeln.steve.klamottenverteiler;
 
+
+/**
+ * MyClothing dient als Übersicht der im Besitzt befindlichen Kleidungsstücke.
+ * Die Kleidungsstücke werden vom Server geladen und dem Benutzer präsentiert.
+ * Sollten Kleidungsstücke vorhanden sein, können verschiedene Operationen, wie
+ * das Löschen eines Kleidungsstücks oder das Bearbeiten initialisiert werden.
+ *
+ * Created by Frank on 30.12.2017.
+ */
+
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,7 +17,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
@@ -16,7 +25,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
@@ -26,10 +34,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
-/**
- * Created by Frank on 30.12.2017.
- */
 
 public class MyClothing extends AppCompatActivity {
 
@@ -54,6 +60,7 @@ public class MyClothing extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
                 new IntentFilter("myclothing"));
 
+        // Hole Kleidung des Benutzers vom Server
         Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
         myIntent.putExtra("payload", "");
         myIntent.putExtra("method", "GET");
@@ -78,6 +85,7 @@ public class MyClothing extends AppCompatActivity {
         btnEditClothing.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Starte Aktivität zum Bearbeiten der Kleidung
                 Intent editIntent = new Intent(getApplicationContext(), EditClothing.class);
                 editIntent.putExtra("cId",cId);
                 startActivity(editIntent);
@@ -94,19 +102,33 @@ public class MyClothing extends AppCompatActivity {
 
             String from = intent.getStringExtra("from");
             if (from.equals("MYCLOTHINGFAIL")) {
+                // Kleidung des Benutzers konnte nicht geholt werden
                 showDialog("Error","Could not get clothing from Server!");
             } else {
                 try {
                 String clothing = intent.getStringExtra("clothing");
                     JSONArray clothingJsonArray = new JSONArray(clothing);
-                    for (int i = 0; i < clothingJsonArray.length(); i++) {
-                        JSONObject clothingJsonObject = clothingJsonArray.getJSONObject(i);
-                        ids.add(clothingJsonObject.getString("id").toString());
+                    if (clothingJsonArray.length() > 1) {
+                        for (int i = 0; i < clothingJsonArray.length(); i++) {
+                            // lösche Hypermedia Element
+                            if (clothingJsonArray.getJSONObject(i).has("_links")) {
+                                clothingJsonArray = remove(i, clothingJsonArray);
+                            }
+                        }
+                        for (int i = 0; i < clothingJsonArray.length(); i++) {
+                            JSONObject clothingJsonObject = clothingJsonArray.getJSONObject(i);
+                            ids.add(clothingJsonObject.getString("id").toString());
+                        }
+                        clothingAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, ids);
+                        spinChooseClothing.setAdapter(clothingAdapter);
+                    } else {
+                        // kein Kleidungsstück vorhanden
+                        showDialog("Error", "You don't have any clothing!");
                     }
-                    clothingAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, ids);
-                    spinChooseClothing.setAdapter(clothingAdapter);
+
                 } catch (JSONException e) {
-                    showDialog("Error", "Can not process obtained data!");
+                    // Fehler beim auslesen der Kleidungsdaten
+                    showDialog("Error", "Could not process obtained data!");
                 }
             }
 
@@ -125,6 +147,38 @@ public class MyClothing extends AppCompatActivity {
                     }
                 });
         alertDialog.show();
+    }
+
+
+    /* Die folgenden zwei Funktionen dienen zum Entfernen eines JSON-Objekts auf einem Array und wurden von
+    https://gist.github.com/emmgfx/0f018b5acfa3fd72b3f6 übernommen.
+    Um eine hohe Kompabilität zu gewährleisten, wurde auf die Verwendung von der einfachen
+    remove() Funktion verzichtet, da diese erst ab Android API19 verfügbar ist.
+     */
+
+
+    public static JSONArray remove(final int idx, final JSONArray from) {
+        final List<JSONObject> objs = asList(from);
+        objs.remove(idx);
+
+        final JSONArray ja = new JSONArray();
+        for (final JSONObject obj : objs) {
+            ja.put(obj);
+        }
+
+        return ja;
+    }
+
+    public static List<JSONObject> asList(final JSONArray ja) {
+        final int len = ja.length();
+        final ArrayList<JSONObject> result = new ArrayList<JSONObject>(len);
+        for (int i = 0; i < len; i++) {
+            final JSONObject obj = ja.optJSONObject(i);
+            if (obj != null) {
+                result.add(obj);
+            }
+        }
+        return result;
     }
 }
 

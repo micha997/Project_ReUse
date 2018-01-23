@@ -54,7 +54,10 @@ public class HttpsService extends IntentService {
         method = intent.getStringExtra("method");
         from = intent.getStringExtra("from");
 
-        // necessary for self signed certificate. WARNING: connection is not secure with this
+        /*Um die Kommunikation über HTTPs mit einem  Zertifikat zu ermöglichen, wird im Folgender ein Trusting-Manager angelegt, der jedes SSL-Zertifikat
+        annimmt. https://developer.android.com/training/articles/security-ssl.html#SelfSigned
+         Um einen sicheren Datenverkehr zu gewährleisten, muss der Trust Manager aus der Applikation entfernt werden und ein geprüftes Zertifikat verwendet werden */
+
         TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
             public java.security.cert.X509Certificate[] getAcceptedIssuers() {
                 return null;
@@ -73,72 +76,120 @@ public class HttpsService extends IntentService {
         try {
             sc = SSLContext.getInstance("SSL");
             sc.init(null, trustAllCerts, new java.security.SecureRandom());
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (KeyManagementException e) {
-            e.printStackTrace();
-        }
+            // HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 
+            // Create all-trusting host name verifier
+            HostnameVerifier allHostsValid = new HostnameVerifier() {
+                public boolean verify(String hostname, SSLSession session) {
+                    return true;
+                }
+            };
+            // Install the all-trusting host verifier
+            //HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
 
-       // HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+            URL url = null;
 
-        // Create all-trusting host name verifier
-        HostnameVerifier allHostsValid = new HostnameVerifier() {
-            public boolean verify(String hostname, SSLSession session) {
-                return true;
-            }
-        };
-        // Install the all-trusting host verifier
-        //HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+            // Einstellungen für HTTPS-Verbindungen vornehmen
+                url = new URL(uri);
+                connection = (HttpURLConnection) url.openConnection();
+                // define HTTP Method
+                connection.setRequestMethod(method);
+                connection.setConnectTimeout(5000);
 
-        URL url = null;
-        try {
-            url = new URL(uri);
-            connection = (HttpURLConnection) url.openConnection();
-            // define HTTP Method
-            connection.setRequestMethod(method);
-            connection.setConnectTimeout(5000);
-
-            if (method.equals("POST") || method.equals("PUT")) {
-                // http-req with body
-                connection.setDoOutput(true);
-                // http-req with res body
-                connection.setDoInput(true);
-                // define content-type for REQ and RES as JSON
-                connection.setRequestProperty("Content-Type", "application/json");
-                connection.setRequestProperty("Accept", "application/json");
-                OutputStreamWriter streamWriter = new OutputStreamWriter(connection.getOutputStream());
-                //write payload
-                streamWriter.write(payload);
-                streamWriter.flush();
-            } else if (method.equals("GET")) {
-                connection.setUseCaches(false);
-                connection.setAllowUserInteraction(false);
-                connection.connect();
-            }
-            sendJSON(uri, payload);
+                if (method.equals("POST") || method.equals("PUT")) {
+                    // http request mit Payload
+                    connection.setDoOutput(true);
+                    // http response mit Payload
+                    connection.setDoInput(true);
+                    // definiere den "Content-Type" des Payloads als JSON
+                    connection.setRequestProperty("Content-Type", "application/json");
+                    connection.setRequestProperty("Accept", "application/json");
+                    // StreamWriter für den Payload wird bereitgestellt
+                    OutputStreamWriter streamWriter = new OutputStreamWriter(connection.getOutputStream());
+                    //übertrage Payload in den streamWriter
+                    streamWriter.write(payload);
+                    streamWriter.flush();
+                } else if (method.equals("GET")) {
+                    connection.setUseCaches(false);
+                    connection.setAllowUserInteraction(false);
+                    connection.connect();
+                }
+                // Sende HTTP-Request
+                sendJSON(uri, payload);
         }  catch (SocketTimeoutException e) {
+            switch (from) {
+                case "SEARCHOUTFIT":
+                    intent = new Intent("showoutfit");
+                    intent.putExtra("from", "SEARCHOUTFITFAIL");
+                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+                    break;
+
+                case "NEW_TOKEN":
+                    intent = new Intent("login");
+                    intent.putExtra("from", "POSTTOKENFAIL");
+                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+                    break;
+
+                case"NEWUSER" :
+                    intent = new Intent("main");
+                    intent.putExtra("from", "POSTUSERFAIL");
+                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+                    break;
+                case"SHOWREQUESTS" :
+                    intent = new Intent("main");
+                    intent.putExtra("from", "SHOWREQUESTSFAIL");
+                    intent.putExtra("success", "0");
+                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+                    break;
+                case "SEARCH":
+                    intent = new Intent("clothing");
+                    intent.putExtra("from", "SEARCHFAIL");
+                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+                    break;
+                case "PROFILE":
+                    intent = new Intent("profile");
+                    intent.putExtra("from", "SEARCHPROFILEFAIL");
+                    break;
+
+                default:
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(HttpsService.this, "Can not connect to server. Internet missing?", Toast.LENGTH_LONG).show();
+                        }
+                    });
+            }
+
+        } catch (IOException e) {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(HttpsService.this, "Can not connect to server. Internet missing?", Toast.LENGTH_LONG).show();
+                    Toast.makeText(HttpsService.this, "Can not send Data to Server!", Toast.LENGTH_LONG).show();
                 }
             });
-        } catch (IOException e) {
-            e.printStackTrace();
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(HttpsService.this, "Can not send Data to Server!", Toast.LENGTH_LONG).show();
+                }
+            });
         } catch (KeyManagementException e) {
-            e.printStackTrace();
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(HttpsService.this, "Can not send Data to Server!", Toast.LENGTH_LONG).show();
+                }
+            });
         }
-    }
+        }
 
     private void sendJSON(String uri, String payload) throws KeyManagementException, NoSuchAlgorithmException {
 
         try {
-            //container for response
+            // Bereite Datencontainer für Payload des Response vor
             StringBuilder stringBuilder = new StringBuilder();
-            // get statuscode from response
+            // Status Code des Response festhalten
             int status = connection.getResponseCode();
             Intent intent = new Intent();
             // analyse Status code
@@ -148,18 +199,17 @@ public class HttpsService extends IntentService {
                     InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
                     BufferedReader bufferedReader = new BufferedReader(streamReader);
 
-                    // read response and safe to String
+                    // Speichert Response Payload
                     while ((response = bufferedReader.readLine()) != null) {
                         stringBuilder.append(response + "\n");
                     }
                     bufferedReader.close();
 
 
-                    //send Data back
+                    /*From enthält einen String über den identifiziert wird, welche Aktivität eine Antwort auf den jeweiligen Request erwartet.*/
                     switch (from) {
-
+                        //from wird ausgewertet und die Daten an die passende Stelle geleitet.
                         case "SEARCH":
-                            // send clothing JSON array to Google Map
                             intent = new Intent("clothing");
                             intent.putExtra("clothing", stringBuilder.toString());
                             intent.putExtra("from", "SEARCH");
@@ -251,6 +301,14 @@ public class HttpsService extends IntentService {
                             intent = new Intent("RATEUSER");
                             intent.putExtra("from", "POSTRATING");
                             break;
+                        case "NEW_TOKEN":
+                            intent = new Intent("login");
+                            intent.putExtra("from", "POSTTOKEN");
+                            break;
+                        case "NEWUSER":
+                            intent = new Intent("main");
+                            intent.putExtra("from", "POSTUSER");
+                            break;
 
 
                     }
@@ -259,7 +317,7 @@ public class HttpsService extends IntentService {
 
                 case 500:
                     switch (from) {
-
+                        /* Sollte ein Request fehlschlagen, wird die zugehörige Aktivität über das Problem im Folgenden benachrichtigt*/
                         case "ADDCLOTHING":
                             intent = new Intent("addclothing");
                             intent.putExtra("from", "ADDCLOTHING");
@@ -342,14 +400,18 @@ public class HttpsService extends IntentService {
                     LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
                     break;
                 default:
-                    Log.e("test", connection.getResponseMessage());
+                    Log.e("HTTPs Response: ", connection.getResponseMessage());
                     break;
             }
 
 
         } catch (Exception exception) {
-            Log.e("test", exception.toString());
-            // send reponse + alertdialog by brodcast
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(HttpsService.this, "Could not process Server-Response!", Toast.LENGTH_LONG).show();
+                }
+            });
 
         } finally {
             if (connection != null) {

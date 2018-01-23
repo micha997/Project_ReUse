@@ -1,6 +1,7 @@
 package com.th_koeln.steve.klamottenverteiler;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -43,7 +44,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /**
- * Created by Michael on 20.01.18.
+    Created by steve on 01.11.17.
  */
 public class SearchClothing extends AppCompatActivity implements View.OnClickListener {
     private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
@@ -57,6 +58,8 @@ public class SearchClothing extends AppCompatActivity implements View.OnClickLis
     private double longitude = 6.9563028;
     private long vicinity = 9999;
     private static int PLACE_PICKER_REQUEST;
+
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +86,11 @@ public class SearchClothing extends AppCompatActivity implements View.OnClickLis
                 }));
 
         ListForAdapter = new ArrayList<>();
+
+        progressDialog = new ProgressDialog(this);
+
+        progressDialog.setMessage("Trying to get clothing..\n");
+        progressDialog.show();
 
         searchClothingToolbar = (Toolbar) findViewById(R.id.searchClothingToolbar);
         setSupportActionBar(searchClothingToolbar);
@@ -111,8 +119,10 @@ public class SearchClothing extends AppCompatActivity implements View.OnClickLis
             String from = intent.getStringExtra("from");
             if (from.equals("SEARCHFAIL")) {
                 showDialog("Error", "Could not get clothing!");
+                progressDialog.dismiss();
             } else if (from.equals("SEARCHPREFCLOTHINGFAIL")) {
                 showDialog("Error", "Could not get clothing!");
+                progressDialog.dismiss();
             } else {
                 try {
                     // get clothing results from HTTP-Service
@@ -151,7 +161,7 @@ public class SearchClothing extends AppCompatActivity implements View.OnClickLis
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
+                progressDialog.dismiss();
                 // send clothing results to Google Maps activity
             }
         }

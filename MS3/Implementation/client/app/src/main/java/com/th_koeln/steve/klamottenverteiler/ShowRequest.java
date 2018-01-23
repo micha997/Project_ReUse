@@ -64,6 +64,7 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
                 new IntentFilter("showrequests"));
 
+        // Hole die verfügbaren Requests vom Server
         Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
         myIntent.putExtra("method","GET");
         myIntent.putExtra("from","SHOWREQUESTS");
@@ -79,50 +80,58 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
 
         progress = new ProgressDialog(this);
         progress.setTitle("Please wait!");
-        progress.setMessage("Trying get your requests..");
+        progress.setMessage("Trying to get your requests..");
         progress.show();
 
     }
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        // Setze Contextmenu Optionen je nach status des Kleidungsstück
         if (v.getId() == R.id.lvShowRequests) {
             ListView lv = (ListView) v;
             AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) menuInfo;
             Request obj = (Request) lv.getItemAtPosition(acmi.position);
+
             if (obj.getStatus().equals("open") && obj.getFrom().equals("foreign")) {
+                // Fremde Anfrage wurde noch nicht angenommen
                 menu.add("Accept");
                 menu.add("Delete");
             } else if (obj.getStatus().equals("open") && obj.getFrom().equals("own")) {
+                // Eigene Anfrage wurde noch nicht angenommen
                 menu.add("Delete");
             } else if (obj.getStatus().equals("accepted") && obj.getFrom().equals("own")) {
+                // Eigene Anfrage wurde akzeptiert
                 menu.add("Chat");
                 menu.add("Delete");
                 menu.add("Success");
             } else if (obj.getStatus().equals("accepted") && obj.getFrom().equals("foreign")) {
-                menu.add("Chat");
-                menu.add("Delete");
-                menu.add("Success");
-            } else if (obj.getStatus().equals("accepted") && obj.getFrom().equals("foreign")) {
+                // Fremde Anfrage wurde akzeptiert
                 menu.add("Chat");
                 menu.add("Delete");
                 menu.add("Success");
             } else if (obj.getStatus().equals("waiting") && !obj.getConfirmed().equals(uId)) {
+                // Anfrage wurde vom Benutzer als erfolgreich markiert
                 menu.add("Chat");
                 menu.add("Confirm");
                 menu.add("Delete");
             } else if (obj.getStatus().equals("waiting") && obj.getConfirmed().equals(uId)) {
+                // Anfrage wurde vom Transaktionspartner als erfolgreich markiert
                 menu.add("Chat");
                 menu.add("Delete");
             } else if (obj.getStatus().equals("confirmed")) {
+                // Anfrage wurde von beiden Transaktionspartnern als erfolgreich markiert
                 menu.add("Chat");
                 menu.add("Delete");
                 menu.add("Start User Rating");
             } else if (obj.getStatus().equals("closed") && obj.getClosed().equals("foreign") && obj.getFrom().equals("own") && obj.getFinished().equals("0")) {
+                // Transaktion wurde von einer Seite bewertet
                 menu.add("Rate User");
             } else if (obj.getStatus().equals("closed") && obj.getClosed().equals("own")&& obj.getFrom().equals("foreign") && obj.getFinished().equals("0")) {
+                // Transaktion wurde von einer Seite bewertet
                 menu.add("Rate User");
             } else if (obj.getFinished().equals("1")) {
+                // Transaktion wurde von beiden Seiten bewertet
                 menu.add("Delete");
             }
             for (int i = 0; i < menu.size(); ++i) {
@@ -159,12 +168,15 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
 
                 switch (title) {
                     case "Delete":
+                        // Lösche Anfrage vom Server
                         sendDelete(menuItems.getOuId(), name);
                         break;
                     case "Accept":
+                        // Akzeptiere Anfrage
                         setStatus("accepted", name);
                         break;
                     case "Chat":
+                        // Starte Chat-Service
                         myIntent = new Intent(getApplicationContext(), Chat.class);
                         myIntent.putExtra("rId", menuItems.getName());
                         myIntent.putExtra("to", menuItems.getOuId());
@@ -172,12 +184,15 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
                         startActivity(myIntent);
                         break;
                     case "Success":
+                        // Anfrage wird einseitig als erfolgreich markiert
                         setStatus("waiting", menuItems.getName());
                         break;
                     case "Confirm":
+                        // Erfolgreiche Anfrage wird bestätigt
                         setStatus("confirmed", name);
                         break;
                     case "Rate User":
+                        // Transaktionspartner hat die Transaktion bereits bewertet. Aktivität zum Bewerten der Tranksaktion wird gestartet,
                         myIntent = new Intent(getApplicationContext(), RateUser.class);
                         myIntent.putExtra("tId", menuItems.getName());
                         myIntent.putExtra("ouId", menuItems.getOuId());
@@ -186,6 +201,7 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
                         startActivity(myIntent);
                         break;
                     case "Start User Rating":
+                        // Es liegt noch keine Bewertung für die Transaktion vor. Bewertungsaktivität wird gestartet
                         myIntent = new Intent(getApplicationContext(), RateUser.class);
                         myIntent.putExtra("tId", menuItems.getName());
                         myIntent.putExtra("ouId", menuItems.getOuId());
@@ -221,6 +237,7 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
                         myIntent = new Intent(getApplicationContext(), RateUser.class);
                         myIntent.putExtra("tId", menuItems.getName());
                         myIntent.putExtra("ouId", menuItems.getOuId());
+                        myIntent.putExtra("rFrom",menuItems.getFrom());
                         myIntent.putExtra("finished","1");
                         startActivity(myIntent);
                         break;
@@ -239,7 +256,16 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
         return true;
     }
 
-    private JSONObject setStatus(String status, String spin) {
+    /**
+     * Sucht innerhalb der Datenstruktur der Requests nach dem Request, der angepasst werden soll
+     * und sendet dem Server anschließend die ID des Requests und den Status der gewünscht ist.
+     *
+     *
+     * @param  status  Beschreibt den status, den der Request bekommen soll.
+     * @param  spin Enthält die ID des Requests, welcher bearbeitet werden soll.
+     */
+
+    private void setStatus(String status, String spin) {
         Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
 
         try {
@@ -257,6 +283,7 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
                     myIntent.putExtra("payload",putRequest.toString());
                 }
             }
+            // Sende neuen Status an den Server
             myIntent.putExtra("method","PUT");
             myIntent.putExtra("from","PUTREQUEST");
             myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId + "/requests/" + spin);
@@ -265,8 +292,15 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
             showDialog("Error", "Could not set status of clothing!");
         }
 
-        return null;
         }
+
+    /**
+     * Sendet einen Aufruf zum Löschen eines bestimmten Requests an den Server.
+     *
+     *
+     * @param  uId  Enthält die Identifikationsnummer des Benutzers, dessen Request gelöscht werden soll
+     * @param  id Enthält die ID des Requests, welcher gelöscht werden soll.
+     */
 
         private void sendDelete(String uId, String id) {
             Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
@@ -283,13 +317,17 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
         public void onReceive(Context context, Intent intent) {
             String success = intent.getStringExtra("success");
             if (success.equals("1")) {
+                // Status eines Requests wurde erfolgreich geändert.
                 showDialog("Success!", "Successfully edited status of request!");
             } else if(success.equals("2")) {
+                // Request wurde erfolgreich gelöscht
                 showDialog("Success!", "Successfully deleted requests!");
             } else {
 
                 String from = intent.getStringExtra("from");
                 if (from.equals("SHOWREQUESTSFAIL")) {
+                    progress.dismiss();
+                    // Requests konnten nicht vom Server geholt werden
                     showDialog("Error", "Could not get request!");
                 } else {
 
@@ -300,10 +338,13 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
                         requestJsonArray = new JSONArray(requests);
                         for (int i = 0; i < requestJsonArray.length(); i++) {
                             JSONObject requestJsonObject = requestJsonArray.getJSONObject(i);
+                            // Trenne eigene Requests von fremden Requests und erstelle für jeden Request ein Request Objekt
                             if (requestJsonObject.getString("from").equals("own")) {
+                                // Erstelle Request Objekt
                                 Request ownnRequest= new Request(requestJsonObject.getString("id").toString(),
                                         requestJsonObject.getString("art").toString(),requestJsonObject.getString("size").toString(),
                                         requestJsonObject.getString("brand").toString(),requestJsonObject.getString("status").toString(),requestJsonObject.getString("from").toString(), requestJsonObject.getString("ouId"),requestJsonObject.getString("confirmed"),requestJsonObject.getString("closed"),requestJsonObject.getString("finished"));
+                                // Füge Request Objekt zur Liste hinzu
                                 ownRequestList.add(ownnRequest);
 
                             } else if (requestJsonObject.getString("from").equals("foreign")) {
@@ -316,16 +357,25 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
                         }
 
                         if (rbForeignRequests.isChecked()) {
-
+                                /* Fremde Requests sind ausgewählt
+                                   Fülle Liste mit fremden Requests
+                                 */
                                 fillListView(foreignRequestList);
+                                // Beende Progress-Dialog
                                 progress.dismiss();
                             if (foreignRequestList.size() == 0)
+                                // Wenn keine Requests vorhanden sind, zeige leere Liste mit Nachricht
                                 lvShowRequests.setEmptyView(findViewById(R.id.txtEmptyRequestList));
 
                         } else {
+                                /* Eigene Requests sind ausgewählt
+                                   Fülle Liste mit Eigene Requests
+                                 */
                                 fillListView(ownRequestList);
+                            // Beende Progress-Dialog
                                 progress.dismiss();
                             if (ownRequestList.size() == 0)
+                                // Wenn keine Requests vorhanden sind, zeige leere Liste mit Nachricht
                                 lvShowRequests.setEmptyView(findViewById(R.id.txtEmptyRequestList));
                         }
 
@@ -339,6 +389,13 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
 
         }
     };
+
+    /**
+     * Nimmt die aktuell ausgewählten Requests entgegen und zeigt diese in einem Listview
+     *
+     *
+     * @param  requests  Enthält die darzustellenden Requests
+     */
 
     private void fillListView(ArrayList<Request> requests) {
         RequestListAdapter reqAdapter;
@@ -365,11 +422,13 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.rbOwnRequest:
+                // Fülle Listview mit eigenen Requests
                 fillListView(ownRequestList);
                 if (ownRequestList.size() == 0)
                     lvShowRequests.setEmptyView(findViewById(R.id.txtEmptyRequestList));
                 break;
             case R.id.rbForeignRequest:
+                // Fülle Listview mit fremden Requests
                 fillListView(foreignRequestList);
                 if (foreignRequestList.size() == 0)
                     lvShowRequests.setEmptyView(findViewById(R.id.txtEmptyRequestList));

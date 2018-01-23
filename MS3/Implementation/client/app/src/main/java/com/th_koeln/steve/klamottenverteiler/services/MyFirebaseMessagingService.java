@@ -40,32 +40,45 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         Intent myIntent = new Intent();
 
             switch (from) {
-            case "accepted":
-                myIntent = new Intent(getApplicationContext(),ShowRequest.class);
+                case "postRequest":
+                    myIntent = new Intent(getApplicationContext(), ShowRequest.class);
+                    myIntent.putExtra("from", "showNotification");
+                    break;
 
-                myIntent.putExtra("from", "showNotification");
+                case "accepted":
+                    myIntent = new Intent(getApplicationContext(),ShowRequest.class);
+                    myIntent.putExtra("from", "showNotification");
+                    break;
+                case "success":
+                    myIntent = new Intent(getApplicationContext(),ShowRequest.class);
+                    myIntent.putExtra("from", "showNotification");
+                    break;
+                case "confirmed":
+                    myIntent = new Intent(getApplicationContext(),ShowRequest.class);
+                    myIntent.putExtra("from", "showNotification");
+                    break;
+                case "waiting":
+                    myIntent = new Intent(getApplicationContext(),ShowRequest.class);
+                    myIntent.putExtra("from", "showNotification");
+                    break;
+                case "message":
+                    if (Chat.active == true) {
+                        Intent intent = new Intent("chat");
+                        intent.putExtra("params", paramsJson.toString());
+                        intent.putExtra("from", "newMessage");
 
-
-                break;
-            case "message":
-                if (Chat.active == true) {
-                    Intent intent = new Intent("chat");
-                    intent.putExtra("params", paramsJson.toString());
-                    intent.putExtra("from", "newMessage");
-
-                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-                } else if (Chat.active == false) {
-                    myIntent = new Intent(getApplicationContext(), Chat.class);
-                    myIntent.putExtra("from", "newMessage");
-                    myIntent.putExtra("to", paramsJson.getString("ouId"));
-                }
-                break;
-            default :
-                    myIntent = new Intent(getApplicationContext(),UserInterface.class);
-                break;
+                        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+                    } else if (Chat.active == false) {
+                        myIntent = new Intent(getApplicationContext(), Chat.class);
+                        myIntent.putExtra("from", "newMessage");
+                        myIntent.putExtra("to", paramsJson.getString("ouId"));
+                    }
+                    break;
+                default :
+                        myIntent = new Intent(getApplicationContext(),UserInterface.class);
+                    break;
 
         }
-            if (Chat.active == false) {
 
             PendingIntent pendingIntent =
                     PendingIntent.getActivity(this, 0, myIntent, PendingIntent.FLAG_ONE_SHOT);
@@ -73,14 +86,13 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                         .setAutoCancel(true)
-                        .setContentTitle("Klamotten-Verteiler")
-                        .setContentText(message.getData().toString())
+                        .setContentTitle(message.getNotification().getTitle())
+                        .setContentText(message.getNotification().getBody())
                         .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
                         .setContentIntent(pendingIntent);
 
                 NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                 manager.notify(0, builder.build());
-            }
         } catch (JSONException e) {
             e.printStackTrace();
         }

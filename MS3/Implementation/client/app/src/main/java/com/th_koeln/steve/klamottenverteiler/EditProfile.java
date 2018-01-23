@@ -1,9 +1,20 @@
 package com.th_koeln.steve.klamottenverteiler;
 
+/**
+ * Zum Editieren des eigenen Profils wird das jeweilige Profil zunächst vom Server geholt und
+ * dem Benutzer Präsentiert. Zum Bearbeiten von Uhrzeiten kommt ein TimePickerDialog zum Einsatz.
+ * Nachdem der Benutzer die gewünschte Attribute angepasst hat, wird eine JSON Datenstruktur mit
+ * den zu ändernden Attributen und deren neuen Werte angelegt
+ * und über den HTTPs Service zum Server weitergeleitet.
+ */
+
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -23,9 +34,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
-/**
- * Created by Frank on 30.12.2017.
- */
+
 
 public class EditProfile extends AppCompatActivity implements View.OnClickListener {
 
@@ -44,6 +53,8 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
     private String txtWeekTimeEnd = "00:00";
     private String txtWeekendTimeBegin = "00:00";
     private String txtWeekendTimeEnd = "00:00";
+
+    private ProgressDialog progressDialog;
 
     private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private final String uId = firebaseAuth.getCurrentUser().getUid();
@@ -81,15 +92,18 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
                 new IntentFilter("profile"));
 
-        // get desired vicinity in km
-        // define parameters for Http-Service call
+        // Hole Profilinformationen vom Server
         Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
         myIntent.putExtra("payload","");
         myIntent.putExtra("method","GET");
         myIntent.putExtra("from","PROFILE");
         myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId);
-        //call http service
         startService(myIntent);
+
+        progressDialog = new ProgressDialog(this);
+
+        progressDialog.setMessage("Trying to get your profile..\n");
+        progressDialog.show();
     }
 
     @Override
@@ -137,19 +151,29 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
         @Override
         public void onReceive(Context context, Intent intent) {
             // get clothing results from HTTP-Service
-            String profile = intent.getStringExtra("profile");
-            try {
-                JSONObject profileJson = new JSONObject(profile);
-                JSONObject timeJson = new JSONObject(profileJson.getString("time"));
-                etGender.setText(profileJson.getString("gender"));
-                btnTimeFromWeekday.setText("Von "+timeJson.getString("txtWeekTimeBegin"));
-                btnTimeToWeekday.setText("Bis "+timeJson.getString("txtWeekTimeEnd"));
-                btnTimeFromWeekend.setText("Von "+timeJson.getString("txtWeekendTimeBegin"));
-                btnTimeToWeekend.setText("Bis "+timeJson.getString("txtWeekendTimeEnd"));
-                txtShowUserProfile.setText(profile.toString());
-                //... fill user profile interface
-            } catch (JSONException e) {
-                e.printStackTrace();
+            String from = intent.getStringExtra("from");
+
+            if (from.equals("SEARCHPROFILEFAIL")) {
+                progressDialog.dismiss();
+                showDialog("Error","Could not get your profile.");
+
+            } else {
+                progressDialog.dismiss();
+
+                String profile = intent.getStringExtra("profile");
+                try {
+                    JSONObject profileJson = new JSONObject(profile);
+                    JSONObject timeJson = new JSONObject(profileJson.getString("time"));
+                    etGender.setText(profileJson.getString("gender"));
+                    btnTimeFromWeekday.setText("Von " + timeJson.getString("txtWeekTimeBegin"));
+                    btnTimeToWeekday.setText("Bis " + timeJson.getString("txtWeekTimeEnd"));
+                    btnTimeFromWeekend.setText("Von " + timeJson.getString("txtWeekendTimeBegin"));
+                    btnTimeToWeekend.setText("Bis " + timeJson.getString("txtWeekendTimeEnd"));
+                    txtShowUserProfile.setText(profile.toString());
+                    //... fill user profile interface
+                } catch (JSONException e) {
+                    showDialog("Error","Profile data is not valid..");
+                }
             }
 
         }
@@ -163,15 +187,15 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
             case R.id.btnSendProfile:
                 JSONObject profile = new JSONObject();
                 try {
+                    // Speicher zu ändernde Attribute in JSON Struktur
                     profile.put("gender", etGender.getText().toString());
-                    // define http service call
+
+                    // Sende Attribute zum HTTPSService
                     myIntent = new Intent(getApplicationContext(), HttpsService.class);
-                    // define parameters for Service-Call
                     myIntent.putExtra("payload",profile.toString());
                     myIntent.putExtra("method","PUT");
                     myIntent.putExtra("from","PUTPROFILE");
                     myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId);
-                    //call http service
                     startService(myIntent);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -222,5 +246,18 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
                 break;
 
         }
+    }
+
+    private void showDialog(String title, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(EditProfile.this).create();
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        alertDialog.show();
     }
 }

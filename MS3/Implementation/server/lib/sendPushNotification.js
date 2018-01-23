@@ -8,48 +8,98 @@ var request = require('request');
 
 
 const sendPushNotification = function(token, cId, payload, fits, from, firebase) {
- //TODO: Switch
+    console.log(from);
 
- if (from=="message") {
-   var message = {
-       data: {
-         message: payload["message"],
-         sender: from,
-         ouId: payload["from"]
-       }
-     }
- };
+    switch (from) {
 
-  if (from == "accepted") {
-  var message = {
-      data: {
-        uId: cId,
-        sender: from
-      }
-    }
-  };
+        case "message":
+            var message = {
+                data: {
+                    message: payload["message"],
+                    sender: from,
+                    ouId: payload["from"]
+                },
+                notification: {
+                    title: "Check your Chat!",
+                    body: "Someone wrote you a message."
+                }
+            }
+            break;
 
-    if (from == "missing") {
-    var message = {
-        data: {
-            art: payload["art"],
-            model: fits["model"],
-            type: "missing",
-            sender: from
-        }
-    };
+        case "success":
+            var message = {
+                data: {
+                    rId: payload["id"],
+                    message: payload["message"],
+                    sender: from,
+                    ouId: payload["from"]
+                },
+                notification: {
+                    title: "Check your requests!",
+                    body: "Someone declared your transaction successful."
+                }
+            }
+            break;
 
-    }
+            case "confirmed":
+                var message = {
+                    data: {
+                        sender: from,
+                    },
+                    notification: {
+                        title: "Check your requests!",
+                        body: "Someone confirmed successfully transaction."
+                    }
+                }
+                break;
 
-    if (from == "postRequest") {
-    var message = {
-        data: {
-            cId: cId,
-            ouId: payload,
-            type: "postRequest",
-            sender: from
-        }
-    };
+        case "waiting":
+            var message = {
+                data: {
+                    sender: from
+                },
+                notification: {
+                    title: "Check your requests!",
+                    body: "Someone declared your transaction as successfully."
+                }
+            }
+            break;
+
+        case "accepted":
+            var message = {
+                data: {
+                    uId: cId,
+                    sender: from
+                },
+                notification: {
+                    title: "Check your requests!",
+                    body: "Someone accepted your request."
+                }
+            }
+            break;
+
+        case "missing":
+            var message = {
+                data: {
+                    art: payload["art"],
+                    model: fits["model"],
+                    type: "missing",
+                    sender: from
+                }
+            }
+            break;
+
+        case "postRequest":
+            var message = {
+                data: {
+                    sender: from
+                },
+                notification: {
+                    title: "Check your requests!",
+                    body: "Someone is interested in your clothing."
+                }
+            }
+            break;
     }
 
     var options = {
@@ -57,6 +107,7 @@ const sendPushNotification = function(token, cId, payload, fits, from, firebase)
         timeToLive: 60 * 60 * 24
     };
 
+    console.log(message);
     firebase.messaging().sendToDevice(token, message, options).then(function(response) {
         console.log("Successfully", response.results);
     }).catch(function(error) {

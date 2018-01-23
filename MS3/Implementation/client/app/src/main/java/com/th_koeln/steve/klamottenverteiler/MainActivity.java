@@ -1,5 +1,19 @@
 package com.th_koeln.steve.klamottenverteiler;
 
+/**
+ * Um das System nutzen zu können ist es nötig sich mit einer Email-Adresse und einem Passwort zu registrieren.
+ * Diese Klasse präsentiert dem Benutzer eine Eingebemöglichkeit seiner Daten für die Registrierung.
+ * Die Daten werden anschließend an den Firebase Server gesendet, um dort einen neuen Account anzulegen.
+ *
+ * Sollte die Registrierung bei Firebase fehlerfrei verlaufen, werden die Daten ebenfalls zum Server gesendet,
+ * um dort ein Profil für den jeweiligen User anlegen zu können.
+ *
+ * Nach einer Erfolgreichen Registrierung initialisiert die Klasse das Senden einer Verifizierungs-Email an
+ * die vom Benutzer hinterlegte Email-Adresse.
+ *
+ * Created by Frank on 10.01.2018.
+ */
+
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -51,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
 
         firebaseAuth = FirebaseAuth.getInstance();
 
+        // Starte UserInterface, wenn benutzer bereits eingeloggt ist.
         if (firebaseAuth.getCurrentUser() != null) {
             finish();
             startActivity(new Intent(this, UserInterface.class));
@@ -79,12 +94,7 @@ public class MainActivity extends AppCompatActivity {
         firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
 
-                if (user != null && isFirebaseCalledOnce) {
-                    sendMail();
-                    isFirebaseCalledOnce=false;
-                }
 
             }
         };
@@ -97,10 +107,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void registerUser() {
+
         String email = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
         isFirebaseCalledOnce=true;
 
+
+        // Überprüfe ob notwendige Informationen eingegeben wurden
         if (TextUtils.isEmpty(email)) {
             Toast.makeText(this, "Please enter email.", Toast.LENGTH_SHORT).show();
             return;
@@ -112,9 +125,10 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        /*progressDialog.setMessage("Benutzer wird registriert");
-        progressDialog.show();*/
+        progressDialog.setMessage("Trying to registrate user..");
+        progressDialog.show();
 
+        // Registriere Benutzer mit Email Und Passwort
         firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
@@ -126,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
                  JSONObject payload = new JSONObject();
                  try {
                      payload.put("uId", uId);
+                     // Sende Aufruf zum erstellen eines Userprofiles
                      myIntent.putExtra("payload",payload.toString());
                      myIntent.putExtra("method","POST");
                      myIntent.putExtra("from","NEWUSER");
@@ -133,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
                      //call http service
                      startService(myIntent);
                  } catch (JSONException e) {
+                     // Userprofil konnte nicht erstellt werden.
                      showDialog("Error", "Could not add your profile!");
                  }
              } else {
@@ -153,7 +169,10 @@ public class MainActivity extends AppCompatActivity {
                  } catch (Exception e) {
                      Toast.makeText(MainActivity.this, "Error! - Can not register.",
                              Toast.LENGTH_LONG).show();
-                 }}
+                 } finally {
+                    progressDialog.dismiss();
+                 }
+             }
             }
         });
     }
@@ -165,7 +184,16 @@ public class MainActivity extends AppCompatActivity {
             // get clothing results from HTTP-Service
             String from = intent.getStringExtra("from");
             if (from.equals("POSTUSERFAIL")) {
+                // Fehler beim erstellen des Userprofiles
+                deleteAccount();
                 showDialog("Error","Could not add userprofile!");
+                progressDialog.dismiss();
+            } else {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                // Sende Verifizierúngs-Mail, wenn User nicht bereits eingeloggt ist
+                if (user != null) {
+                    sendMail();
+                }
             }
 
         }
@@ -181,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
                         dialog.dismiss();
                     }
                 });
-//        alertDialog.show();
+        alertDialog.show();
     }
 
     private void sendMail()
@@ -194,13 +222,21 @@ public class MainActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
                             FirebaseAuth.getInstance().signOut();
+
+
                             startActivity(new Intent(getApplicationContext(), Login.class));
                         } else {
-                            // no email sent
+                            // Email konnte nicht gesendet werden.
+                            deleteAccount();
                             Toast.makeText(getApplicationContext(), "Fehler beim Senden der Email", Toast.LENGTH_SHORT).show();
                             startActivity(getIntent());
                         }
                     }
                 });
+    }
+
+    private void deleteAccount() {
+        final FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+        currentUser.delete();
     }
 }

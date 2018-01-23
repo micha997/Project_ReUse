@@ -348,7 +348,6 @@ const database = {
         }
 
         function sendPush(mappings, body, firebase, callback) {
-            if (body.status == "accepted") {
                 mappings.findOne({
                     uId: body.uId,
                     type: "token"
@@ -356,12 +355,11 @@ const database = {
                     if (err) {
                         callback(null);
                     } else {
-                        sendPushNotification(mappings.token, body.uId, mappings, "", "accepted", firebase);
+                        sendPushNotification(mappings.token, body.uId, mappings, "", body.status, firebase);
                         callback(null);
                     }
 
                 })
-            }
         }
     },
     putClothing(cId, put, callback) {

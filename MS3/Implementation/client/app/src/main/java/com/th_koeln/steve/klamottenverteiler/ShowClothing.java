@@ -31,8 +31,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Created by Michael on 21.01.2018.
- */
+ * Created by Frank on 25.12.2017.
+ * */
 
 public class ShowClothing extends AppCompatActivity implements View.OnClickListener{
 
@@ -86,29 +86,39 @@ public class ShowClothing extends AppCompatActivity implements View.OnClickListe
         myIntent.putExtra("from","SHOWDETAILS");
         myIntent.putExtra("url",getString(R.string.DOMAIN) + "/clothing/" + clothingID);
         startService(myIntent);
+
+
     }
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            // get clothing results from HTTP-Service
+
             String from = intent.getStringExtra("from");
+
+            // Fehler beim erstellen des Requests
             if (from.equals("NEWREQUESTFAIL")) {
                 showDialog("Error","Could not add request!");
             }
+            //Fehler beim holen der Kleidungsstücke
             if (from.equals("SHOWDETAILSFAIL")) {
                 showDialog("Error","Could not get clothing from Server!");
             }
+            // angeforderte Kleidungsstücke verarbeiten
             if(from.equals("SHOWDETAILS")){
                 try {
                     clothing = intent.getStringExtra("clothing");
                     JSONObject request = new JSONObject(clothing);
+
+                    // Bild Daten auslesen und umwandeln ( Base64 -> Bitmap)
                     if(request.getString("image")!=null) {
                         byte[] decodedBytes = Base64.decode(request.getString("image"), 0);
                         Bitmap clothingPicture = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
                         imgShowClothingPicture.setImageBitmap(clothingPicture);
                     }
+
+                    // überprüfe ob Kleidungsattribute gesetzt sind und zeige diese gegebenfalls an
                     if(!request.getString("notes").equals("") && !request.getString("notes").isEmpty() && !request.isNull("notes"))
                         titleTextView.setText(request.getString("notes"));
                     if(!request.getString("art").equals("") && !request.getString("art").isEmpty() && !request.isNull("art"))
@@ -154,9 +164,11 @@ public class ShowClothing extends AppCompatActivity implements View.OnClickListe
                         showDialog("Error", "Choosen clothing allready belongs to you!");
                     } else {
                         JSONObject request = new JSONObject();
+                        // Parteien des Requests in die zu überliefernde Struktur einfügen
                         request.put("uId", ouId);
                         request.put("ouId", clothingJson.getString("uId"));
 
+                        // Sende request
                         Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
                         myIntent.putExtra("payload", request.toString());
                         myIntent.putExtra("method", "POST");

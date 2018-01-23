@@ -1,5 +1,15 @@
 package com.th_koeln.steve.klamottenverteiler;
 
+/**
+ * Diese Klasse dient der Verifizierung der Identität der Benutzer über die Firebase Plattform.
+ * Neben dem Login des Benutzers prüft die Klasse ebenfalls, ob die Email Adresse des Benutzers
+ * valide ist.
+ * Im Erfolgsfall wird ein Benutzer-Token von Firebase angefordert und anschließend an den Server
+ * weitergeleitet.
+ *
+ * Created by steve on 05.11.17.
+ */
+
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -12,6 +22,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,9 +44,7 @@ import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * Created by steve on 05.11.17.
- */
+
 
 public class Login extends AppCompatActivity implements View.OnClickListener {
     private TextView etPasswordLogin;
@@ -49,15 +58,16 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_login);
 
         firebaseAuth = FirebaseAuth.getInstance();
 
+        // Starte UserInterface, wenn benutzer bereits eingeloggt ist.
         if (firebaseAuth.getCurrentUser() != null) {
             startActivity(new Intent(this, UserInterface.class));
             finish();
         }
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
 
         etPasswordLogin = (EditText) findViewById(R.id.etPasswordLogin);
         etEmailLogin = (EditText) findViewById(R.id.etEmailLogin);
@@ -68,11 +78,6 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         btnLogin = (Button) findViewById(R.id.btnLogin);
         btnLogin.setOnClickListener(this);
 
-        firebaseAuth = FirebaseAuth.getInstance();
-
-        if (firebaseAuth.getCurrentUser() != null) {
-            startActivity(new Intent(getApplicationContext(), UserInterface.class));
-        }
         progressDialog = new ProgressDialog(this);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
@@ -86,23 +91,24 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         String password = etPasswordLogin.getText().toString().trim();
 
         if (TextUtils.isEmpty(email)) {
-            Toast.makeText(this, "Bitte Email-Adresse eingeben.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please enter email-address!", Toast.LENGTH_SHORT).show();
             return;
         }
 
         if (TextUtils.isEmpty(password)) {
-            Toast.makeText(this, "Bitte Passwort eingeben.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Plase enter your password!.", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        progressDialog.setMessage("Benutzer wird registriert");
+        progressDialog.setMessage("Trying to login\n");
         progressDialog.show();
 
         firebaseAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
-                progressDialog.dismiss();
 
+
+                // Informiere Benutzer, wenn Loginvorgang fehlgeschlagen ist.
                 if(!task.isSuccessful()) {
                     try {
                         throw task.getException();
@@ -120,6 +126,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                                 Toast.LENGTH_LONG).show();
                     }
                 } else {
+                    // Überprüfe, ob die Email Adresse des Benutzers validiert ist
                     checkVerified();
                 }
             }
@@ -141,22 +148,22 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 
     }
 
+
+
+
     private void checkVerified() {
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         if (user.isEmailVerified()) {
-
+            // Sende Usertoken zum Server und starte UserInterface, wenn Email verifiziert ist
             sendTokenToServer();
-            Toast.makeText(this, "You are now logged in", Toast.LENGTH_SHORT).show();
-            Intent in = new Intent(getApplicationContext(),UserInterface.class);
-            in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(in);
-            finish();
+
 
         } else {
-
+            // Logout wenn Email Adresse des Benutzers nicht verifiziert ist.
             Toast.makeText(getApplicationContext(), "Email is not verified", Toast.LENGTH_SHORT).show();
+            progressDialog.dismiss();
             FirebaseAuth.getInstance().signOut();
 
         }
@@ -166,18 +173,29 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            // get clothing results from HTTP-Service
             String from = intent.getStringExtra("from");
             if (from.equals("POSTTOKENFAIL")) {
-                showDialog("Error","Could not add Token!");
+                // Token konnte nicht gesendet werden + User ausloggen.
+                showDialog("Error","Could not add login!");
+                FirebaseAuth.getInstance().signOut();
+                progressDialog.dismiss();
+            } else {
+                Toast.makeText(getApplicationContext(), "You are now logged in", Toast.LENGTH_SHORT).show();
+                Intent in = new Intent(getApplicationContext(),UserInterface.class);
+                in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(in);
+                finish();
             }
+
 
         }
     };
 
     private void sendTokenToServer() {
+
         final FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
         try {
+            // Hole UserToken von Firebase
             mUser.getToken(true)
                     .addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
 
@@ -189,6 +207,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                                 uID = mUser.getUid();
 
                                 try {
+                                    // Sende User Token zum Server
                                     Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
                                     JSONObject token = new JSONObject();
                                     token.put("token", idToken);
@@ -200,15 +219,17 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                                     startService(myIntent);
 
                                 } catch (JSONException e) {
-
+                                    FirebaseAuth.getInstance().signOut();
                                     showDialog("Error", "Could not send your usertoken!");
-                                    ;
+
 
                                 }
                             }
                         }
                     });
         } catch (NullPointerException e) {
+            // Senden des Tokens fehlgeschlagen
+            FirebaseAuth.getInstance().signOut();
             showDialog("Error", "Could not send usertoken to server!");
         }
     }

@@ -1,11 +1,17 @@
 package com.th_koeln.steve.klamottenverteiler;
 
+/** Die Klasse UserInterface ist die zentrale Anlaufstelle für Benutzer um das Erledigen von Aufgaben
+ * einzuleiten. Dem Benutzer werden die einzelnen Funktionionen, die zur Auswahl stehen, präsentiert
+ * und bei Auswahl einer Funktion, wird die entsprechende Klasse aufgerufen.
+ *
+ * Created by steve on 05.11.17.
+ */
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
-
 import com.google.firebase.auth.FirebaseAuth;
 
 public class UserInterface extends AppCompatActivity implements View.OnClickListener {
@@ -55,8 +61,6 @@ public class UserInterface extends AppCompatActivity implements View.OnClickList
         if (firebaseAuth.getCurrentUser() == null) {
             startActivity(new Intent(this, Login.class));
         }
-
-        //btnShowPrefer = (Button) findViewById(R.id.btnShowPrefer);
     }
 
     @Override

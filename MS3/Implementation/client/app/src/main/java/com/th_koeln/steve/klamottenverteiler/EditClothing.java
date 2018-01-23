@@ -25,6 +25,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
+ * "EditClothing" bietet dem Benutzer die Möglichkeit Kleidungsstücke auch nach dem Einstellen weiter zu bearbeiten.
+ * Die bereits verfügbaren Kleidunsstücke werden zu Beginn vom Server geladen passend dargestellt und es wird eine
+ *  Möglichkeit geboten die jeweiligen Werte zu ändern.
+ *
+ *  Betätigt der Benutzer den "Senden"-Button, werden die aktuell eingetragenen Werte ins JSON Dateiformat umgewandelt
+ *  und an den Server gesendet.
+ *
  * Created by Frank on 30.12.2017.
  */
 
@@ -41,6 +48,8 @@ public class EditClothing extends AppCompatActivity {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_clothing);
+
+        // Identifziert des aktuell zu bearbeitende Kleidungsstück
         cId = getIntent().getStringExtra("cId");
 
         txtFabric = (EditText) findViewById(R.id.txtFabric);
@@ -51,20 +60,21 @@ public class EditClothing extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
                 new IntentFilter("editclothing"));
 
+
         btnPutClothing.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 JSONObject newProfile = new JSONObject();
                 try {
+                    // Zu ändernde Attribute in JSON Struktur festhalten
                     newProfile.put("fabric", txtFabric.getText().toString());
-                    // define http service call
+
+                    // Sende neue Attribute zum Server
                     Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
-                    // define parameters for Service-Call
                     myIntent.putExtra("payload", newProfile.toString());
                     myIntent.putExtra("method", "PUT");
                     myIntent.putExtra("from", "PUTCLOTHING");
                     myIntent.putExtra("url", getString(R.string.DOMAIN) + "/clothing/" + cId);
-                    //call http service
                     startService(myIntent);
                 } catch (JSONException e) {
                     showDialog("Error", "Could not process your entries!");
@@ -73,12 +83,12 @@ public class EditClothing extends AppCompatActivity {
             }
         });
 
+        // Hole betreffendes Kleidungsstück vom Server
         Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
         myIntent.putExtra("payload", "");
         myIntent.putExtra("method", "GET");
         myIntent.putExtra("from", "EDITCLOTHING");
         myIntent.putExtra("url", getString(R.string.DOMAIN) + "/clothing/" + cId );
-        //call http service
         startService(myIntent);
 
 
@@ -89,21 +99,25 @@ public class EditClothing extends AppCompatActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            // get clothing results from HTTP-Service
             String from = intent.getStringExtra("from");
 
             if (from.equals("EDITCLOTHINGFAIL")) {
+                // Kleidung konnte nicht vom Server geholt werden
                 showDialog("Error", "Could not get clothing!");
             } else if (from.equals("PUTCLOTHINGFAIL")) {
+                // Ändern des Kleidungsstücks fehlgeschlagen
                 showDialog("Error", "Could not edit clothing!");
             } else {
                 try {
+                    // Zeige gewähltes Kleidungsstück an
                     String clothing = intent.getStringExtra("clothing");
                     JSONObject clothingJson=new JSONObject(clothing);
                     txtFabric.setText(clothingJson.getString("fabric"));
                     txtShowClothing.setText(clothingJson.toString());
+                    // Bild in nötiges Format umwandeln (Base64 -> Bitmap)
                     byte[] decodedBytes = Base64.decode(clothingJson.getString("image"), 0);
                     Bitmap clothingPicture = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+                    // Zeige Bild des Kleidungsstücks an
                     imgShowClothing.setImageBitmap(clothingPicture);
                 } catch (JSONException e) {
                     showDialog("Error", "Could not process your entries!");

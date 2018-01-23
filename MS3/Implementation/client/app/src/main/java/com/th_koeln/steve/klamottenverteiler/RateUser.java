@@ -28,6 +28,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
+ * Nach dem erfolgreichen Ablauf einer Transaktion, bietet diese Klasse den Transaktonspartnern
+ * sich gegenseitig zu bewerten. Hierfür wird dem Benutzer eine Eingabemaske mit der Möglichkeit
+ * seine Bewertung zu konkretisieren geboten. Nachdem der Benutzer die erforderlichen Daten
+ * eingetragen hat, werden die Daten ins JSON Dateiformat überführt und zum Server gesendet.
+ *
  * Created by Frank on 10.01.2018.
  */
 
@@ -76,12 +81,14 @@ public class RateUser extends AppCompatActivity {
                     String rFrom = getIntent().getStringExtra("rFrom");
                     String finished = getIntent().getStringExtra("finished");
 
+                    // Speicher Zeitpunkt der Bewertung
                     SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
                     Date now = new Date();
 
                     String strDate = sdfDate.format(now);
                     Date date = sdfDate.parse(strDate);
 
+                    // Erstelle Datenstruktur für die aktuelle Bewertung
                     rating.put("choice", spinChooseRating.getSelectedItem().toString());
                     rating.put("comment", txtComment.getText().toString());
                     rating.put("time",date.getTime() );
@@ -90,6 +97,7 @@ public class RateUser extends AppCompatActivity {
                     rating.put("rFrom",rFrom);
                     rating.put("finished",finished);
 
+                    // Sende Bewertung zum Server
                     Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
                     myIntent.putExtra("payload",rating.toString());
                     myIntent.putExtra("method","POST");
@@ -114,8 +122,10 @@ public class RateUser extends AppCompatActivity {
 
             String from = intent.getStringExtra("from");
             if (from.equals("POSTRATINGFAIL")) {
+                // Bewertung konnte nicht eingetragen werden
                 showDialog("Error","Could not add rating to Server!");
             } else if (from.equals("POSTRATING")) {
+                // Bewertung erfolgreich eingetragen
                 showDialog("Success","Successfully added rating!");
             }
 
