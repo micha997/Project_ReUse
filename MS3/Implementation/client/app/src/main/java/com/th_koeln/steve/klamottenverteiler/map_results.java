@@ -107,6 +107,7 @@ public class map_results extends FragmentActivity implements OnMapReadyCallback,
                         dialog.dismiss();
                     }
                 });
+        if (!isFinishing())
         alertDialog.show();
     }
 }

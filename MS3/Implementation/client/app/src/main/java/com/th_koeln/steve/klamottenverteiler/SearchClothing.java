@@ -186,6 +186,7 @@ public class SearchClothing extends AppCompatActivity
                         dialog.dismiss();
                     }
                 });
+        if (!isFinishing())
         alertDialog.show();
     }
 

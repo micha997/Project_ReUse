@@ -176,7 +176,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
             String from = intent.getStringExtra("from");
             if (from.equals("POSTTOKENFAIL")) {
                 // Token konnte nicht gesendet werden + User ausloggen.
-                showDialog("Error","Could not add login!");
+                showDialog("Error","Could not login!");
                 FirebaseAuth.getInstance().signOut();
                 progressDialog.dismiss();
             } else {
@@ -243,6 +243,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                         dialog.dismiss();
                     }
                 });
+        if (!isFinishing())
         alertDialog.show();
     }
 }

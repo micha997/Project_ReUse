@@ -44,6 +44,7 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
     private ListView lvShowRequests;
     private boolean menu_first;
     private ProgressDialog progress;
+    private AlertDialog alertDialog;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -83,6 +84,17 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
         progress.setMessage("Trying to get your requests..");
         progress.show();
 
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(progress != null) {
+            progress.dismiss();
+        }
+        if(alertDialog != null) {
+            alertDialog.dismiss();
+        }
     }
 
     @Override
@@ -406,7 +418,7 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
 
 
     private void showDialog(String title, String message) {
-        AlertDialog alertDialog = new AlertDialog.Builder(ShowRequest.this).create();
+        alertDialog = new AlertDialog.Builder(ShowRequest.this).create();
         alertDialog.setTitle(title);
         alertDialog.setMessage(message);
         alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
@@ -415,7 +427,8 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
                         dialog.dismiss();
                     }
                 });
-//        alertDialog.show();
+        if (!isFinishing())
+        alertDialog.show();
     }
 
     @Override

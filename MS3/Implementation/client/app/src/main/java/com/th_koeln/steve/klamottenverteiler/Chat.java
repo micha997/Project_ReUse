@@ -198,6 +198,7 @@ public class Chat extends AppCompatActivity {
                         dialog.dismiss();
                     }
                 });
+        if (!isFinishing())
         alertDialog.show();
     }
 }

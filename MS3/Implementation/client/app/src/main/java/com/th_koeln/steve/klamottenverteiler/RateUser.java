@@ -134,6 +134,7 @@ public class RateUser extends AppCompatActivity {
 
 
     private void showDialog(String title, String message) {
+
         AlertDialog alertDialog = new AlertDialog.Builder(RateUser.this).create();
         alertDialog.setTitle(title);
         alertDialog.setMessage(message);
@@ -143,6 +144,7 @@ public class RateUser extends AppCompatActivity {
                         dialog.dismiss();
                     }
                 });
+        if (!isFinishing())
         alertDialog.show();
     }
 }

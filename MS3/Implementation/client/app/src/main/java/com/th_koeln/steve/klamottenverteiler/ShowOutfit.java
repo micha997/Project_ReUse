@@ -257,6 +257,7 @@ public class ShowOutfit extends AppCompatActivity implements View.OnClickListene
                         dialog.dismiss();
                     }
                 });
+        if (!isFinishing())
         alertDialog.show();
     }
 }

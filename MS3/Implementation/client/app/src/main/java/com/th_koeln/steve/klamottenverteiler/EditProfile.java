@@ -258,6 +258,7 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
                         dialog.dismiss();
                     }
                 });
+        if (!isFinishing())
         alertDialog.show();
     }
 }

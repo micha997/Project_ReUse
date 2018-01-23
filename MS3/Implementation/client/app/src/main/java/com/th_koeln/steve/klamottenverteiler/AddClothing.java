@@ -450,6 +450,7 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
                         dialog.dismiss();
                     }
                 });
+        if (!isFinishing())
         alertDialog.show();
     }
 

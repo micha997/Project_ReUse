@@ -138,6 +138,7 @@ public class EditClothing extends AppCompatActivity {
                         dialog.dismiss();
                     }
                 });
+        if (!isFinishing())
         alertDialog.show();
     }
 }

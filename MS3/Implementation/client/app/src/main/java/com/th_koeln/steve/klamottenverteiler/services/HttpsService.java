@@ -117,50 +117,7 @@ public class HttpsService extends IntentService {
                 // Sende HTTP-Request
                 sendJSON(uri, payload);
         }  catch (SocketTimeoutException e) {
-            switch (from) {
-                case "SEARCHOUTFIT":
-                    intent = new Intent("showoutfit");
-                    intent.putExtra("from", "SEARCHOUTFITFAIL");
-                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-                    break;
-
-                case "NEW_TOKEN":
-                    intent = new Intent("login");
-                    intent.putExtra("from", "POSTTOKENFAIL");
-                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-                    break;
-
-                case"NEWUSER" :
-                    intent = new Intent("main");
-                    intent.putExtra("from", "POSTUSERFAIL");
-                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-                    break;
-                case"SHOWREQUESTS" :
-                    intent = new Intent("main");
-                    intent.putExtra("from", "SHOWREQUESTSFAIL");
-                    intent.putExtra("success", "0");
-                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-                    break;
-                case "SEARCH":
-                    intent = new Intent("clothing");
-                    intent.putExtra("from", "SEARCHFAIL");
-                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-                    break;
-                case "PROFILE":
-                    intent = new Intent("profile");
-                    intent.putExtra("from", "SEARCHPROFILEFAIL");
-                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-                    break;
-
-                default:
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(HttpsService.this, "Can not connect to server. Internet missing?", Toast.LENGTH_LONG).show();
-                        }
-                    });
-            }
-
+            reactOnTimeout(from);
         } catch (IOException e) {
             mHandler.post(new Runnable() {
                 @Override
@@ -218,8 +175,8 @@ public class HttpsService extends IntentService {
 
                         case "GMAPS":
                             intent = new Intent("gmaps");
-                            intent.putExtra("mapsData",stringBuilder.toString());
-                            intent.putExtra("from","GMAPS");
+                            intent.putExtra("mapsData", stringBuilder.toString());
+                            intent.putExtra("from", "GMAPS");
                             break;
 
                         case "CLOTHINGOPTIONS":
@@ -300,7 +257,7 @@ public class HttpsService extends IntentService {
                             intent = new Intent("chat");
                             intent.putExtra("params", stringBuilder.toString());
                             intent.putExtra("from", "GETCONVERSATION");
-                        break;
+                            break;
 
                         case "ADDCLOTHING":
                             intent = new Intent("addclothing");
@@ -423,8 +380,8 @@ public class HttpsService extends IntentService {
                     Log.e("HTTPs Response: ", connection.getResponseMessage());
                     break;
             }
-
-
+        } catch (SocketTimeoutException e) {
+            reactOnTimeout(from);
         } catch (Exception exception) {
             mHandler.post(new Runnable() {
                 @Override
@@ -437,6 +394,55 @@ public class HttpsService extends IntentService {
             if (connection != null) {
                 connection.disconnect();
             }
+        }
+    }
+
+    public void reactOnTimeout(String from) {
+        Intent intent;
+
+        switch (from) {
+
+            case "SEARCHOUTFIT":
+                intent = new Intent("showoutfit");
+                intent.putExtra("from", "SEARCHOUTFITFAIL");
+                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+                break;
+
+            case "NEW_TOKEN":
+                intent = new Intent("login");
+                intent.putExtra("from", "POSTTOKENFAIL");
+                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+                break;
+
+            case"NEWUSER" :
+                intent = new Intent("main");
+                intent.putExtra("from", "POSTUSERFAIL");
+                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+                break;
+            case"SHOWREQUESTS" :
+                intent = new Intent("showrequests");
+                intent.putExtra("from", "SHOWREQUESTSFAIL");
+                intent.putExtra("success", "0");
+                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+                break;
+            case "SEARCH":
+                intent = new Intent("clothing");
+                intent.putExtra("from", "SEARCHFAIL");
+                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+                break;
+            case "PROFILE":
+                intent = new Intent("profile");
+                intent.putExtra("from", "SEARCHPROFILEFAIL");
+                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+                break;
+
+            default:
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(HttpsService.this, "Could not connect to server. Internet missing?", Toast.LENGTH_LONG).show();
+                    }
+                });
         }
     }
 }

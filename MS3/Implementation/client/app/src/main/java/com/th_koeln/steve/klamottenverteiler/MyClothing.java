@@ -146,6 +146,7 @@ public class MyClothing extends AppCompatActivity {
                         dialog.dismiss();
                     }
                 });
+        if (!isFinishing())
         alertDialog.show();
     }
 

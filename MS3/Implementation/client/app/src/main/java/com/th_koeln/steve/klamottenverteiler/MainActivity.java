@@ -190,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
                 progressDialog.dismiss();
             } else {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
-                // Sende Verifizierúngs-Mail, wenn User nicht bereits eingeloggt ist
+                // Sende Verifizierúngs-Mail, wenn User eingeloggt ist
                 if (user != null) {
                     sendMail();
                 }
@@ -209,6 +209,7 @@ public class MainActivity extends AppCompatActivity {
                         dialog.dismiss();
                     }
                 });
+        if (!isFinishing())
         alertDialog.show();
     }
 

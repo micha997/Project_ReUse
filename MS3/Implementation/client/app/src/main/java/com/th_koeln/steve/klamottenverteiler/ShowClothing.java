@@ -196,6 +196,7 @@ public class ShowClothing extends AppCompatActivity implements View.OnClickListe
                         dialog.dismiss();
                     }
                 });
+        if (!isFinishing())
         alertDialog.show();
     }
 
