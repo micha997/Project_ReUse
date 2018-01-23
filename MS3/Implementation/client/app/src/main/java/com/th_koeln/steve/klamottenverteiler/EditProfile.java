@@ -157,7 +157,7 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
                 progressDialog.dismiss();
                 showDialog("Error","Could not get your profile.");
 
-            } else {
+            } else if (from.equals("SEARCHPROFILE")) {
                 progressDialog.dismiss();
 
                 String profile = intent.getStringExtra("profile");

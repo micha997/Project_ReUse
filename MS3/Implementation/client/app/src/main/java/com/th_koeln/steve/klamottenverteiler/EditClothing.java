@@ -107,7 +107,7 @@ public class EditClothing extends AppCompatActivity {
             } else if (from.equals("PUTCLOTHINGFAIL")) {
                 // Ändern des Kleidungsstücks fehlgeschlagen
                 showDialog("Error", "Could not edit clothing!");
-            } else {
+            } else if (from.equals("EDITCLOTHING")) {
                 try {
                     // Zeige gewähltes Kleidungsstück an
                     String clothing = intent.getStringExtra("clothing");

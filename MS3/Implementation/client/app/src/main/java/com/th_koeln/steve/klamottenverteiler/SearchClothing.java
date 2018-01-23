@@ -60,7 +60,6 @@ public class SearchClothing extends AppCompatActivity
     private RecyclerView searchRecyclerView;
     private Toolbar searchClothingToolbar;
     private LocationManager locationManager;
-    private ProgressDialog loadingProgress;
 
     /*Default Koordinaten ist die Koelner Innenstadt.
     Nicht ideal, aber falls persoenliche Koordinaten nicht
@@ -83,11 +82,6 @@ public class SearchClothing extends AppCompatActivity
         getLocation();
 
         //Loading Indikator
-        loadingProgress = new ProgressDialog(this);
-        loadingProgress.setTitle("Loading");
-        loadingProgress.setMessage("Angebote werden geladen ...");
-        loadingProgress.setCancelable(true);
-        loadingProgress.show();
 
         searchRecyclerView = (RecyclerView) findViewById(R.id.searchRecyclerView);
         searchRecyclerView.setHasFixedSize(true);
@@ -135,12 +129,8 @@ public class SearchClothing extends AppCompatActivity
                 progressDialog.dismiss();
             } else if (from.equals("SEARCHPREFCLOTHINGFAIL")) {
                 showDialog("Error", "Could not get clothing!");
-<<<<<<< HEAD
                 progressDialog.dismiss();
-            } else {
-=======
             } else if (from.equals("SEARCH")){
->>>>>>> 245833bbf0dfab3daa743ea9695ea36081aa81e5
                 try {
                     // get clothing results from HTTP-Service
                     String clothinglist = intent.getStringExtra("clothing");
@@ -177,13 +167,10 @@ public class SearchClothing extends AppCompatActivity
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-<<<<<<< HEAD
                 progressDialog.dismiss();
                 // send clothing results to Google Maps activity
-=======
-                //Laden der Angebote abgeschlossen -> LoadingProgress kann weg
-                loadingProgress.dismiss();
->>>>>>> 245833bbf0dfab3daa743ea9695ea36081aa81e5
+
+
             }
         }
     };

@@ -149,6 +149,7 @@ public class HttpsService extends IntentService {
                 case "PROFILE":
                     intent = new Intent("profile");
                     intent.putExtra("from", "SEARCHPROFILEFAIL");
+                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
                     break;
 
                 default:
