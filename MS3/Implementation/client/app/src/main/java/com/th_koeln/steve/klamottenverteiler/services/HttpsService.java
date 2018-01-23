@@ -245,10 +245,22 @@ public class HttpsService extends IntentService {
                             intent.putExtra("from", "SHOWDETAILS");
                             break;
 
+                        case "GETCLOTHINGDETAIL":
+                            intent = new Intent("getClothingDetail");
+                            intent.putExtra("clothing", stringBuilder.toString());
+                            intent.putExtra("from", "GETCLOTHINGDETAIL");
+                            break;
+
                         case "PROFILE":
                             intent = new Intent("profile");
                             intent.putExtra("profile", stringBuilder.toString());
                             intent.putExtra("from", "SEARCHPROFILE");
+                            break;
+
+                        case "GETPROFILE":
+                            intent = new Intent("getProfile");
+                            intent.putExtra("profile", stringBuilder.toString());
+                            intent.putExtra("from", "GETPROFILE");
                             break;
 
                         case "MYCLOTHING":
@@ -274,6 +286,13 @@ public class HttpsService extends IntentService {
                             intent.putExtra("clothing", stringBuilder.toString());
                             intent.putExtra("success", "0");
                             intent.putExtra("from", "SHOWREQUESTS");
+                            break;
+
+                        case "GETOWNREQUESTS":
+                            intent = new Intent("getOwnRequests");
+                            intent.putExtra("clothing", stringBuilder.toString());
+                            intent.putExtra("success", "0");
+                            intent.putExtra("from", "GETOWNREQUESTS");
                             break;
 
                         case "GETCONVERSATION":

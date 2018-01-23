@@ -1,6 +1,7 @@
 package com.th_koeln.steve.klamottenverteiler;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -96,9 +97,9 @@ public class TimePlan extends AppCompatActivity implements LocationListener {
 
         //BroadcastReceiver
         IntentFilter filter = new IntentFilter();
-        filter.addAction("showrequests");
-        filter.addAction("profile");
-        filter.addAction("showdetails");
+        filter.addAction("getOwnRequests");
+        filter.addAction("getProfile");
+        filter.addAction("getClothingDetail");
         filter.addAction("gmaps");
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, filter);
 
@@ -106,7 +107,7 @@ public class TimePlan extends AppCompatActivity implements LocationListener {
         startIntent = new Intent(getApplicationContext(), HttpsService.class);
         //Requests werden besorgt (Kleidungsstuecke die angefragt wurden und abgeholt werden sollen)
         startIntent.putExtra("method","GET");
-        startIntent.putExtra("from","SHOWREQUESTS");
+        startIntent.putExtra("from","GETOWNREQUESTS");
         startIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId + "/requests");
         //Service-Call starten
         startService(startIntent);
@@ -134,7 +135,7 @@ public class TimePlan extends AppCompatActivity implements LocationListener {
         public void onReceive(Context context, Intent intent) {
 
             //Response mit den eigenen Requests (userID, clothingID)
-            if(intent.getStringExtra("from").equals("SHOWREQUESTS")) {
+            if(intent.getStringExtra("from").equals("GETOWNREQUESTS")) {
                 String profile = intent.getStringExtra("clothing");
                 try {
                     JSONArray requestArray = new JSONArray(profile);
@@ -157,7 +158,7 @@ public class TimePlan extends AppCompatActivity implements LocationListener {
             }
 
             //Response mit den Profildaten (Uhrzeiten)
-            if(intent.getStringExtra("from").equals("SEARCHPROFILE")){
+            if(intent.getStringExtra("from").equals("GETPROFILE")){
                 String profile = intent.getStringExtra("profile");
                 try{
                     JSONObject profileJson = new JSONObject(profile);
@@ -187,7 +188,7 @@ public class TimePlan extends AppCompatActivity implements LocationListener {
             }
 
             //Response mit den Kleidungsstueckdaten (Koordinaten)
-            if(intent.getStringExtra("from").equals("SHOWDETAILS")){
+            if(intent.getStringExtra("from").equals("GETCLOTHINGDETAIL")){
                 String clothing = intent.getStringExtra("clothing");
                 try{
                     JSONObject clothingJson = new JSONObject(clothing);
@@ -261,7 +262,7 @@ public class TimePlan extends AppCompatActivity implements LocationListener {
             Intent timeIntent = new Intent(getApplicationContext(), HttpsService.class);
             timeIntent.putExtra("payload", "");
             timeIntent.putExtra("method", "GET");
-            timeIntent.putExtra("from", "PROFILE");
+            timeIntent.putExtra("from", "GETPROFILE");
             timeIntent.putExtra("url", getString(R.string.DOMAIN) + "/user/" + Clean_Transaktionen.get(i).getuID());
             //call http service
             startService(timeIntent);
@@ -315,7 +316,7 @@ public class TimePlan extends AppCompatActivity implements LocationListener {
             Intent coordIntent = new Intent(getApplicationContext(), HttpsService.class);
             coordIntent.putExtra("payload","");
             coordIntent.putExtra("method", "GET");
-            coordIntent.putExtra("from", "SHOWDETAILS");
+            coordIntent.putExtra("from", "GETCLOTHINGDETAIL");
             coordIntent.putExtra("url", getString(R.string.DOMAIN) + "/clothing/" + ZeitClean_Transaktionen.get(k).getcID());
             //call http service
             startService(coordIntent);
@@ -545,7 +546,9 @@ public class TimePlan extends AppCompatActivity implements LocationListener {
                             dialog.dismiss();
                         }
                     });
-            alertDialog.show();
+            if(!isFinishing()) {
+                alertDialog.show();
+            }
         }
     }
 
@@ -631,7 +634,7 @@ public class TimePlan extends AppCompatActivity implements LocationListener {
         myLatitude = location.getLatitude();
         if(!gotGPSDATA) {
             gotGPSDATA = true;
-            makeTimePlanPart3();
+            //makeTimePlanPart3();
         }
     }
 

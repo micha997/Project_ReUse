@@ -68,9 +68,10 @@
 
     <Button
         android:id="@+id/btnTimeFromWeekday"
-        android:layout_width="174dp"
+        android:layout_width="168dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
         android:text="Von 00:00"
         app:layout_constraintStart_toStartOf="parent"
@@ -78,9 +79,10 @@
 
     <Button
         android:id="@+id/btnTimeToWeekday"
-        android:layout_width="174dp"
+        android:layout_width="168dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
         android:text="Bis 00:00"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/btnTimeFromWeekday" />
@@ -100,9 +102,10 @@
 
     <Button
         android:id="@+id/btnTimeFromWeekend"
-        android:layout_width="174dp"
+        android:layout_width="168dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
         android:text="Von 00:00"
         app:layout_constraintStart_toStartOf="parent"
@@ -110,9 +113,10 @@
 
     <Button
         android:id="@+id/btnTimeToWeekend"
-        android:layout_width="174dp"
+        android:layout_width="168dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
         android:text="Bis 00:00"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/btnTimeFromWeekend" />
