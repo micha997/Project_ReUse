@@ -21,14 +21,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.support.v7.widget.Toolbar;
-import android.widget.Spinner;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.firebase.auth.FirebaseAuth;
 import com.th_koeln.steve.klamottenverteiler.adapter.ClothingOfferAdapter;
 import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
@@ -42,12 +41,15 @@ import org.json.JSONObject;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Created by Michael on 20.01.18.
  */
 
-public class SearchClothing extends AppCompatActivity implements View.OnClickListener, LocationListener {
+public class SearchClothing extends AppCompatActivity
+        implements View.OnClickListener, LocationListener {
 
     public static final int CHOOSE_OPTION = 77;
 
@@ -65,7 +67,7 @@ public class SearchClothing extends AppCompatActivity implements View.OnClickLis
     abgerufen werden koennen soll dennoch ein Ergebniss erscheinen*/
     private double latitude = 50.935534250455916;
     private double longitude = 6.960927844047546;
-    private long vicinity = 100;
+    private int vicinity = 100;
     private boolean gotGPSDATA = false;
 
     @Override
@@ -198,6 +200,7 @@ public class SearchClothing extends AppCompatActivity implements View.OnClickLis
                 String color = checkEmptyString(data.getStringExtra("color"));
                 //String fabric = checkEmptyString(data.getStringExtra("fabric"));
                 String brand = checkEmptyString(data.getStringExtra("brand"));
+                vicinity = data.getIntExtra("distance", 50);
                 ListForAdapter = new ArrayList<>();
                 searchTheClothing(brand,style,color,art,size,longitude,latitude);
             }
@@ -222,15 +225,51 @@ public class SearchClothing extends AppCompatActivity implements View.OnClickLis
     public boolean onOptionsItemSelected(MenuItem item){
         int actionID = item.getItemId();
 
-        //Filter Button
-        if(actionID == R.id.action_filter){
+        //Search Button
+        if(actionID == R.id.action_search){
             Intent showDetailActivity = new Intent(getApplicationContext(), SearchClothingFilter.class);
+            showDetailActivity.putExtra("distance",vicinity);
             startActivityForResult(showDetailActivity, CHOOSE_OPTION);
         }
 
-        //Search Button
-        if(actionID == R.id.action_search){
+        //Filter Button
+        if(actionID == R.id.action_filter){
+            View menuItemView = findViewById(R.id.action_filter);
+            PopupMenu popup = new PopupMenu(SearchClothing.this, menuItemView);
+            MenuInflater inflate = popup.getMenuInflater();
+            inflate.inflate(R.menu.popup_search,popup.getMenu());
+            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem menuItem) {
+                    switch(menuItem.getItemId()){
+                        case R.id.distanceAsc:
+                            Collections.sort(ListForAdapter, new Comparator<ClothingOffer>() {
+                                @Override
+                                public int compare(ClothingOffer c1, ClothingOffer c2) {
+                                    if(c1.getDistance() < c2.getDistance())return -1;
+                                    if(c1.getDistance() > c2.getDistance())return 1;
+                                    return 0;
+                                }
+                            });
+                            fillView(ListForAdapter);
+                            break;
 
+                        case R.id.distanceDesc:
+                            Collections.sort(ListForAdapter, new Comparator<ClothingOffer>() {
+                                @Override
+                                public int compare(ClothingOffer c1, ClothingOffer c2) {
+                                    if(c1.getDistance() < c2.getDistance())return 1;
+                                    if(c1.getDistance() > c2.getDistance())return -1;
+                                    return 0;
+                                }
+                            });
+                            fillView(ListForAdapter);
+                            break;
+                    }
+                    return false;
+                }
+            });
+            popup.show();
         }
 
         return super.onOptionsItemSelected(item);

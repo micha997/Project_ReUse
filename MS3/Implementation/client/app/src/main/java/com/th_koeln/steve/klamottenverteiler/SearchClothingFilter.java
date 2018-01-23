@@ -4,21 +4,18 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.BitmapFactory;
-import android.location.Address;
-import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Base64;
+
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.ui.PlacePicker;
+
 import com.th_koeln.steve.klamottenverteiler.adapter.ClothingOptionsAdapter;
 import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
 import com.th_koeln.steve.klamottenverteiler.services.ListViewHelper;
@@ -27,12 +24,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * Created by Michael on 22.01.2018.
@@ -41,16 +33,14 @@ import java.util.Locale;
 public class SearchClothingFilter extends AppCompatActivity implements View.OnClickListener {
 
     public static final int CHOOSE_OPTION = 77;
-    private int OPT = 1;
-
-    private ListView listViewOptions;
+    private int OPT = 1, choosenOption, progressDist;
     private ArrayList<String> clothingOptionsLevel1 = new ArrayList<String>();
+    private JSONArray clothingOptions;
 
     private Button btnSearch, btnCancel;
-
-    private int choosenOption;
-
-    private JSONArray clothingOptions;
+    private ListView listViewOptions;
+    private TextView textViewProgress;
+    private SeekBar seekBarDistance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +48,15 @@ public class SearchClothingFilter extends AppCompatActivity implements View.OnCl
         setContentView(R.layout.filter_activity_layout);
 
         listViewOptions = (ListView) findViewById(R.id.listViewOptions);
+        textViewProgress = (TextView) findViewById(R.id.textViewProgress);
+
+        Intent in = getIntent();
+        progressDist = in.getIntExtra("distance",0);
+
+        seekBarDistance = (SeekBar) findViewById(R.id.seekBarDistance);
+        seekBarDistance.setOnSeekBarChangeListener(seekBarChangeListener);
+        seekBarDistance.setProgress(progressDist);
+        textViewProgress.setText("Entfernung in KM: "+progressDist);
 
         btnSearch = (Button) findViewById(R.id.btnSearch);
         btnSearch.setOnClickListener(this);
@@ -164,6 +163,7 @@ public class SearchClothingFilter extends AppCompatActivity implements View.OnCl
                 resultIntent.putExtra("color",color);
                 //resultIntent.putExtra("fabric",fabric);
                 resultIntent.putExtra("brand",brand);
+                resultIntent.putExtra("distance",progressDist);
                 setResult(CHOOSE_OPTION, resultIntent);
                 finish();
                 break;
@@ -207,6 +207,24 @@ public class SearchClothingFilter extends AppCompatActivity implements View.OnCl
                     e.printStackTrace();
                 }
             }
+        }
+    };
+
+    SeekBar.OnSeekBarChangeListener seekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+            textViewProgress.setText("Entfernung in KM: " + i);
+            progressDist = i;
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+
         }
     };
 
