@@ -246,7 +246,7 @@ public class HttpsService extends IntentService {
                         case "SEARCHOUTFIT":
                             intent = new Intent("showoutfit");
                             intent.putExtra("clothing", stringBuilder.toString());
-                            intent.putExtra("from", "SEARCHCLOTHING");
+                            intent.putExtra("from", "SEARCHOUTFIT");
                             break;
 
                         case "SHOWREQUESTS":

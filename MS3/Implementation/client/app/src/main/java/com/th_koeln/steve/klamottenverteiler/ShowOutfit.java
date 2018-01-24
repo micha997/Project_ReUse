@@ -1,32 +1,30 @@
 package com.th_koeln.steve.klamottenverteiler;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PagerSnapHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SnapHelper;
+import android.support.v7.widget.Toolbar;
 import android.util.Base64;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.Spinner;
-import android.widget.Toast;
 
-import com.google.android.gms.location.LocationListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.th_koeln.steve.klamottenverteiler.adapter.ClothingOfferAdapter;
 import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
@@ -59,9 +57,11 @@ public class ShowOutfit extends AppCompatActivity implements View.OnClickListene
     private ArrayList<String> miss = new ArrayList();
     private ArrayAdapter<String> missingAdapter;
 
+    private Toolbar addOutfitTB;
     private Button btnSendClothingRequest;
     private Button btnSubscribeMissingClothing;
 
+    private ProgressDialog progressDialog;
     private String model;
     private int index = 0;
     private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
@@ -122,16 +122,25 @@ public class ShowOutfit extends AppCompatActivity implements View.OnClickListene
         btnSubscribeMissingClothing = (Button) findViewById(R.id.btnSubscribeMissingClothing);
         btnSubscribeMissingClothing.setOnClickListener(this);
 
+        addOutfitTB = (Toolbar) findViewById(R.id.addOutfitTB);
+        setSupportActionBar(addOutfitTB);
+
         IntentFilter filter = new IntentFilter();
         filter.addAction("getClothingDetail2");
+        filter.addAction("showoutfit");
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,filter);
-
-        getDetailedData();
     }
 
-    public void getDetailedData(){
+    public void getDetailedData(String outfit){
+        HeadForAdapter.clear();
+        Layer1ForAdapter.clear();
+        Layer2ForAdapter.clear();
+        Layer3ForAdapter.clear();
+        BottomForAdapter.clear();
+        ShoesForAdapter.clear();
+        miss.clear();
         try {
-            JSONObject outfitsArray = new JSONObject(getIntent().getStringExtra("outfit"));
+            JSONObject outfitsArray = new JSONObject(outfit);
             JSONArray layers = outfitsArray.getJSONArray("layers");
             model = outfitsArray.getString("model");
             String objects;
@@ -269,6 +278,20 @@ public class ShowOutfit extends AppCompatActivity implements View.OnClickListene
         }
     }
 
+    private void sendOutfitRequest(String selected){
+        // Outfits vom Server abrufen
+        if(selected.equals("Winter")) {
+            Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
+            myIntent.putExtra("method", "GET");
+            myIntent.putExtra("from", "SEARCHOUTFIT");
+            myIntent.putExtra("url", getString(R.string.DOMAIN) + "/outfit/" + "winter");
+            startService(myIntent);
+            progressDialog = new ProgressDialog(ShowOutfit.this);
+            progressDialog.setMessage("Trying to get outfit..");
+            progressDialog.show();
+        }
+    }
+
     private void fillView(ArrayList<ClothingOffer> options, RecyclerView putRecyc) {
         ClothingOfferAdapter optAdapter;
         optAdapter = new ClothingOfferAdapter(this, options);
@@ -335,6 +358,18 @@ public class ShowOutfit extends AppCompatActivity implements View.OnClickListene
                     }
                 }
             }
+
+            if (intent.getStringExtra("from").equals("SEARCHOUTFITFAIL")) {
+                // Fehler beim Suchen der Outfits
+                showDialog("Error!", "Could not get outfit!");
+                progressDialog.dismiss();
+            }
+            if (intent.getStringExtra("from").equals("SEARCHOUTFIT")) {
+                progressDialog.dismiss();
+                // Starte Aktivität um gelieferte Kleidung anzuzeigen.
+                String outfit = intent.getStringExtra("clothing");
+                getDetailedData(outfit);
+            }
         }
     };
 
@@ -342,6 +377,43 @@ public class ShowOutfit extends AppCompatActivity implements View.OnClickListene
     public void onBackPressed() {
         super.onBackPressed();
         finish();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.outfit_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        int actionID = item.getItemId();
+
+        //Search Button
+        if(actionID == R.id.action_add){
+            AlertDialog.Builder builder = new AlertDialog.Builder(ShowOutfit.this);
+            final String[] tmpString = new String[]{"Winter", "Sommer", "Winter-Sport", "Herbst"};
+            builder.setTitle("Choose context")
+                    .setSingleChoiceItems(tmpString,0, null)
+            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    ListView lw = ((AlertDialog)dialogInterface).getListView();
+                    String selected = (String) lw.getAdapter().getItem(lw.getCheckedItemPosition());
+                    sendOutfitRequest(selected);
+                    dialogInterface.dismiss();
+                }
+            })
+            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                }
+            })
+            .create()
+            .show();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void showDialog(String title, String message) {

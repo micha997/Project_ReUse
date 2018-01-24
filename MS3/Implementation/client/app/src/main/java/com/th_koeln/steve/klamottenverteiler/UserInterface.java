@@ -20,7 +20,7 @@ public class UserInterface extends AppCompatActivity implements View.OnClickList
     private Button btnLogout;
     private Button btnMyClothing;
     // private Button btnShowPrefer;
-    private Button btnChooseContext;
+    private Button btnShowOutfit;
     private Button btnEditProfile;
     private Button btnTimePlan;
     private Button btnRequests;
@@ -44,8 +44,8 @@ public class UserInterface extends AppCompatActivity implements View.OnClickList
         btnMyClothing = (Button) findViewById(R.id.btnMyClothing);
         btnMyClothing.setOnClickListener(this);
 
-        btnChooseContext = (Button) findViewById(R.id.btnChooseContext);
-        btnChooseContext.setOnClickListener(this);
+        btnShowOutfit = (Button) findViewById(R.id.btnShowOutfit);
+        btnShowOutfit.setOnClickListener(this);
 
         btnEditProfile = (Button) findViewById(R.id.btnEditProfile);
         btnEditProfile.setOnClickListener(this);
@@ -81,8 +81,8 @@ public class UserInterface extends AppCompatActivity implements View.OnClickList
                 finish();
                 break;
 
-            case R.id.btnChooseContext:
-                startActivity(new Intent(getApplicationContext(),ChooseContext.class));
+            case R.id.btnShowOutfit:
+                startActivity(new Intent(getApplicationContext(),ShowOutfit.class));
                 break;
 
             case R.id.btnEditProfile:

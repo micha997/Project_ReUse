@@ -74,8 +74,8 @@ public class ChooseContext extends AppCompatActivity {
                 Intent showClothing = new Intent(getApplicationContext(), ShowOutfit.class);
                 showClothing.putExtra("outfit", outfit);
                 showClothing.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(showClothing);
-                finish();
+                //startActivity(showClothing);
+                //finish();
             }
         }
     };

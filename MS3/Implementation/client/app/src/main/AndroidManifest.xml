@@ -41,7 +41,8 @@
         <activity android:name=".EditProfile" />
         <activity android:name=".EditClothing" />
         <activity android:name=".MyClothing" />
-        <activity android:name=".ShowOutfit" />
+        <activity android:name=".ShowOutfit"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".ClothingOptionsDetail" />
         <activity android:name=".SearchClothingFilter" />
         <activity android:name=".TimePlan"/>
