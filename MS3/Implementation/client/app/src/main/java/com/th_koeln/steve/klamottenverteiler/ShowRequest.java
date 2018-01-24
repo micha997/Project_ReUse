@@ -358,19 +358,19 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
                             if (requestJsonObject.getString("from").equals("own")) {
                                 // Erstelle Request Objekt
                                 Request ownnRequest= new Request(requestJsonObject.getString("id").toString(),
-                                        requestJsonObject.getString("art").toString(),requestJsonObject.getString("size").toString(),
-                                        requestJsonObject.getString("brand").toString(),requestJsonObject.getString("status").toString(),
+                                        requestJsonObject.getString("size").toString(),
+                                        requestJsonObject.getString("status").toString(),
                                         requestJsonObject.getString("from").toString(), requestJsonObject.getString("ouId"),requestJsonObject.getString("confirmed"),
-                                        requestJsonObject.getString("closed"),requestJsonObject.getString("finished"), requestJsonObject.getString("notes"));
+                                        requestJsonObject.getString("closed"),requestJsonObject.getString("finished"), requestJsonObject.getString("notes"), requestJsonObject.getString("art"));
                                 // Füge Request Objekt zur Liste hinzu
                                 ownRequestList.add(ownnRequest);
 
                             } else if (requestJsonObject.getString("from").equals("foreign")) {
                                 Request foreignRequest= new Request(requestJsonObject.getString("id").toString(),
-                                        requestJsonObject.getString("art").toString(),requestJsonObject.getString("size").toString(),
-                                        requestJsonObject.getString("brand").toString(),requestJsonObject.getString("status").toString(),
+                                        requestJsonObject.getString("size").toString(),
+                                        requestJsonObject.getString("status").toString(),
                                         requestJsonObject.getString("from").toString(), requestJsonObject.getString("uId"),requestJsonObject.getString("confirmed"),
-                                        requestJsonObject.getString("closed"), requestJsonObject.getString("finished"), requestJsonObject.getString("notes"));
+                                        requestJsonObject.getString("closed"), requestJsonObject.getString("finished"), requestJsonObject.getString("notes"), requestJsonObject.getString("art"));
                                 foreignRequestList.add(foreignRequest);
                             }
 

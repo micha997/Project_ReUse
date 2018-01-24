@@ -38,7 +38,7 @@ public class RequestListAdapter extends ArrayAdapter<Request> {
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         String name = getItem(position).getName();
-        String art = getItem(position).getArt();
+
         String size = getItem(position).getSize();
         String brand = getItem(position).getBrand();
         String status = getItem(position).getStatus();
@@ -48,8 +48,10 @@ public class RequestListAdapter extends ArrayAdapter<Request> {
         String closed = getItem(position).getClosed();
         String finished = getItem(position).getFinished();
         String title = getItem(position).getTitle();
+        String art = getItem(position).getArt();
 
-        Request request = new Request(name, art, size, brand, status, from, ouId, confirmed, closed, finished, title);
+        Request request = new Request(name, size, status, from, ouId, confirmed, closed, finished, title, art);
+
 
         LayoutInflater inflater = LayoutInflater.from(mContext);
         convertView = inflater.inflate(mRessource,parent,false);
@@ -60,7 +62,6 @@ public class RequestListAdapter extends ArrayAdapter<Request> {
         TextView txtRequestBrand = (TextView) convertView.findViewById(R.id.txtRequestBrand);
         TextView txtRequestStatus = (TextView) convertView.findViewById(R.id.txtRequestStatus);
         txtRequestName.setText("Name : " + title);
-        txtRequestArt.setText("Art: " + art);
         txtRequestSize.setText("Size: " + size);
         txtRequestBrand.setText("Brand: " + brand);
 

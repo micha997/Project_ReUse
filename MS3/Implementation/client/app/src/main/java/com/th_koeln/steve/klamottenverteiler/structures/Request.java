@@ -7,7 +7,6 @@ package com.th_koeln.steve.klamottenverteiler.structures;
 public class Request {
 
     private String name;
-    private String art;
     private String size;
     private String brand;
     private String from;
@@ -17,13 +16,12 @@ public class Request {
     private String closed;
     private String finished;
     private String title;
+    private String art;
 
 
-    public Request(String name, String art, String size, String brand, String status, String from, String ouId, String confirmed, String closed, String finished, String title) {
+    public Request(String name, String size, String status, String from, String ouId, String confirmed, String closed, String finished, String title, String art) {
         this.name = name;
-        this.art = art;
         this.size = size;
-        this.brand = brand;
         this.status = status;
         this.from = from;
         this.ouId = ouId;
@@ -31,6 +29,15 @@ public class Request {
         this.closed = closed;
         this.finished = finished;
         this.title = title;
+        this.art = art;
+    }
+
+    public String getArt() {
+        return art;
+    }
+
+    public void setArt(String art) {
+        this.art = art;
     }
 
     public String getTitle() {
@@ -88,14 +95,6 @@ public class Request {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getArt() {
-        return art;
-    }
-
-    public void setArt(String art) {
-        this.art = art;
     }
 
     public String getSize() {

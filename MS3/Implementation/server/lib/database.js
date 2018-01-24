@@ -228,11 +228,13 @@ const database = {
                 for (var single_req in requests) {
 
                     for (var single_clothing in mapping) {
-                        if (mapping[single_clothing].id == requests[single_req].cId)
+                        if (mapping[single_clothing].id == requests[single_req].cId) {
                             delete mapping[single_clothing].uId;
                         delete mapping[single_clothing].id;
                         delete mapping[single_clothing].uId;
                         var obj = Object.assign(requests[single_req], mapping[single_clothing]);
+                        console.log(obj);
+                        }
                     }
                 }
 
