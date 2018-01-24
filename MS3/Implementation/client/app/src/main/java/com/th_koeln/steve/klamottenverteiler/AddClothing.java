@@ -135,6 +135,9 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
         optionsIntent.putExtra("from","CLOTHINGOPTIONS");
         optionsIntent.putExtra("url",getString(R.string.DOMAIN) + "/clothingOptions/");
         startService(optionsIntent);
+        progress = new ProgressDialog(this);
+        progress.setMessage("Trying to get data from server..");
+        progress.show();
 
         listViewOptions.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -157,7 +160,6 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
             }
         });
 
-        progress = new ProgressDialog(this);
     }
 
 
@@ -371,8 +373,7 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
                         myIntent.putExtra("from","ADDCLOTHING");
                         myIntent.putExtra("url",getString(R.string.DOMAIN) + "/klamotten");
                         // Starte Progress-Dialog
-                        progress.setTitle("Please wait!");
-                        progress.setMessage("Trying to add clothing..");
+                        progress.setMessage("Trying to add clothing!");
                         progress.show();
                         startService(myIntent);
                     } catch (JSONException e) {
@@ -404,30 +405,40 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            if(intent.getStringExtra("from").equals("ADDCLOTHING")) {
-                String success = intent.getStringExtra("success");
-                // Schließe progress-dialog
-                progress.dismiss();
-                if (success.equals("1")) {
-                    showDialog("Success!", "Successfully added clothing!");
-                } else {
-                    showDialog("Error!", "Failed to add clothing!");
-                }
+            switch (intent.getStringExtra("from")) {
+
+                case "ADDCLOTHING":
+                    String success = intent.getStringExtra("success");
+                    if (success.equals("1")) {
+                        showDialog("Success!", "Successfully added clothing!");
+                    } else {
+                        showDialog("Error!", "Failed to add clothing!");
+                    }
+                    progress.dismiss();
+                    break;
+
+                case "CLOTHINGOPTIONS":
+                    String rawData = intent.getStringExtra("optionsData");
+                    try {
+                        clothingOptions = new JSONArray(rawData);
+                        for(int i=0;clothingOptions.length()>i;i++){
+                            JSONObject tmpObject = new JSONObject(clothingOptions.get(i).toString());
+                            clothingOptionsLevel1.add(tmpObject.getString("topic"));
+                        }
+                        fillListView(clothingOptionsLevel1);
+                    }catch(JSONException e){
+                        showDialog("Error", "Could not process request data!");
+                    }
+                    progress.dismiss();
+                    break;
+                case "CLOTHINGOPTIONSFAIL":
+                    progress.dismiss();
+                        showDialog("Error", "Could not get data from server!");
+
+                    break;
+
             }
 
-            if(intent.getStringExtra("from").equals("CLOTHINGOPTIONS")){
-                String rawData = intent.getStringExtra("optionsData");
-                try {
-                    clothingOptions = new JSONArray(rawData);
-                    for(int i=0;clothingOptions.length()>i;i++){
-                        JSONObject tmpObject = new JSONObject(clothingOptions.get(i).toString());
-                        clothingOptionsLevel1.add(tmpObject.getString("topic"));
-                    }
-                    fillListView(clothingOptionsLevel1);
-                }catch(JSONException e){
-                    showDialog("Error", "Could not process request data!");
-                }
-            }
 
         }
     };

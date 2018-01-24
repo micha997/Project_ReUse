@@ -19,6 +19,7 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.th_koeln.steve.klamottenverteiler.adapter.RequestListAdapter;
 import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
 import com.th_koeln.steve.klamottenverteiler.structures.Request;
@@ -45,6 +46,7 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
     private boolean menu_first;
     private ProgressDialog progress;
     private AlertDialog alertDialog;
+    private RequestListAdapter reqAdapter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -65,12 +67,9 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
                 new IntentFilter("showrequests"));
 
+
         // Hole die verfügbaren Requests vom Server
-        Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
-        myIntent.putExtra("method","GET");
-        myIntent.putExtra("from","SHOWREQUESTS");
-        myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId + "/requests");
-        startService(myIntent);
+        getRequestsFromServer();
 
         lvShowRequests.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -84,17 +83,6 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
         progress.setMessage("Trying to get your requests..");
         progress.show();
 
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if(progress != null) {
-            progress.dismiss();
-        }
-        if(alertDialog != null) {
-            alertDialog.dismiss();
-        }
     }
 
     @Override
@@ -322,6 +310,18 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
             startService(myIntent);
         }
 
+    /**
+     * Leitet den Aufruf vorhandener Requests vom Server ein.
+     *
+     */
+
+        private void getRequestsFromServer() {
+            Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
+            myIntent.putExtra("method","GET");
+            myIntent.putExtra("from","SHOWREQUESTS");
+            myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId + "/requests/");
+            startService(myIntent);
+        }
 
         private BroadcastReceiver mReceiver = new BroadcastReceiver() {
 
@@ -330,8 +330,12 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
             String success = intent.getStringExtra("success");
             if (success.equals("1")) {
                 // Status eines Requests wurde erfolgreich geändert.
+                getRequestsFromServer();
+                reqAdapter.notifyDataSetChanged();
                 showDialog("Success!", "Successfully edited status of request!");
             } else if(success.equals("2")) {
+                getRequestsFromServer();
+                reqAdapter.notifyDataSetChanged();
                 // Request wurde erfolgreich gelöscht
                 showDialog("Success!", "Successfully deleted requests!");
             } else {
@@ -355,14 +359,18 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
                                 // Erstelle Request Objekt
                                 Request ownnRequest= new Request(requestJsonObject.getString("id").toString(),
                                         requestJsonObject.getString("art").toString(),requestJsonObject.getString("size").toString(),
-                                        requestJsonObject.getString("brand").toString(),requestJsonObject.getString("status").toString(),requestJsonObject.getString("from").toString(), requestJsonObject.getString("ouId"),requestJsonObject.getString("confirmed"),requestJsonObject.getString("closed"),requestJsonObject.getString("finished"));
+                                        requestJsonObject.getString("brand").toString(),requestJsonObject.getString("status").toString(),
+                                        requestJsonObject.getString("from").toString(), requestJsonObject.getString("ouId"),requestJsonObject.getString("confirmed"),
+                                        requestJsonObject.getString("closed"),requestJsonObject.getString("finished"), requestJsonObject.getString("notes"));
                                 // Füge Request Objekt zur Liste hinzu
                                 ownRequestList.add(ownnRequest);
 
                             } else if (requestJsonObject.getString("from").equals("foreign")) {
                                 Request foreignRequest= new Request(requestJsonObject.getString("id").toString(),
                                         requestJsonObject.getString("art").toString(),requestJsonObject.getString("size").toString(),
-                                        requestJsonObject.getString("brand").toString(),requestJsonObject.getString("status").toString(),requestJsonObject.getString("from").toString(), requestJsonObject.getString("uId"),requestJsonObject.getString("confirmed"),requestJsonObject.getString("closed"), requestJsonObject.getString("finished"));
+                                        requestJsonObject.getString("brand").toString(),requestJsonObject.getString("status").toString(),
+                                        requestJsonObject.getString("from").toString(), requestJsonObject.getString("uId"),requestJsonObject.getString("confirmed"),
+                                        requestJsonObject.getString("closed"), requestJsonObject.getString("finished"), requestJsonObject.getString("notes"));
                                 foreignRequestList.add(foreignRequest);
                             }
 
@@ -410,7 +418,7 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
      */
 
     private void fillListView(ArrayList<Request> requests) {
-        RequestListAdapter reqAdapter;
+
         reqAdapter = new RequestListAdapter(getApplicationContext(), R.layout.list_requests,requests );
         lvShowRequests.setAdapter(reqAdapter);
 

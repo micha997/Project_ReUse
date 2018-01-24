@@ -79,7 +79,6 @@ const database = {
             if (err) {
                 return callback(err);
             }
-            console.log(latitude);
             var clothing = calcClothingDistance(mappings, latitude, longitude, vicinity);
 
             //send results back to handler
@@ -642,7 +641,6 @@ const database = {
         if (!callback) {
             throw new Error('Callback is missing.');
         }
-
         const mapping = {
             id: uuidv4(),
             cId: cId,
@@ -655,30 +653,80 @@ const database = {
         };
         //write mapping to Database
 
-        this.mappings.update({
-            type: "userprofile",
-            uId: mapping.uId
-        }, {
-            $push: {
-                requests: mapping
-            }
-        }, mapping, err => {
-            if (err) {
+        async.waterfall([
+            async.apply(findRequest, this.mappings, mapping),
+            async.apply(findUserProfile, this.mappings, mapping),
+            async.apply(sendMessage, this.mappings, body.ouId, mapping.cId)
+        ], function(err) {
+            if (err == "1") {
                 return callback(err);
+            } else {
+              console.log("all good");
+                callback(null);
             }
-            this.mappings.findOne({
-                uId: body.ouId,
+        });
+
+
+        function findRequest(mappings, mapping, callback) {
+          console.log("geht los");
+            var flag="0";
+            mappings.findOne({
+                uId: mapping.uId,
+                type: "userprofile",
+              }, (err, userprofile) => {
+                    if (err) {
+                        callback("1", null);
+                    } else {
+                    for ( var single_req in userprofile.requests) {
+                      if (userprofile.requests[single_req].cId == mapping.cId) {
+                          callback("1", null);
+                          flag="1";
+                      }
+                      }
+                      if (flag=="0") {
+                        callback(null);
+                        }
+                      }
+                    })
+                  }
+
+            function findUserProfile(mappings, mapping, callback) {
+                          mappings.update({
+                              type: "userprofile",
+                              uId: mapping.uId
+                          }, {
+                              $push: {
+                                  requests: mapping
+                              }
+                          }, (err) => {
+                            console.log("hab profil");
+                            if (err) {
+                                callback("1", null);
+                            } else {
+                            console.log("schicke jetzt callback");
+                            callback(null);
+                            }
+                          })
+                        }
+
+          function sendMessage(mappings, uId, cId ,callback) {
+            mappings.findOne({
+                uId: uId,
                 type: "token"
             }, (err, mappings) => {
                 if (err) {
-                    return callback(err);
+                    callback("1", null);
                 }
-                sendPushNotification(mappings.token, cId, body.ouId, "", "postRequest", firebase);
+                sendPushNotification(mappings.token, cId, uId, "", "postRequest", firebase);
                 callback(null);
             });
-        });
+          }
 
-    },
+
+
+
+          },
+
     postUserToken(id, token, callback) {
         if (!id) {
             throw new Error('id is missing.');
@@ -813,7 +861,6 @@ const database = {
             rfrom: rating["rfrom"],
             finished: rating["finished"]
         };
-        console.log(mapping);
         //write mapping to Database
         this.mappings.update({
             type: "userprofile",
@@ -1020,7 +1067,6 @@ const database = {
         }
 
         function findOtherMessages(mappings, uId, ouId, ownMessages, callback) {
-          console.log(ownMessages);
             mappings.find({
                 type: "userprofile",
                 "messages.from": ouId,
@@ -1050,7 +1096,6 @@ const database = {
 };
 
 function calcClothingDistance(mappings, latitude, longitude, vicinity) {
-    console.log("Lat: " + latitude + "Long: " + longitude + " vicinity: " + vicinity);
     var mappings_new = [];
     for (var i = 0; i < mappings.length; i++) {
         // calc distance

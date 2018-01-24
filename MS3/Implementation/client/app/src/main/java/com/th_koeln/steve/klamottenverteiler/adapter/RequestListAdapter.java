@@ -47,8 +47,9 @@ public class RequestListAdapter extends ArrayAdapter<Request> {
         String confirmed = getItem(position).getConfirmed();
         String closed = getItem(position).getClosed();
         String finished = getItem(position).getFinished();
+        String title = getItem(position).getTitle();
 
-        Request request = new Request(name, art, size, brand, status, from, ouId, confirmed, closed, finished);
+        Request request = new Request(name, art, size, brand, status, from, ouId, confirmed, closed, finished, title);
 
         LayoutInflater inflater = LayoutInflater.from(mContext);
         convertView = inflater.inflate(mRessource,parent,false);
@@ -58,7 +59,7 @@ public class RequestListAdapter extends ArrayAdapter<Request> {
         TextView txtRequestSize = (TextView) convertView.findViewById(R.id.txtRequestSize);
         TextView txtRequestBrand = (TextView) convertView.findViewById(R.id.txtRequestBrand);
         TextView txtRequestStatus = (TextView) convertView.findViewById(R.id.txtRequestStatus);
-        txtRequestName.setText("Name : " + name);
+        txtRequestName.setText("Name : " + title);
         txtRequestArt.setText("Art: " + art);
         txtRequestSize.setText("Size: " + size);
         txtRequestBrand.setText("Brand: " + brand);
@@ -68,15 +69,24 @@ public class RequestListAdapter extends ArrayAdapter<Request> {
                 txtRequestStatus.setText("Status: " + "Waiting for response..");
                 break;
             case "accepted":
-                txtRequestStatus.setText("Status: accepted");
+                txtRequestStatus.setText("Ready to clarify details");
                 break;
             case "waiting":
                 if (confirmed.equals(uId)) {
-                    txtRequestStatus.setText("Status: Waiting for confirmation");
+                    txtRequestStatus.setText("Status: Waiting for confirmation..");
                 } else {
-                    txtRequestStatus.setText("Status: Waiting for your confirmation");
+                    txtRequestStatus.setText("Status: Waiting for your confirmation..");
                 }
                 break;
+            case "confirmed":
+                    txtRequestStatus.setText("Status: Request confirmed..");
+                break;
+            case "success":
+                txtRequestStatus.setText("Status: Waiting for User Rating..");
+            break;
+            case "closed":
+                txtRequestStatus.setText("Status: Request is finished..");
+
             default:
                 txtRequestStatus.setText(status);
                 break;

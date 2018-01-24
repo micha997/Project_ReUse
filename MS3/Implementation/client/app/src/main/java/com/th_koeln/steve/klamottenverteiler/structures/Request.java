@@ -16,10 +16,10 @@ public class Request {
     private String confirmed;
     private String closed;
     private String finished;
+    private String title;
 
 
-
-    public Request(String name, String art, String size, String brand, String status, String from, String ouId, String confirmed, String closed, String finished) {
+    public Request(String name, String art, String size, String brand, String status, String from, String ouId, String confirmed, String closed, String finished, String title) {
         this.name = name;
         this.art = art;
         this.size = size;
@@ -30,6 +30,15 @@ public class Request {
         this.confirmed = confirmed;
         this.closed = closed;
         this.finished = finished;
+        this.title = title;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getFinished() {

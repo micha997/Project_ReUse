@@ -99,8 +99,11 @@ public class ShowClothing extends AppCompatActivity implements View.OnClickListe
             String from = intent.getStringExtra("from");
 
             // Fehler beim erstellen des Requests
+            if (from.equals("NEWREQUEST")) {
+                showDialog("Success", "Successfully added Request. Pls wait for partner to confirm.");
+            }
             if (from.equals("NEWREQUESTFAIL")) {
-                showDialog("Error","Could not add request!");
+                showDialog("Error","Could not add request! Already requested?");
             }
             //Fehler beim holen der Kleidungsstücke
             if (from.equals("SHOWDETAILSFAIL")) {

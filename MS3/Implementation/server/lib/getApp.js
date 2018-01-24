@@ -39,12 +39,12 @@ const getApp = function(database, firebase) {
     app.get('/user/:id', routes.getUserProfile(database));
     app.put('/user/:uId', routes.putUserProfile(database));
     app.delete('/user/:uId', routes.deleteUserProfile(database));
-    app.delete('/user/:uId/clothing', routes.deleteUserClothing(database));
-    app.get('/user/:uId/requests', routes.getUserRequests(database));
+    app.delete('/user/:uId/clothing', routes.deleteUserClothing(database, firebase));
+    app.get('/user/:uId/requests', routes.getUserRequests(database,firebase));
     app.delete('/user/:uId/requests/:id', routes.deleteUserRequest(database));
     app.get('/clothing/:brand/:style/:color/:art/:size/:latitude/:longitude/:vicinity', routes.getCustomeClothing(database));
 
-    app.put('/user/:uId/requests/:id', routes.putRequest(database, firebase));
+    app.put('/user/:uId/requests/:id', routes.putRequest(database,firebase));
     app.post('/user/:uId/rating', routes.postUserRating(database));
     app.get('/user/:uId/rating', routes.getUserRating(database));
     app.put('/user/:uId/rating/:id', routes.putUserRating(database));

@@ -286,6 +286,10 @@ public class HttpsService extends IntentService {
                             intent = new Intent("main");
                             intent.putExtra("from", "POSTUSER");
                             break;
+                        case "NEWREQUEST":
+                            intent = new Intent("showclothing");
+                            intent.putExtra("from", "NEWREQUEST");
+                            break;
 
 
                     }
@@ -435,7 +439,11 @@ public class HttpsService extends IntentService {
                 intent.putExtra("from", "SEARCHPROFILEFAIL");
                 LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
                 break;
-
+            case "CLOTHINGOPTIONS":
+                intent = new Intent("addclothing");
+                intent.putExtra("from", "CLOTHINGOPTIONSFAIL");
+                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+                break;
             default:
                 mHandler.post(new Runnable() {
                     @Override
