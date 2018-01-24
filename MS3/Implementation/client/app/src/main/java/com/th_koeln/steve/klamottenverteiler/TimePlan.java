@@ -321,6 +321,8 @@ public class TimePlan extends AppCompatActivity implements LocationListener {
             //call http service
             startService(coordIntent);
         }
+        //Falls gar keine Uhrzeiten gegeben sind
+        if(ZeitClean_Transaktionen.size() == 0)makeTimePlanPart5();
     }
 
     public void makeTimePlanPart3() {
@@ -634,7 +636,7 @@ public class TimePlan extends AppCompatActivity implements LocationListener {
         myLatitude = location.getLatitude();
         if(!gotGPSDATA) {
             gotGPSDATA = true;
-            //makeTimePlanPart3();
+            makeTimePlanPart3();
         }
     }
 
