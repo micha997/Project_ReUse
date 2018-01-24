@@ -2,10 +2,10 @@ package com.th_koeln.steve.klamottenverteiler;
 
 /**
  * Zum Editieren des eigenen Profils wird das jeweilige Profil zunächst vom Server geholt und
- * dem Benutzer Präsentiert. Zum Bearbeiten von Uhrzeiten kommt ein TimePickerDialog zum Einsatz.
- * Nachdem der Benutzer die gewünschte Attribute angepasst hat, wird eine JSON Datenstruktur mit
- * den zu ändernden Attributen und deren neuen Werte angelegt
- * und über den HTTPs Service zum Server weitergeleitet.
+ * dem Benutzer Praesentiert. Zum Bearbeiten von Uhrzeiten kommt ein TimePickerDialog zum Einsatz.
+ * Nachdem der Benutzer die gewuenschte Attribute angepasst hat, wird eine JSON Datenstruktur mit
+ * den zu aendernden Attributen und deren neuen Werte angelegt
+ * und ueber den HTTPs Service zum Server weitergeleitet.
  */
 
 import android.app.AlertDialog;
@@ -17,13 +17,17 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
@@ -33,16 +37,15 @@ import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
-
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 public class EditProfile extends AppCompatActivity implements View.OnClickListener {
 
-    private EditText etGender;
-    private TextView txtShowUserProfile;
-
-    private Button btnSendProfile;
-    private Button btnTimeSend;
+    private Spinner spinnerGender;
+    private Button btnSendData;
+    private TextView textViewMyID;
+    private String[] genderArr = new String[]{"Geschlecht wählen","Weiblich","Männlich"};
 
     private Button btnTimeFromWeekday;
     private Button btnTimeToWeekday;
@@ -61,21 +64,17 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
 
     //Variablen fuer TimePicker
     private int DIALOG_ID = -1;
-    private int hourPick;
-    private int minutePick;
+    private int hourPick, minutePick;
 
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile_2);
 
-        etGender = (EditText) findViewById(R.id.editTextGender);
-        txtShowUserProfile = (TextView) findViewById(R.id.txtShowUserProfile);
+        spinnerGender = (Spinner) findViewById(R.id.spinnerGender);
+        textViewMyID = (TextView) findViewById(R.id.textViewMyID);
 
-        btnSendProfile = (Button) findViewById(R.id.btnSendProfile);
-        btnSendProfile.setOnClickListener(this);
-
-        btnTimeSend = (Button) findViewById(R.id.btnTimeSend);
-        btnTimeSend.setOnClickListener(this);
+        btnSendData = (Button) findViewById(R.id.btnSendData);
+        btnSendData.setOnClickListener(this);
 
         btnTimeFromWeekend = (Button) findViewById(R.id.btnTimeFromWeekend);
         btnTimeFromWeekend.setOnClickListener(this);
@@ -89,10 +88,27 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
         btnTimeToWeekday = (Button) findViewById(R.id.btnTimeToWeekday);
         btnTimeToWeekday.setOnClickListener(this);
 
+        ArrayAdapter<String> gAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, genderArr){
+            @Override
+            public boolean isEnabled(int position){
+                if(position==0){return false;}
+                else{return true;}
+            }
+            @Override
+            public View getDropDownView(int position, View convertView, ViewGroup parent){
+                View v = super.getDropDownView(position, convertView, parent);
+                TextView tv = (TextView) v;
+                if(position==0){tv.setTextColor(Color.GRAY);}
+                else{tv.setTextColor(Color.BLACK);}
+                return v;
+            }
+        };
+        spinnerGender.setAdapter(gAdapter);
+
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
                 new IntentFilter("profile"));
 
-        // Hole Profilinformationen vom Server
+        // Hole Profil-Informationen vom Server
         Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
         myIntent.putExtra("payload","");
         myIntent.putExtra("method","GET");
@@ -163,14 +179,33 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
                 String profile = intent.getStringExtra("profile");
                 try {
                     JSONObject profileJson = new JSONObject(profile);
-                    JSONObject timeJson = new JSONObject(profileJson.getString("time"));
-                    etGender.setText(profileJson.getString("gender"));
-                    btnTimeFromWeekday.setText("Von " + timeJson.getString("txtWeekTimeBegin"));
-                    btnTimeToWeekday.setText("Bis " + timeJson.getString("txtWeekTimeEnd"));
-                    btnTimeFromWeekend.setText("Von " + timeJson.getString("txtWeekendTimeBegin"));
-                    btnTimeToWeekend.setText("Bis " + timeJson.getString("txtWeekendTimeEnd"));
-                    txtShowUserProfile.setText(profile.toString());
-                    //... fill user profile interface
+                    if(profileJson.has("time")) {
+                        JSONObject timeJson = new JSONObject(profileJson.getString("time"));
+                        btnTimeFromWeekday.setText("Von " + timeJson.getString("txtWeekTimeBegin"));
+                        txtWeekTimeBegin = timeJson.getString("txtWeekTimeBegin");
+                        btnTimeToWeekday.setText("Bis " + timeJson.getString("txtWeekTimeEnd"));
+                        txtWeekTimeEnd = timeJson.getString("txtWeekTimeEnd");
+                        btnTimeFromWeekend.setText("Von " + timeJson.getString("txtWeekendTimeBegin"));
+                        txtWeekendTimeBegin = timeJson.getString("txtWeekendTimeBegin");
+                        btnTimeToWeekend.setText("Bis " + timeJson.getString("txtWeekendTimeEnd"));
+                        txtWeekendTimeEnd = timeJson.getString("txtWeekendTimeEnd");
+                    }
+                    if(!profileJson.getString("gender").equals("?")){
+                        switch(profileJson.getString("gender")){
+                            case "W":
+                                spinnerGender.setSelection(1);
+                                break;
+                            case "M":
+                                spinnerGender.setSelection(2);
+                                break;
+                            default:
+                                spinnerGender.setSelection(0);
+                                break;
+                        }
+                    }
+
+                    if(profileJson.has("uId")){textViewMyID.setText(profileJson.getString("uId"));}
+
                 } catch (JSONException e) {
                     showDialog("Error","Profile data is not valid..");
                 }
@@ -184,11 +219,30 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
         Intent myIntent;
         switch (view.getId()) {
 
-            case R.id.btnSendProfile:
+            case R.id.btnSendData:
                 JSONObject profile = new JSONObject();
                 try {
-                    // Speicher zu ändernde Attribute in JSON Struktur
-                    profile.put("gender", etGender.getText().toString());
+
+                    //Das Geschlecht
+                    int tmpG = spinnerGender.getSelectedItemPosition();
+                    switch (tmpG){
+                        case 0:
+                            break;
+                        case 1:
+                            profile.put("gender","W");
+                            break;
+                        case 2:
+                            profile.put("gender", "M");
+                            break;
+                    }
+
+                    //Die Uhrzeiten
+                    JSONObject time = new JSONObject();
+                    time.put("txtWeekTimeBegin", txtWeekTimeBegin);
+                    time.put("txtWeekTimeEnd", txtWeekTimeEnd);
+                    time.put("txtWeekendTimeBegin", txtWeekendTimeBegin);
+                    time.put("txtWeekendTimeEnd", txtWeekendTimeEnd);
+                    profile.put("time",time);
 
                     // Sende Attribute zum HTTPSService
                     myIntent = new Intent(getApplicationContext(), HttpsService.class);
@@ -197,29 +251,7 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
                     myIntent.putExtra("from","PUTPROFILE");
                     myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId);
                     startService(myIntent);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                break;
-
-            case R.id.btnTimeSend:
-                JSONObject times = new JSONObject();
-                JSONObject newProfile = new JSONObject();
-                try {
-                    times.put("txtWeekTimeBegin", txtWeekTimeBegin);
-                    times.put("txtWeekTimeEnd", txtWeekTimeEnd);
-                    times.put("txtWeekendTimeBegin", txtWeekendTimeBegin);
-                    times.put("txtWeekendTimeEnd", txtWeekendTimeEnd);
-                    newProfile.put("time",times);
-                    // define http service call
-                    myIntent = new Intent(getApplicationContext(), HttpsService.class);
-                    // define parameters for Service-Call
-                    myIntent.putExtra("payload",newProfile.toString());
-                    myIntent.putExtra("method","PUT");
-                    myIntent.putExtra("from","PUTPROFILE");
-                    myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId);
-                    //call http service
-                    startService(myIntent);
+                    showDialog("Success","Updated profile data");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
