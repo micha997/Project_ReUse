@@ -45,7 +45,7 @@ import java.util.Collections;
 import java.util.Comparator;
 
 /**
-    Created by steve on 01.11.17.
+    Created by Michael on 20.01.18.
  */
 
 public class SearchClothing extends AppCompatActivity
@@ -80,8 +80,6 @@ public class SearchClothing extends AppCompatActivity
         checkGPSPermission();
         //Holt die Location
         getLocation();
-
-        //Loading Indikator
 
         searchRecyclerView = (RecyclerView) findViewById(R.id.searchRecyclerView);
         searchRecyclerView.setHasFixedSize(true);
@@ -168,9 +166,6 @@ public class SearchClothing extends AppCompatActivity
                     e.printStackTrace();
                 }
                 progressDialog.dismiss();
-                // send clothing results to Google Maps activity
-
-
             }
         }
     };

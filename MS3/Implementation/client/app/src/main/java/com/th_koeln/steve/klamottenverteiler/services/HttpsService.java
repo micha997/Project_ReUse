@@ -36,6 +36,7 @@ public class HttpsService extends IntentService {
     private String response = null;
     private String method;
     private String from;
+    private String layer;
 
     HttpURLConnection connection = null;
     Handler mHandler;
@@ -53,6 +54,8 @@ public class HttpsService extends IntentService {
         String uri = intent.getStringExtra("url");
         method = intent.getStringExtra("method");
         from = intent.getStringExtra("from");
+        //Spezifisch fuer die Outfitdarstellung
+        if(intent.hasExtra("layer")){layer = intent.getStringExtra("layer"); }
 
         /*Um die Kommunikation über HTTPs mit einem  Zertifikat zu ermöglichen, wird im Folgender ein Trusting-Manager angelegt, der jedes SSL-Zertifikat
         annimmt. https://developer.android.com/training/articles/security-ssl.html#SelfSigned
@@ -209,6 +212,13 @@ public class HttpsService extends IntentService {
                             intent.putExtra("from", "GETCLOTHINGDETAIL");
                             break;
 
+                        case "GETCLOTHINGDETAIL2":
+                            intent = new Intent("getClothingDetail2");
+                            intent.putExtra("clothing", stringBuilder.toString());
+                            intent.putExtra("layer",layer);
+                            intent.putExtra("from", "GETCLOTHINGDETAIL2");
+                            break;
+
                         case "PROFILE":
                             intent = new Intent("profile");
                             intent.putExtra("profile", stringBuilder.toString());
@@ -236,7 +246,7 @@ public class HttpsService extends IntentService {
                         case "SEARCHOUTFIT":
                             intent = new Intent("showoutfit");
                             intent.putExtra("clothing", stringBuilder.toString());
-                            intent.putExtra("from", "SEARCHCLOTHING");
+                            intent.putExtra("from", "SEARCHOUTFIT");
                             break;
 
                         case "SHOWREQUESTS":

@@ -6,8 +6,8 @@ package com.th_koeln.steve.klamottenverteiler.structures;
 
 public class ClothingOffer {
 
-    String id, uId, art, size, style, gender, color, fabric, title, brand;
-    String imagePath;
+    String id, uId, art, size, style, gender,
+            color, fabric, title, brand, imagePath;
     double distance;
 
     public ClothingOffer(String id, String uId, String art, String size,

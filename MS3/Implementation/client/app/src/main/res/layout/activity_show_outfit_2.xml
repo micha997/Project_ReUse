@@ -3,6 +3,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scrollV"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -10,26 +11,38 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/addOutfitTB"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:elevation="4dp"
+            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            app:title="@string/app_name"
+            app:titleTextColor="@color/cast_expanded_controller_text_color" />
+
         <TextView
             android:id="@+id/textHead"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
+            android:layout_marginRight="8dp"
             android:layout_marginTop="8dp"
             android:text="Head"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.03"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/addOutfitTB" />
 
-        <Spinner
-            android:id="@+id/spinnerHead"
-            android:layout_width="368dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/headRecycler"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:clickable="true"
+            android:focusable="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textHead" />
@@ -39,120 +52,115 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
+            android:layout_marginRight="8dp"
             android:layout_marginTop="8dp"
             android:text="Layer 1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.03"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/spinnerHead" />
+            app:layout_constraintTop_toBottomOf="@+id/headRecycler" />
 
-        <Spinner
-            android:id="@+id/spinnerLayer1"
-            android:layout_width="368dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textLayer1" />
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/layer1Recycler"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            app:layout_constraintTop_toBottomOf="@+id/textLayer1"
+            android:clickable="true"
+            android:focusable="true" />
 
         <TextView
             android:id="@+id/textLayer2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
+            android:layout_marginRight="8dp"
             android:layout_marginTop="8dp"
             android:text="Layer 2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.03"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/spinnerLayer1" />
+            app:layout_constraintTop_toBottomOf="@+id/layer1Recycler" />
 
-        <Spinner
-            android:id="@+id/spinnerLayer2"
-            android:layout_width="368dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textLayer2" />
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/layer2Recycler"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            app:layout_constraintTop_toBottomOf="@+id/textLayer2"
+            android:clickable="true"
+            android:focusable="true" />
 
         <TextView
             android:id="@+id/textLayer3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
+            android:layout_marginRight="8dp"
             android:layout_marginTop="8dp"
             android:text="Layer 3"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.03"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/spinnerLayer2" />
+            app:layout_constraintTop_toBottomOf="@+id/layer2Recycler" />
 
-        <Spinner
-            android:id="@+id/spinnerLayer3"
-            android:layout_width="368dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textLayer3" />
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/layer3Recycler"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            app:layout_constraintTop_toBottomOf="@+id/textLayer3"
+            android:clickable="true"
+            android:focusable="true" />
 
         <TextView
             android:id="@+id/textBottom"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
+            android:layout_marginRight="8dp"
             android:layout_marginTop="8dp"
             android:text="Bottom"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.03"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/spinnerLayer3" />
+            app:layout_constraintTop_toBottomOf="@+id/layer3Recycler" />
 
-        <Spinner
-            android:id="@+id/spinnerBottom"
-            android:layout_width="368dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textBottom" />
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/bottomRecycler"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            app:layout_constraintTop_toBottomOf="@+id/textBottom"
+            android:clickable="true"
+            android:focusable="true" />
 
         <TextView
             android:id="@+id/textShoes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
+            android:layout_marginRight="8dp"
             android:layout_marginTop="8dp"
             android:text="Shoes"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.03"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/spinnerBottom" />
+            app:layout_constraintTop_toBottomOf="@+id/bottomRecycler" />
 
-        <Spinner
-            android:id="@+id/spinnerShoes"
-            android:layout_width="368dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textShoes" />
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/shoesRecycler"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            app:layout_constraintTop_toBottomOf="@+id/textShoes"
+            android:clickable="true"
+            android:focusable="true" />
 
         <Button
             android:id="@+id/btnSendClothingRequest"
@@ -164,15 +172,15 @@
             android:text="Send Requests"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/spinnerShoes" />
+            app:layout_constraintTop_toBottomOf="@+id/shoesRecycler" />
 
         <TextView
             android:id="@+id/textMissing"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="16dp"
             android:text="Missing"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.03"
@@ -181,8 +189,8 @@
 
         <Spinner
             android:id="@+id/spinnerMissingClothing"
-            android:layout_width="368dp"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
@@ -194,13 +202,16 @@
             android:id="@+id/btnSubscribeMissingClothing"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:text="Subscribe"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/spinnerMissingClothing" />
 
     </android.support.constraint.ConstraintLayout>
+
 </ScrollView>

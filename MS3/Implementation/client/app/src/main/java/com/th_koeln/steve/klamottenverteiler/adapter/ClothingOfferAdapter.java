@@ -42,7 +42,7 @@ public class ClothingOfferAdapter extends RecyclerView.Adapter<ClothingOfferAdap
     @Override
     public ClothingOfferViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(con);
-        View view = inflater.inflate(R.layout.search_clothing_layout, null);
+        View view = inflater.inflate(R.layout.search_clothing_layout, parent,false);
         return new ClothingOfferViewHolder(view);
     }
 
