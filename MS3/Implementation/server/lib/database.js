@@ -207,6 +207,9 @@ const database = {
                 if (err) {
                     callback("1", null);
                 }
+                for (var single_profile in mappings) {
+                  delete mappings.image;
+                }
                 for (var single_ownReq in mappings.requests) {
                     mappings.requests[single_ownReq].from = "own";
                     requests.push(mappings.requests[single_ownReq]);
@@ -224,7 +227,7 @@ const database = {
                 if (err) {
                     callback("1", null);
                 }
-
+                var results= [];
                 for (var single_req in requests) {
 
                     for (var single_clothing in mapping) {
@@ -232,15 +235,17 @@ const database = {
                             delete mapping[single_clothing].uId;
                         delete mapping[single_clothing].id;
                         delete mapping[single_clothing].uId;
+
                         var obj = Object.assign(requests[single_req], mapping[single_clothing]);
-                        console.log(obj);
+                        results.push(obj);
+
                         }
                     }
+
                 }
-
-
+                console.log(obj);
                 //send results back to handler
-                callback(null, requests);
+                callback(null, results);
             })
         }
 
@@ -402,7 +407,6 @@ const database = {
             }
             for (var single_mappings in mappings)
             delete mappings[single_mappings].image;
-                      console.log(mappings);
             //send results back to handler
             callback(null, mappings);
         })
@@ -667,14 +671,12 @@ const database = {
             if (err == "1") {
                 return callback(err);
             } else {
-              console.log("all good");
                 callback(null);
             }
         });
 
 
         function findRequest(mappings, mapping, callback) {
-          console.log("geht los");
             var flag="0";
             mappings.findOne({
                 uId: mapping.uId,
@@ -705,11 +707,9 @@ const database = {
                                   requests: mapping
                               }
                           }, (err) => {
-                            console.log("hab profil");
                             if (err) {
                                 callback("1", null);
                             } else {
-                            console.log("schicke jetzt callback");
                             callback(null);
                             }
                           })

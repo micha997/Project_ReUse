@@ -411,8 +411,7 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
     };
 
     /**
-     * Nimmt die aktuell ausgewählten Requests entgegen und zeigt diese in einem Listview
-     *
+     * Nimmt die aktuell ausgewählten Requests entgegen und zeigt diese in einem Listview an.
      *
      * @param  requests  Enthält die darzustellenden Requests
      */

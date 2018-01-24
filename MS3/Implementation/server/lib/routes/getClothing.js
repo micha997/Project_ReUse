@@ -12,6 +12,7 @@ const getClothing = function(database) {
             if (err) {
                 return res.status(500).end();
             } else {
+              console.log(mappings);
               var self= { href: "/clothing/" + req.params.cId};
               var userprofile = { href: "/user/" + mappings["uId"]};
               mappings["_links"]= {self: self, userprofile: userprofile};
