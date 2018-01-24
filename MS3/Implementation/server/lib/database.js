@@ -394,9 +394,13 @@ const database = {
             type: "clothing",
             uId: uId
         }).toArray((err, mappings) => {
+
             if (err) {
                 return callback(err);
             }
+            for (var single_mappings in mappings)
+            delete mappings[single_mappings].image;
+                      console.log(mappings);
             //send results back to handler
             callback(null, mappings);
         })

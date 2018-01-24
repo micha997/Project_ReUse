@@ -14,7 +14,7 @@ const getUserClothing = function(database) {
             } else {
 
               var profile = { href: "/user/" + req.params.uId};
-              mappings[0] = { _links : profile };
+              mappings.push = { _links : profile };
               return res.send(mappings);
             }
         })

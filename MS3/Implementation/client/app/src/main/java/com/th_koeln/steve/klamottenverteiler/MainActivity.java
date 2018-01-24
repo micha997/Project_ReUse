@@ -34,7 +34,9 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseNetworkException;
+import com.google.firebase.FirebaseOptions;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
@@ -45,6 +47,9 @@ import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 public class MainActivity extends AppCompatActivity {
     private Button btnRegister;

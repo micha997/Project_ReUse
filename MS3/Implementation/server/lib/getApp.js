@@ -24,9 +24,6 @@ const getApp = function(database, firebase) {
         limit: '5mb'
     }));
 
-
-
-
     // define routes
     app.get('/outfit/:art', routes.getOutfit(database, "false"));
     app.post('/user/:uId/search', routes.postUserSearch(database));

@@ -206,6 +206,8 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                                 String idToken = FirebaseInstanceId.getInstance().getToken();
                                 uID = mUser.getUid();
 
+
+
                                 try {
                                     // Sende User Token zum Server
                                     Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
