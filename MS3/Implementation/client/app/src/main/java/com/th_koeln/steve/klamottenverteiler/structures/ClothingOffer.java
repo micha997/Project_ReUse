@@ -9,6 +9,8 @@ public class ClothingOffer {
     String id, uId, art, size, style, gender,
             color, fabric, title, brand, imagePath;
     double distance;
+    //Speziell fuer ShowRequest.class Adapter
+    String status, from, finished, closed, confirmed;
 
     public ClothingOffer(String id, String uId, String art, String size,
                          String style, String gender, String color, String fabric,
@@ -119,7 +121,49 @@ public class ClothingOffer {
         return distance;
     }
 
+    //Spezifische Methoden fuer ShowRequests.class
+
     public void setDistance(double distance) {
         this.distance = distance;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getFrom() {
+        return from;
+    }
+
+    public void setFrom(String from) {
+        this.from = from;
+    }
+
+    public String getFinished() {
+        return finished;
+    }
+
+    public void setFinished(String finished) {
+        this.finished = finished;
+    }
+
+    public String getClosed() {
+        return closed;
+    }
+
+    public void setClosed(String closed) {
+        this.closed = closed;
+    }
+
+    public String getConfirmed() {
+        return confirmed;
+    }
+
+    public void setConfirmed(String confirmed) {
+        this.confirmed = confirmed;
     }
 }

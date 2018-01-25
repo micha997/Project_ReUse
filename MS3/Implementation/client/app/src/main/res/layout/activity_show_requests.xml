@@ -52,18 +52,11 @@
         android:fillViewport="true">
 
         <ListView
-            android:id="@+id/lvShowRequests"
+            android:id="@+id/requestsListView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
+            android:layout_height="wrap_content" />
 
     </ScrollView>
 
 
 </LinearLayout>
-
-
-
-
-<!--
-</ScrollView>-->

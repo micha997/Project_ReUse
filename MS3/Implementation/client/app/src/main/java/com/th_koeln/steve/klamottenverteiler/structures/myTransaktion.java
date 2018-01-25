@@ -8,42 +8,39 @@ import java.util.Date;
 
 //Klasse um Objekte zu erstellen, die fuer die Transaktion benoetigt werden
 public class myTransaktion {
-    //ID des Angebotes
-    String uID;
-    //ID des Users
-    String cID;
+    //ID des Users, Angebotes. Titel des Objekts.
+    String uID, cID, titel;
 
     //Ort des Angebotes
-    double longitude;
-    double latitude;
+    double longitude = -200;
+    double latitude = -200;
 
     //Zeit Von Bis an Wochentagen
-    Date timeFromWorkday;
-    Date timeToWorkday;
+    Date timeFromWorkday = null;
+    Date timeToWorkday = null;
     //Zeit Von Bis am Wochenende
-    Date timeFromWeekend;
-    Date timeToWeekend;
+    Date timeFromWeekend = null;
+    Date timeToWeekend = null;
 
     //Zeitpunkt zum abholen
-    Date timeToGet;
+    Date timeToGet = null;
 
     //Distanz vom letzten Punkt zu diesem in Meter
-    long distanceToMeFromLast;
+    long distanceToMeFromLast = -1;
     //Zeit vom letzten Punkt zu diesem in Sekunden
-    long timeToMeFromLast;
+    long timeToMeFromLast = -1;
 
     public myTransaktion(String userID, String clothingID){
         uID = userID;
         cID = clothingID;
-        longitude = -1;
-        latitude = -1;
-        timeFromWorkday = null;
-        timeToWorkday = null;
-        timeFromWeekend = null;
-        timeToWeekend = null;
-        timeToGet = null;
-        distanceToMeFromLast = -1;
-        timeToMeFromLast = -1;
+    }
+
+    public String getTitel() {
+        return titel;
+    }
+
+    public void setTitel(String titel) {
+        this.titel = titel;
     }
 
     public String getuID(){

@@ -24,6 +24,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.th_koeln.steve.klamottenverteiler.adapter.TimePlanAdapter;
 import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
 import com.th_koeln.steve.klamottenverteiler.structures.myTransaktion;
@@ -46,6 +47,10 @@ public class TimePlan extends AppCompatActivity implements LocationListener {
     private LocationManager locationManager;
     private ListView listViewTimePlan;
 
+    //Eigene User-ID besorgen
+    FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+    final String uId = firebaseAuth.getCurrentUser().getUid();
+
     private ProgressDialog loadingProgress;
     private Intent startIntent;
 
@@ -53,11 +58,14 @@ public class TimePlan extends AppCompatActivity implements LocationListener {
     private double myLatitude = 0;
     private double tmpLongitude = 0;
     private double tmpLatitude = 0;
-    private int addIndex;
+    private int addIndex, selectedMODE = 0;
     private boolean weekend = true;
     private boolean gotGPSDATA = false;
     private String GOOGLE_MAPS_API = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&";
-    private String API_KEY = "&mode=walking&key=AIzaSyAY6iMYLBkXbxDfmAbISNbUZUWI_7NtsoQ";
+    private String GMAPS_MODE = "&mode=walking";
+    private String API_KEY = "&key=AIzaSyAY6iMYLBkXbxDfmAbISNbUZUWI_7NtsoQ";
+    final String[] modeShowString = new String[]{"Walking", "Driving", "Bicycling", "Transit"};
+    final String[] modeURLString = new String[]{"&mode=walking", "&mode=driving", "&mode=bicycling", "&mode=transit"};
 
     //Array mit Requests mit dem ein Zeitplan erstellt werden soll
     private ArrayList<myTransaktion> Transaktionen = new ArrayList<myTransaktion>();
@@ -77,23 +85,12 @@ public class TimePlan extends AppCompatActivity implements LocationListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_time_plan_2);
 
-        //Eigene User-ID besorgen
-        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-        final String uId = firebaseAuth.getCurrentUser().getUid();
-
         //Objekte aus dem Layout
         actionBtnUpdate = (FloatingActionButton) findViewById(R.id.actionBtnUpdate);
         listViewTimePlan = (ListView) findViewById(R.id.listViewTimePlan);
 
         //Permission Check
         checkGPSPermission();
-
-        //Loading Indicator
-        loadingProgress = new ProgressDialog(this);
-        loadingProgress.setTitle("Loading");
-        loadingProgress.setMessage("Zeitplan wird erstellt ...");
-        loadingProgress.setCancelable(true);
-        loadingProgress.show();
 
         //BroadcastReceiver
         IntentFilter filter = new IntentFilter();
@@ -103,14 +100,7 @@ public class TimePlan extends AppCompatActivity implements LocationListener {
         filter.addAction("gmaps");
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, filter);
 
-        //Intent mit einem Service-Call erstellen
-        startIntent = new Intent(getApplicationContext(), HttpsService.class);
-        //Requests werden besorgt (Kleidungsstuecke die angefragt wurden und abgeholt werden sollen)
-        startIntent.putExtra("method","GET");
-        startIntent.putExtra("from","GETOWNREQUESTS");
-        startIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId + "/requests");
-        //Service-Call starten
-        startService(startIntent);
+        getRequests();
 
         actionBtnUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -123,10 +113,43 @@ public class TimePlan extends AppCompatActivity implements LocationListener {
                 WayClean_Transaktionen = new ArrayList<myTransaktion>();
                 AppendLater_Transaktionen_NoTime = new ArrayList<myTransaktion>();
                 Same_Transaktionen = new ArrayList<myTransaktion>();
-                startService(startIntent);
-                loadingProgress.show();
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(TimePlan.this);
+                builder.setTitle("Transportation method")
+                        .setSingleChoiceItems(modeShowString,selectedMODE, null)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                ListView lw = ((AlertDialog)dialogInterface).getListView();
+                                selectedMODE = lw.getCheckedItemPosition();
+                                GMAPS_MODE = modeURLString[selectedMODE];
+                                getRequests();
+                                dialogInterface.dismiss();
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                            }
+                        })
+                        .create()
+                        .show();
             }
         });
+    }
+
+    private void getRequests(){
+        loadProgress();
+        String idToken = FirebaseInstanceId.getInstance().getToken();
+        //Intent mit einem Service-Call erstellen
+        startIntent = new Intent(getApplicationContext(), HttpsService.class);
+        //Requests werden besorgt (Kleidungsstuecke die angefragt wurden und abgeholt werden sollen)
+        startIntent.putExtra("method","GET");
+        startIntent.putExtra("from","GETOWNREQUESTS");
+        startIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId + "/" + idToken + "/requests");
+        //Service-Call starten
+        startService(startIntent);
     }
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -143,6 +166,9 @@ public class TimePlan extends AppCompatActivity implements LocationListener {
                         JSONObject tmpRequest = new JSONObject(requestArray.get(i).toString());
                         if (tmpRequest.getString("ouId").length() > 6 && tmpRequest.getString("from").equals("own")) {
                             myTransaktion tmpTrans = new myTransaktion(tmpRequest.getString("ouId"), tmpRequest.getString("cId"));
+                            tmpTrans.setTitel(tmpRequest.getString("notes"));
+                            tmpTrans.setLatitude(Double.parseDouble(tmpRequest.getString("latitude")));
+                            tmpTrans.setLongitude(Double.parseDouble(tmpRequest.getString("longitude")));
                             Transaktionen.add(tmpTrans);
                         }
                     }
@@ -310,6 +336,7 @@ public class TimePlan extends AppCompatActivity implements LocationListener {
             dirtyTransaktionen.remove(index);
         }
 
+        /*
         //Koordinaten der Kleidungsstuecke besorgen bevor die weitere Zeitplanung erfolgt
         addIndex = 0;
         for (int k = 0; ZeitClean_Transaktionen.size() > k; k++) {
@@ -321,8 +348,10 @@ public class TimePlan extends AppCompatActivity implements LocationListener {
             //call http service
             startService(coordIntent);
         }
+        */
         //Falls gar keine Uhrzeiten gegeben sind
-        if(ZeitClean_Transaktionen.size() == 0)makeTimePlanPart5();
+        if(ZeitClean_Transaktionen.size() > 0){getLocation();}
+        else{makeTimePlanPart5();}
     }
 
     public void makeTimePlanPart3() {
@@ -398,7 +427,8 @@ public class TimePlan extends AppCompatActivity implements LocationListener {
             mapsIntent.putExtra("from", "GMAPS");
             mapsIntent.putExtra("url", GOOGLE_MAPS_API
                     + "origins=" + tmpLatitude + "," + tmpLongitude
-                    + "&destinations=" + toLatitude + "," + toLongitude + API_KEY);
+                    + "&destinations=" + toLatitude + "," + toLongitude
+                    + GMAPS_MODE + API_KEY);
             //call http service
             startService(mapsIntent);
         }
@@ -606,6 +636,15 @@ public class TimePlan extends AppCompatActivity implements LocationListener {
         TimePlanAdapter tpAdapter;
         tpAdapter = new TimePlanAdapter(this, options);
         listViewTimePlan.setAdapter(tpAdapter);
+    }
+
+    private void loadProgress(){
+        //Loading Indicator
+        loadingProgress = new ProgressDialog(this);
+        loadingProgress.setTitle("Loading");
+        loadingProgress.setMessage("Zeitplan wird erstellt ...");
+        loadingProgress.setCancelable(true);
+        loadingProgress.show();
     }
 
     //Prueft ob die Berechtigung vorhanden ist GPS zu nutzen

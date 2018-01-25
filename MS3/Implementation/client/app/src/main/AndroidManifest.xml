@@ -40,7 +40,8 @@
         <activity android:name=".ChooseContext" />
         <activity android:name=".EditProfile" />
         <activity android:name=".EditClothing" />
-        <activity android:name=".MyClothing" />
+        <activity android:name=".MyClothing"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".ShowOutfit"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".ClothingOptionsDetail" />
