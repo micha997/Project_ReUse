@@ -1033,6 +1033,22 @@ const database = {
             callback(null);
         });
     },
+    getUserToken(token, callback) {
+    if (!callback) {
+        throw new Error('Callback is missing.');
+    }
+    // find all elements
+    this.mappings.findOne({
+        token: token,
+        type: "token"
+    }, (err, mappings) => {
+        if (err) {
+            return callback(err);
+        }
+        //send results back to handler
+        callback(null, mappings);
+    })
+},
     getConversation(uId, ouId, callback) {
         if (!callback) {
             throw new Error('Callback is missing.');

@@ -1,6 +1,6 @@
 'use strict';
 
-const http = require('http');
+const https = require('https');
 const fs = require('fs');
 const getApp = require('./lib/getApp');
 const database = require('./lib/database');
@@ -31,7 +31,7 @@ const options = {
 };
 
 // define server
-const server = http.createServer(app);
+const server = https.createServer(options,app);
 
 // server port
 const port = process.env.PORT || 50262;

@@ -19,6 +19,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
 
 import org.json.JSONException;
@@ -66,9 +67,10 @@ public class EditClothing extends AppCompatActivity {
             public void onClick(View view) {
                 JSONObject newProfile = new JSONObject();
                 try {
+
+
                     // Zu ändernde Attribute in JSON Struktur festhalten
                     newProfile.put("fabric", txtFabric.getText().toString());
-
                     // Sende neue Attribute zum Server
                     Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
                     myIntent.putExtra("payload", newProfile.toString());

@@ -64,6 +64,7 @@ public class RequestListAdapter extends ArrayAdapter<Request> {
         txtRequestName.setText("Name : " + title);
         txtRequestSize.setText("Size: " + size);
         txtRequestBrand.setText("Brand: " + brand);
+        txtRequestArt.setText("Art:" + art);
 
         switch (status) {
             case "open":

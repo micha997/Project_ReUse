@@ -1,9 +1,14 @@
 'use strict';
 
+const requireAuthentication = require("../requireAuthentication");
+
 const postKlamotten = function(database) {
 
     return function(req, res) {
         // call database
+
+        var logedIn = requireAuthentication(database, req.body.token);
+        console.log(logedIn);
         database.addClothing(JSON.stringify(req.body), err => {
             if (err) {
                 console.log("Failed to add clothing!");

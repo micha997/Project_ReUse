@@ -44,6 +44,7 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.th_koeln.steve.klamottenverteiler.adapter.ClothingOptionsAdapter;
 import com.th_koeln.steve.klamottenverteiler.services.HttpsService;
 import com.th_koeln.steve.klamottenverteiler.services.ListViewHelper;
@@ -130,10 +131,12 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
         filter.addAction("clothingOptions");
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, filter);
 
+        String idToken = FirebaseInstanceId.getInstance().getToken();
+
         Intent optionsIntent = new Intent(getApplicationContext(), HttpsService.class);
         optionsIntent.putExtra("method","GET");
         optionsIntent.putExtra("from","CLOTHINGOPTIONS");
-        optionsIntent.putExtra("url",getString(R.string.DOMAIN) + "/clothingOptions/");
+        optionsIntent.putExtra("url",getString(R.string.DOMAIN) + "/clothingOptions/" + idToken);
         startService(optionsIntent);
         progress = new ProgressDialog(this);
         progress.setMessage("Trying to get data from server..");
@@ -350,8 +353,10 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
                         && !notes.isEmpty() && longitude != 10000 && latitude != 10000 ) {
                     // Erstelle Json Objekt der eingegebenen Daten
                     JSONObject kleidung = new JSONObject();
+                    String idToken = FirebaseInstanceId.getInstance().getToken();
                     try {
                         kleidung.put("size",size);
+                        kleidung.put("token","asdasdsadasd");
                         kleidung.put("art",art);
                         kleidung.put("style",style);
                         kleidung.put("gender",gender);

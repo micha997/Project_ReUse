@@ -53,9 +53,7 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_requests);
 
-
         lvShowRequests = (ListView) findViewById(R.id.lvShowRequests);
-
 
         rbOwnRequests = (RadioButton) findViewById(R.id.rbOwnRequest);
         rbOwnRequests.setOnClickListener(this);
@@ -66,7 +64,6 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
                 new IntentFilter("showrequests"));
-
 
         // Hole die verfügbaren Requests vom Server
         getRequestsFromServer();
@@ -316,10 +313,12 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
      */
 
         private void getRequestsFromServer() {
+            String idToken = FirebaseInstanceId.getInstance().getToken();
+
             Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
             myIntent.putExtra("method","GET");
             myIntent.putExtra("from","SHOWREQUESTS");
-            myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId + "/requests/");
+            myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId + "/requests/" + idToken);
             startService(myIntent);
         }
 
@@ -377,8 +376,8 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
                         }
 
                         if (rbForeignRequests.isChecked()) {
-                                /* Fremde Requests sind ausgewählt
-                                   Fülle Liste mit fremden Requests
+                                /* Fremde Requests sind ausgewählt.
+                                   -> Fülle Liste mit fremden Requests
                                  */
                                 fillListView(foreignRequestList);
                                 // Beende Progress-Dialog
@@ -388,8 +387,8 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
                                 lvShowRequests.setEmptyView(findViewById(R.id.txtEmptyRequestList));
 
                         } else {
-                                /* Eigene Requests sind ausgewählt
-                                   Fülle Liste mit Eigene Requests
+                                /* Eigene Requests sind ausgewählt.
+                                   -> Fülle Liste mit Eigene Requests
                                  */
                                 fillListView(ownRequestList);
                             // Beende Progress-Dialog

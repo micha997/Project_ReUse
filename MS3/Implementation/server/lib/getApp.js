@@ -2,9 +2,12 @@
 
 const express = require('express');
 const bodyParser = require('body-parser')
+const requireAuthentication = require('./requireAuthentication');
+const async = require("async");
 
 
 var routes = require("./routes");
+var login = false;
 
 const getApp = function(database, firebase) {
     // check Database
@@ -19,10 +22,38 @@ const getApp = function(database, firebase) {
         extended: true,
         limit: '5mb'
     }));
+
     app.use(bodyParser.urlencoded({
         extended: true,
         limit: '5mb'
     }));
+
+    var logIn = function (req, res, next) {
+      async.waterfall([
+          async.apply(callrequireAuthentication, database, req.params.token)
+      ], function(err, result) {
+          if (err == "1") {
+              return res.status(500).end();
+
+          } else {
+            login=result;
+            console.log(result);
+            next();
+          }
+      });
+
+      function callrequireAuthentication(database, token, callback) {
+        requireAuthentication(database, req.params.token, next, (err, mappings, next) => {
+
+              if (mappings == true) {
+                return callback(null, true);
+              } else {
+                callback("1",null);
+              }
+        })
+      }
+    }
+    app.use('/user/:uId/requests/:token', logIn);
 
     // define routes
     app.get('/outfit/:art', routes.getOutfit(database, "false"));
@@ -37,7 +68,7 @@ const getApp = function(database, firebase) {
     app.put('/user/:uId', routes.putUserProfile(database));
     app.delete('/user/:uId', routes.deleteUserProfile(database));
     app.delete('/user/:uId/clothing', routes.deleteUserClothing(database, firebase));
-    app.get('/user/:uId/requests', routes.getUserRequests(database,firebase));
+    app.get('/user/:uId/requests/:token', routes.getUserRequests(database,firebase, login));
     app.delete('/user/:uId/requests/:id', routes.deleteUserRequest(database));
     app.get('/clothing/:brand/:style/:color/:art/:size/:latitude/:longitude/:vicinity', routes.getCustomeClothing(database));
 
@@ -51,7 +82,7 @@ const getApp = function(database, firebase) {
 
     app.put('/user/:uId/clothing', routes.putClothing(database));
     app.get('/clothing/:cId', routes.getClothing(database));
-	  app.get('/clothingOptions', routes.getClothingOptions());
+	  app.get('/clothingOptions/:token', routes.getClothingOptions());
     app.put('/clothing/:cId', routes.putClothing(database));
     app.post('/clothing/:cId', routes.postRequest(database,firebase));
     app.delete('/clothing/:cId', routes.deleteClothing(database));

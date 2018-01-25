@@ -20,6 +20,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 
 import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
@@ -38,7 +39,7 @@ public class HttpsService extends IntentService {
     private String from;
     private String layer;
 
-    HttpURLConnection connection = null;
+    HttpsURLConnection connection = null;
     Handler mHandler;
 
     public void onCreate() {
@@ -59,7 +60,7 @@ public class HttpsService extends IntentService {
 
         /*Um die Kommunikation über HTTPs mit einem  Zertifikat zu ermöglichen, wird im Folgender ein Trusting-Manager angelegt, der jedes SSL-Zertifikat
         annimmt. https://developer.android.com/training/articles/security-ssl.html#SelfSigned
-         Um einen sicheren Datenverkehr zu gewährleisten, muss der Trust Manager aus der Applikation entfernt werden und ein geprüftes Zertifikat verwendet werden */
+         Um einen sicheren Datenverkehr zu gewährleisten, muss der Trust Manager aus der Applikation entfernt werden und ein geprüftes Zertifikat verwendet werden. */
 
         TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
             public java.security.cert.X509Certificate[] getAcceptedIssuers() {
@@ -79,7 +80,7 @@ public class HttpsService extends IntentService {
         try {
             sc = SSLContext.getInstance("SSL");
             sc.init(null, trustAllCerts, new java.security.SecureRandom());
-            // HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 
             // Create all-trusting host name verifier
             HostnameVerifier allHostsValid = new HostnameVerifier() {
@@ -88,14 +89,14 @@ public class HttpsService extends IntentService {
                 }
             };
             // Install the all-trusting host verifier
-            //HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+            HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
 
             URL url = null;
 
             // Einstellungen für HTTPS-Verbindungen vornehmen
                 url = new URL(uri);
-                connection = (HttpURLConnection) url.openConnection();
-                // define HTTP Method
+                connection = (HttpsURLConnection) url.openConnection();
+                // define HTTPs Method
                 connection.setRequestMethod(method);
                 connection.setConnectTimeout(5000);
 
