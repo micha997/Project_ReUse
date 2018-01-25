@@ -37,14 +37,13 @@ const getApp = function(database, firebase) {
 
           } else {
             login=result;
-            console.log(result);
             next();
           }
       });
 
       function callrequireAuthentication(database, token, callback) {
         requireAuthentication(database, req.params.token, next, (err, mappings, next) => {
-
+              console.log(mappings);
               if (mappings == true) {
                 return callback(null, true);
               } else {
@@ -53,7 +52,7 @@ const getApp = function(database, firebase) {
         })
       }
     }
-    app.use('/user/:uId/requests/:token', logIn);
+
 
     // define routes
     app.get('/outfit/:art', routes.getOutfit(database, "false"));
@@ -68,9 +67,11 @@ const getApp = function(database, firebase) {
     app.put('/user/:uId', routes.putUserProfile(database));
     app.delete('/user/:uId', routes.deleteUserProfile(database));
     app.delete('/user/:uId/clothing', routes.deleteUserClothing(database, firebase));
-    app.get('/user/:uId/requests/:token', routes.getUserRequests(database,firebase, login));
+    app.use('/user/:uId/:token/requests/', logIn);
+    app.get('/user/:uId/:token/requests/', routes.getUserRequests(database,firebase));
     app.delete('/user/:uId/requests/:id', routes.deleteUserRequest(database));
     app.get('/clothing/:brand/:style/:color/:art/:size/:latitude/:longitude/:vicinity', routes.getCustomeClothing(database));
+
 
     app.put('/user/:uId/requests/:id', routes.putRequest(database,firebase));
     app.post('/user/:uId/rating', routes.postUserRating(database));
@@ -82,7 +83,7 @@ const getApp = function(database, firebase) {
 
     app.put('/user/:uId/clothing', routes.putClothing(database));
     app.get('/clothing/:cId', routes.getClothing(database));
-	  app.get('/clothingOptions/:token', routes.getClothingOptions());
+	  app.get('/clothingOptions', routes.getClothingOptions());
     app.put('/clothing/:cId', routes.putClothing(database));
     app.post('/clothing/:cId', routes.postRequest(database,firebase));
     app.delete('/clothing/:cId', routes.deleteClothing(database));

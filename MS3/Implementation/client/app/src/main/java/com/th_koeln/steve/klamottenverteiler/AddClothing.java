@@ -136,7 +136,7 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
         Intent optionsIntent = new Intent(getApplicationContext(), HttpsService.class);
         optionsIntent.putExtra("method","GET");
         optionsIntent.putExtra("from","CLOTHINGOPTIONS");
-        optionsIntent.putExtra("url",getString(R.string.DOMAIN) + "/clothingOptions/" + idToken);
+        optionsIntent.putExtra("url",getString(R.string.DOMAIN) + "/clothingOptions");
         startService(optionsIntent);
         progress = new ProgressDialog(this);
         progress.setMessage("Trying to get data from server..");

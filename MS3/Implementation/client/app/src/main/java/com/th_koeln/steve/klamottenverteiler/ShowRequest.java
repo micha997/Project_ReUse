@@ -318,7 +318,7 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
             Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
             myIntent.putExtra("method","GET");
             myIntent.putExtra("from","SHOWREQUESTS");
-            myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId + "/requests/" + idToken);
+            myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId + "/" + idToken + "/requests/");
             startService(myIntent);
         }
 

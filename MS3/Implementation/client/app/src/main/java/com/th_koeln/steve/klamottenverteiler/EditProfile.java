@@ -174,7 +174,7 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
                 showDialog("Error","Could not get your profile.");
 
             } else if (from.equals("SEARCHPROFILE")) {
-                progressDialog.dismiss();
+
 
                 String profile = intent.getStringExtra("profile");
                 try {
@@ -203,12 +203,14 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
                                 break;
                         }
                     }
-
+                    progressDialog.dismiss();
                     if(profileJson.has("uId")){textViewMyID.setText(profileJson.getString("uId"));}
 
                 } catch (JSONException e) {
                     showDialog("Error","Profile data is not valid..");
                 }
+            } else if (from.equals("PUTPROFILE")) {
+                showDialog("Success","Successfully edited clothing.");
             }
 
         }
@@ -251,7 +253,6 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
                     myIntent.putExtra("from","PUTPROFILE");
                     myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId);
                     startService(myIntent);
-                    showDialog("Success","Updated profile data");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

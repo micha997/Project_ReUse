@@ -243,7 +243,6 @@ const database = {
                     }
 
                 }
-                console.log(obj);
                 //send results back to handler
                 callback(null, results);
             })
@@ -270,8 +269,15 @@ const database = {
             uId: uId
         }, {
             $set: put
+        }, (err) => {
+          if (err) {
+              callback(err);
+          } else {
+          callback(null);
+          }
         })
-    },
+      },
+
     putUserRating(uId, id, put, callback) {
         if (!uId) {
             throw new Error('id is missing.');
