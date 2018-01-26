@@ -58,6 +58,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView tvGoLogin;
     private FirebaseAuth.AuthStateListener firebaseAuthListener;
     private boolean isFirebaseCalledOnce =false;
+    private String newTokenKey;
+
 
     private ProgressDialog progressDialog;
 
@@ -105,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
         };
         firebaseAuth.addAuthStateListener(firebaseAuthListener);
 
+        newTokenKey= "AgwGYtZUPYKavwAQLRHw0kjxGKI7KQekKhS9MStDXxcVmQZ9ipUmkBoId7AAxC605I9UkpNcO9wQcbSNyIcDVx4uhCFZOErGLFp88tlzhJiCAbCY1FI8sydBHacK6UGfzlMQJ4qx3XreLxX4aBKqTtl5emHzCf0c9FVrpwQnsYEwjmuw2CtKe0FYriX1KxBybUVBRevYnLwif3eLOvGOHxu5bFWwwV7A4rLmHtuqDGWtcfw8xtn48XwS4tTmwbgxMIITv3UrfijcDoAThudrrpDO9B6kj9G07bsP68ydUn9ZkMalgJ6sP3G0ePPcKOVlkhjyDpYeOr8qZTIVZJNr3CEsnWTUQhXYf9lCRUTQp5i1PPZUJHsi7vFm71QdnOiJQWS3l8htAjecmqT2WSOZfKjANc7da6aooKwbllIrrBikUk0z46KAIt87C2CdjjSxoLi8080poQQ4oZimi7jrHuiixHwai0rAjqMyDpD2ippE5t2jAEy3Z4Li";
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
                 new IntentFilter("main"));
@@ -145,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
                  JSONObject payload = new JSONObject();
                  try {
                      payload.put("uId", uId);
+                     payload.put("key", newTokenKey);
                      // Sende Aufruf zum erstellen eines Userprofiles
                      myIntent.putExtra("payload",payload.toString());
                      myIntent.putExtra("method","POST");
@@ -232,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
 
                             startActivity(new Intent(getApplicationContext(), Login.class));
                         } else {
-                            // Email konnte nicht gesendet werden.
+                            // Email konnte nicht gesendet werden. Account wird gelöscht.
                             deleteAccount();
                             Toast.makeText(getApplicationContext(), "Fehler beim Senden der Email", Toast.LENGTH_SHORT).show();
                             startActivity(getIntent());

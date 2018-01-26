@@ -13,7 +13,7 @@ const getAll = function(database) {
                 return res.status(500).end();
             } else {
               console.log(mappings);
-              return res.status(201).send(mappings);
+              return res.status(200).send(mappings);
             }
         })
         /*for (var single_map in mappings) {

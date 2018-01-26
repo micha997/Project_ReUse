@@ -8,7 +8,6 @@ var request = require('request');
 
 
 const sendPushNotification = function(token, cId, payload, fits, from, firebase) {
-    console.log(from);
 
     switch (from) {
 
@@ -36,7 +35,7 @@ const sendPushNotification = function(token, cId, payload, fits, from, firebase)
                 },
                 notification: {
                     title: "Check your requests!",
-                    body: "Someone declared your transaction successful."
+                    body: "Someone declared your transaction as successfully."
                 }
             }
             break;
@@ -81,10 +80,12 @@ const sendPushNotification = function(token, cId, payload, fits, from, firebase)
         case "missing":
             var message = {
                 data: {
-                    art: payload["art"],
-                    model: fits["model"],
-                    type: "missing",
+                    cId: cId,
                     sender: from
+                },
+                notification: {
+                    title: "New clothing for you!",
+                    body: "Someone entered clothing you are missing."
                 }
             }
             break;
@@ -107,7 +108,6 @@ const sendPushNotification = function(token, cId, payload, fits, from, firebase)
         timeToLive: 60 * 60 * 24
     };
 
-    console.log(message);
     firebase.messaging().sendToDevice(token, message, options).then(function(response) {
         console.log("Successfully", response.results);
     }).catch(function(error) {

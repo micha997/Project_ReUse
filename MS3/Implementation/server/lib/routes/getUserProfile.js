@@ -16,7 +16,7 @@ const getUserProfile = function(database) {
               var requests = { href: "/user/" + req.params.id + "/requests"};
               var clothing = {href: "/user/" + req.params.id + "/clothing" };
               //mappings["_links"] =  { requests, clothing} ;
-              return res.status(201).send(mappings);
+              return res.status(200).send(mappings);
             }
         })
 

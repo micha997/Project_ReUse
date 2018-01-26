@@ -528,7 +528,7 @@ const database = {
         })
     },
 
-    addClothing(clothing, callback) {
+    addClothing(clothing, firebase, callback) {
         if (!clothing) {
             throw new Error('Clothing is missing.');
             callback(err);
@@ -562,7 +562,7 @@ const database = {
             async.apply(insertClothing, this.mappings),
             searchFits,
             async.apply(findUsers, this.mappings),
-            async.apply(sendPush, this.mappings),
+            async.apply(sendPush, this.mappings, firebase),
         ], function(err) {
             if (err == "1") {
                 return callback(err);
@@ -603,36 +603,36 @@ const database = {
 
             queryCollection(mappings, function(users) {
                 callback(null, mapping, fits, users);
-                //You can do more stuff with the result here
             });
         }
 
-        function sendPush(mappings, mapping, fits, users, callback) {
+        function sendPush(mappings, firebase, mapping, fits, users, callback) {
             //callback(null, 'done');
             try {
                 for (var single_mapping in users) {
                     if (users[single_mapping].subscription != null) {
                         for (var single_subscription in users[single_mapping].subscription) {
-                            if (fits.model == users[single_mapping].subscription[single_subscription].type + "_" + users[single_mapping].subscription[single_subscription].missing) {
-                                mappings.find({
+                          var i = 0;
+                          for (var single_fit in fits) {
+                            if (fits[single_fit].model == users[single_mapping].subscription[single_subscription].type + "_" + users[single_mapping].subscription[single_subscription].missing) {
+                                mappings.findOne({
                                     uId: users[single_mapping].uId,
                                     type: "token"
-                                }).toArray(function(err, users) {
+                                }, (err, token) => {
                                     if (err) {
                                         callback("2");
                                     } else {
-                                        var i = 0;
-                                        for (var map in users) {
-                                            sendPushNotification(users[map].token, "0", mapping, fits, "missing");
-                                        }
+                                        sendPushNotification(token.token, mapping.id, mapping, fits[single_fit], "missing", firebase);
                                     }
                                 })
 
                             }
                         }
+                        }
                     }
 
                 }
+
                 callback(null);
             } catch (e) {
                 callback("2");

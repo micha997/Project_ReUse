@@ -15,7 +15,7 @@ const getConversation = function(database) {
               mappings.sort(function(a, b) {
                 return parseFloat(a.time) - parseFloat(b.time);
               })
-            return res.status(201).send(mappings);
+            return res.status(200).send(mappings);
             }
           })
 

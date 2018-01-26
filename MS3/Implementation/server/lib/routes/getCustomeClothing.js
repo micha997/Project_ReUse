@@ -27,7 +27,7 @@ const getCustomeClothing = function(database) {
             if (err) {
                 return res.status(500).end();
             } else {
-              return res.send(mappings);
+              return res.status(200).send(mappings);
             }
         })
 

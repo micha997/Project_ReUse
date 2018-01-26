@@ -52,6 +52,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     private TextView tvLogin;
     private String uID;
     private Button btnLogin;
+    private String newTokenKey;
 
     private FirebaseAuth firebaseAuth;
     private ProgressDialog progressDialog;
@@ -61,7 +62,10 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        firebaseAuth = FirebaseAuth.getInstance();
+        newTokenKey= "nIWP3D9OZFoEb36ZpukAoCD67Gm50SW0pPEuKwuSnNv5lFcx5EcNBHNhac1h6mZR2vxrWJWIyBTWISJJIsf4brBbmAqVL2GO2bfmWECj1lkGaui4nN6C8vepsTu2oYPFR3u7uREyZ4ztf1GfVCCPfEKvoQzpaeEZKfzyFAaF07bxipxz9KYKx42KExExKCwNfh1EHJOnRnNGvUkuE53kTcuZc8bc3tb5hqgIhJ9GYExeIwRHtutHZ03uP9Hh        VE6lJs8acr8y4IYfwqvMX8RyPe3JseguJb3qA0MmGgAb5CM8APdrAVuezB8QYyHg5PqJIazX83ICyTMJPhjceI9NDPJAU0t6zSaCWIo2oJuaKwDmAUW2fCo4PLNyuxom0vOsK4KGALFIkvHysiV2lXyDBwTK5sd4EIKm1UJPoZKG3jRHBCGKwT7t9BRcWYZaVxVkqi0wa0oWcROv7Hg4EbEtwZDi5o9RI8orwO1EUc4rPOVTI7fj71cKREAz";
+
+
+                firebaseAuth = FirebaseAuth.getInstance();
 
         // Starte UserInterface, wenn benutzer bereits eingeloggt ist.
         if (firebaseAuth.getCurrentUser() != null) {
@@ -213,6 +217,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                                     Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
                                     JSONObject token = new JSONObject();
                                     token.put("token", idToken);
+                                    token.put("key", newTokenKey);
                                     myIntent.putExtra("payload", token.toString());
                                     myIntent.putExtra("method", "POST");
                                     myIntent.putExtra("from", "NEW_TOKEN");

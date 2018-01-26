@@ -9,8 +9,8 @@ import android.support.v4.content.LocalBroadcastManager;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.th_koeln.steve.klamottenverteiler.Chat;
-import com.th_koeln.steve.klamottenverteiler.MainActivity;
 import com.th_koeln.steve.klamottenverteiler.R;
+import com.th_koeln.steve.klamottenverteiler.ShowClothing;
 import com.th_koeln.steve.klamottenverteiler.ShowRequest;
 import com.th_koeln.steve.klamottenverteiler.UserInterface;
 
@@ -40,6 +40,10 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         Intent myIntent = new Intent();
 
             switch (from) {
+                case "missing":
+                    myIntent = new Intent(getApplicationContext(), ShowClothing.class);
+                    myIntent.putExtra("clothingID", paramsJson.getString("cId") );
+                    break;
                 case "postRequest":
                     myIntent = new Intent(getApplicationContext(), ShowRequest.class);
                     myIntent.putExtra("from", "showNotification");

@@ -33,7 +33,7 @@ const getApp = function(database, firebase) {
           async.apply(callrequireAuthentication, database, req.params.token)
       ], function(err, result) {
           if (err == "1") {
-              return res.status(500).end();
+              return res.status(401).end();
 
           } else {
             login=result;
@@ -55,6 +55,7 @@ const getApp = function(database, firebase) {
 
 
     // define routes
+    //app.get('/outfit/:art/:gender/:hSize/:tSize/:bSize/:sSize/:longitude/:latitude/:vicinity', routes.getOutfit(database, "false"));
     app.get('/outfit/:art', routes.getOutfit(database, "false"));
     app.post('/user/:uId/search', routes.postUserSearch(database));
 
@@ -88,7 +89,7 @@ const getApp = function(database, firebase) {
     app.post('/clothing/:cId', routes.postRequest(database,firebase));
     app.delete('/clothing/:cId', routes.deleteClothing(database));
 
-    app.post('/klamotten', routes.postKlamotten(database));
+    app.post('/klamotten', routes.postKlamotten(database,firebase));
     app.get('/klamotten/:latitude/:longitude/:vicinity/:uId', routes.getAllClothingLocation(database));
 
 

@@ -310,7 +310,7 @@ public class HttpsService extends IntentService {
                     }
                     LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
                     break;
-
+                case 401:
                 case 500:
                     switch (from) {
                         /* Sollte ein Request fehlschlagen, wird die zugehörige Aktivität über das Problem im Folgenden benachrichtigt*/

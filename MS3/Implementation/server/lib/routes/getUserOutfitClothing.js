@@ -13,7 +13,7 @@ const getUserOutfitClothing = function(database, choise) {
             if (err) {
                 return res.status(500).end();
             } else {
-              return res.status(201).send(mappings);
+              return res.status(200).send(mappings);
             }
         })
     };

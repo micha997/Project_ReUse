@@ -6,9 +6,7 @@ const getOutfit = function(database, choise) {
     }
 
     return function(req, res) {
-        //console.log(req.params.latitude);
 
-        // call database
 
         database.getOutfit(choise,req.params.art, req.params, (err, mappings) => {
             res.setHeader("Content-Type", "application/json");
@@ -25,7 +23,7 @@ const getOutfit = function(database, choise) {
                 }
               }
               mappings["_embedded"] = { clothingLinks};
-              return res.status(201).send(mappings);
+              return res.status(200).send(mappings);
             }
         })
     };

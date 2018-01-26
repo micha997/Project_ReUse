@@ -15,7 +15,7 @@ const getUserClothing = function(database) {
 
               var profile = { href: "/user/" + req.params.uId};
               mappings.push = { _links : profile };
-              return res.send(mappings);
+              return res.status(200).send(mappings);
             }
         })
 

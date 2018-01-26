@@ -15,7 +15,7 @@ const getUserPrefer = function(database) {
                 return res.status(500).end();
             } else {
               var prefs = calcPrefs(mappings);
-              return res.send(prefs);
+              return res.status(200).send(prefs);
             }
         })
 

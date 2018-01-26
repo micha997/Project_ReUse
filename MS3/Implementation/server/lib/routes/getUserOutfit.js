@@ -22,7 +22,7 @@ const getUserOutfit = function(database, choise) {
                     mappings_new.push(mappings[single_map].oId);
                   }
                }
-              return res.status(201).send(mappings_new);
+              return res.status(200).send(mappings_new);
             }
         })
 
