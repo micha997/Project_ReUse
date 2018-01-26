@@ -18,7 +18,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 /**
- * Created by Michael on 18.01.2018.
+ * Created by Steffen Owtschinnikow on 18.01.2018.
  */
 
 public class ClothingOptionsDetail extends AppCompatActivity {

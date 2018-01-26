@@ -31,7 +31,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Created by Michael on 21.01.2018.
+ * Created by Steffen Owtschinnikow on 25.12.2017.
  * */
 
 public class ShowClothing extends AppCompatActivity implements View.OnClickListener{

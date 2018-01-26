@@ -40,7 +40,7 @@ import java.util.ArrayList;
 
 
 /**
- * Created by Michael on 22.01.2018.
+ * Created by Steffen Owtschinnikow on 02.01.2018.
  */
 
 public class ShowOutfit extends AppCompatActivity implements View.OnClickListener {

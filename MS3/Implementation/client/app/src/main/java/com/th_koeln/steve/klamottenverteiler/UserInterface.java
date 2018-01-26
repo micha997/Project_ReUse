@@ -4,7 +4,7 @@ package com.th_koeln.steve.klamottenverteiler;
  * einzuleiten. Dem Benutzer werden die einzelnen Funktionionen, die zur Auswahl stehen, präsentiert
  * und bei Auswahl einer Funktion, wird die entsprechende Klasse aufgerufen.
  *
- * Created by steve on 05.11.17.
+ * Created by Steffen Owtschinnikow on 05.11.17.
  */
 
 import android.content.Intent;

@@ -11,7 +11,7 @@ package com.th_koeln.steve.klamottenverteiler;
  * Nach einer Erfolgreichen Registrierung initialisiert die Klasse das Senden einer Verifizierungs-Email an
  * die vom Benutzer hinterlegte Email-Adresse.
  *
- * Created by Frank on 10.01.2018.
+ * Created by Steffen Owtschinnikow on 10.01.2018.
  */
 
 import android.app.AlertDialog;

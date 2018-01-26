@@ -10,10 +10,10 @@ package com.th_koeln.steve.klamottenverteiler;
  * wird die exakte Position verschleiert, indem lediglich ein zufaelliger Punkt, der in der Strasse des Benutzers
  * liegt, gespeichert wird.
  *
- * Das Bild des jeweiligen Kleidungsstueck wird per "Get Content"-Methode geladen und anschließend
+ * Das Bild des jeweiligen Kleidungsstuecks wird per "Get Content"-Methode geladen und anschließend
  * für den Transport mithilfe von Base64 kodiert.
  *
- * Created by Michael on 20.01.18.
+ * Created by Steffen Owtschinnikow on 31.10.17.
  */
 
 import android.app.AlertDialog;

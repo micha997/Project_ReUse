@@ -4,7 +4,7 @@ package com.th_koeln.steve.klamottenverteiler;
  * Die Aktivität "Choose Context" bietet die Möglichkeit einen bestimmten
  * Kontext für ein Outfit zu wählen, welches der Benutzer anfordern möchte.
  *
- * Created by Frank on 25.12.2017.
+ * Created by Steffen Owtschinnikow on 25.12.2017.
  */
 
 import android.app.AlertDialog;

@@ -33,7 +33,7 @@ import java.util.Date;
  * seine Bewertung zu konkretisieren geboten. Nachdem der Benutzer die erforderlichen Daten
  * eingetragen hat, werden die Daten ins JSON Dateiformat überführt und zum Server gesendet.
  *
- * Created by Frank on 10.01.2018.
+ * Created by Steffen Owtschinnikow on 10.01.2018.
  */
 
 public class RateUser extends AppCompatActivity {

@@ -33,7 +33,7 @@ import org.json.JSONObject;
  *  Betätigt der Benutzer den "Senden"-Button, werden die aktuell eingetragenen Werte ins JSON Dateiformat umgewandelt
  *  und an den Server gesendet.
  *
- * Created by Frank on 30.12.2017.
+ * Created by Steffen Owtschinnikow on 30.12.2017.
  */
 
 public class EditClothing extends AppCompatActivity {

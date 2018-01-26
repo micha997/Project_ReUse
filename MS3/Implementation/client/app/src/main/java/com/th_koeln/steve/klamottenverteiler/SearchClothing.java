@@ -45,7 +45,7 @@ import java.util.Collections;
 import java.util.Comparator;
 
 /**
-    Created by Michael on 20.01.18.
+ * Created by Steffen Owtschinnikow on 01.11.17.
  */
 
 public class SearchClothing extends AppCompatActivity

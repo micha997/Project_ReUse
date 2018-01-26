@@ -6,7 +6,9 @@ package com.th_koeln.steve.klamottenverteiler;
  * Die Kleidungsstücke werden vom Server geladen und dem Benutzer präsentiert.
  * Sollten Kleidungsstücke vorhanden sein, können verschiedene Operationen, wie
  * das Löschen eines Kleidungsstücks oder das Bearbeiten initialisiert werden.
- **/
+ *
+ * Created by Steffen Owtschinnikow on 30.12.2017.
+ */
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -23,10 +25,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.Spinner;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.th_koeln.steve.klamottenverteiler.adapter.ClothingOfferAdapter;
@@ -41,11 +39,6 @@ import org.json.JSONObject;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
-
-/*
- * Created by Michael on 24.01.2017.
- */
 
 public class MyClothing extends AppCompatActivity {
 

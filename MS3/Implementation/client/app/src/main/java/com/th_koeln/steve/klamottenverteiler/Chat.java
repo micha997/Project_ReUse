@@ -5,7 +5,7 @@ package com.th_koeln.steve.klamottenverteiler;
  * signalisiert hat und der Anbieter die Anfrage bestätigt hat. Zu Beginn wird der aktuelle Chatverlauf vom Server
  * geladen und dem Benutzer präsentiert. Jede neue Nachricht wird dem Chatverlauf hinzugefügt und an den Server weitergeleitet.
  *
- * Created by Frank on 09.01.2018.
+ * Created by Steffen Owtschinnikow on 09.01.2018.
  */
 
 import android.app.AlertDialog;

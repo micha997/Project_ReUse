@@ -7,7 +7,7 @@ package com.th_koeln.steve.klamottenverteiler;
  * Im Erfolgsfall wird ein Benutzer-Token von Firebase angefordert und anschließend an den Server
  * weitergeleitet.
  *
- * Created by steve on 05.11.17.
+ * Created by Steffen Owtschinnikow on 05.11.17.
  */
 
 import android.app.AlertDialog;
