@@ -122,7 +122,7 @@ public class MyClothing extends AppCompatActivity {
                     // get clothing results from HTTP-Service
                     String clothinglist = intent.getStringExtra("clothing");
                     JSONArray clothinglistJsonArray = new JSONArray(clothinglist);
-                    if (clothinglistJsonArray.length() > 1) {
+                    if (clothinglistJsonArray.length() > 0) {
                         for (int i = 0; i < clothinglistJsonArray.length(); i++) {
 
                             JSONObject tmpObj = clothinglistJsonArray.getJSONObject(i);

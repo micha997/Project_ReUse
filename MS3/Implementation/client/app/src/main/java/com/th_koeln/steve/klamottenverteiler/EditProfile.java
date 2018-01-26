@@ -237,13 +237,16 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
                             break;
                     }
 
-                    //Die Uhrzeiten
-                    JSONObject time = new JSONObject();
-                    time.put("txtWeekTimeBegin", txtWeekTimeBegin);
-                    time.put("txtWeekTimeEnd", txtWeekTimeEnd);
-                    time.put("txtWeekendTimeBegin", txtWeekendTimeBegin);
-                    time.put("txtWeekendTimeEnd", txtWeekendTimeEnd);
-                    profile.put("time",time);
+                    if(!txtWeekendTimeBegin.equals(txtWeekendTimeEnd) &&
+                            !txtWeekTimeBegin.equals(txtWeekTimeEnd)) {
+                        //Die Uhrzeiten
+                        JSONObject time = new JSONObject();
+                        time.put("txtWeekTimeBegin", txtWeekTimeBegin);
+                        time.put("txtWeekTimeEnd", txtWeekTimeEnd);
+                        time.put("txtWeekendTimeBegin", txtWeekendTimeBegin);
+                        time.put("txtWeekendTimeEnd", txtWeekendTimeEnd);
+                        profile.put("time", time);
+                    }
 
                     // Sende Attribute zum HTTPSService
                     Intent upIntent = new Intent(getApplicationContext(), HttpsService.class);

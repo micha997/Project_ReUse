@@ -80,7 +80,7 @@ public class myTransaktion {
     }
 
     public String getTimeFromWorkdayString(){
-        String hours="00",minutes="00";
+        String hours="99",minutes="99";
         if(timeFromWorkday!=null) {
             hours = checkHoursMinutes(timeFromWorkday.getHours() + "");
             minutes = checkHoursMinutes(timeFromWorkday.getMinutes() + "");
@@ -97,7 +97,7 @@ public class myTransaktion {
     }
 
     public String getTimeToWorkdayString(){
-        String hours="00",minutes="00";
+        String hours="99",minutes="99";
         if(timeToWorkday!=null) {
             hours = checkHoursMinutes(timeToWorkday.getHours() + "");
             minutes = checkHoursMinutes(timeToWorkday.getMinutes() + "");
@@ -114,7 +114,7 @@ public class myTransaktion {
     }
 
     public String getTimeFromWeekendString(){
-        String hours="00",minutes="00";
+        String hours="99",minutes="99";
         if(timeFromWeekend!=null) {
             hours = checkHoursMinutes(timeFromWeekend.getHours() + "");
             minutes = checkHoursMinutes(timeFromWeekend.getMinutes() + "");
@@ -131,7 +131,7 @@ public class myTransaktion {
     }
 
     public String getTimeToWeekendString(){
-        String hours="00",minutes="00";
+        String hours="99",minutes="99";
         if(timeToWeekend!=null) {
             hours = checkHoursMinutes(timeToWeekend.getHours() + "");
             minutes = checkHoursMinutes(timeToWeekend.getMinutes() + "");
@@ -148,7 +148,7 @@ public class myTransaktion {
     }
 
     public String getTimeToGetString(){
-        String hours="Kein",minutes="Termin";
+        String hours="",minutes="";
         if(timeToGet!=null) {
             hours = checkHoursMinutes(timeToGet.getHours() + "");
             minutes = checkHoursMinutes(timeToGet.getMinutes() + "");

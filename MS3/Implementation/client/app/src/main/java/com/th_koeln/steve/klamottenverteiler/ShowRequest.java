@@ -439,12 +439,18 @@ public class ShowRequest extends AppCompatActivity implements View.OnClickListen
             //Anzeige der eigenen Requests
             case R.id.rbOwnRequest:
                 if (MyRequestsForAdapter.size() > 0) {fillView(MyRequestsForAdapter);}
-                else{requestsListView.setEmptyView(findViewById(R.id.txtEmptyRequestList));}
+                else{
+                    requestsListView.setAdapter(null);
+                    requestsListView.setEmptyView(findViewById(R.id.txtEmptyRequestList));
+                }
                 break;
             //Anzeige der fremden Requests
             case R.id.rbForeignRequest:
                 if (ForeignRequestsForAdapter.size() > 0) {fillView(ForeignRequestsForAdapter);}
-                else{requestsListView.setEmptyView(findViewById(R.id.txtEmptyRequestList));}
+                else{
+                    requestsListView.setAdapter(null);
+                    requestsListView.setEmptyView(findViewById(R.id.txtEmptyRequestList));
+                }
                 break;
         }
     }
