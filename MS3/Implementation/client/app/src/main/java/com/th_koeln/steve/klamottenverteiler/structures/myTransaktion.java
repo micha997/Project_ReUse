@@ -8,42 +8,39 @@ import java.util.Date;
 
 //Klasse um Objekte zu erstellen, die fuer die Transaktion benoetigt werden
 public class myTransaktion {
-    //ID des Angebotes
-    String uID;
-    //ID des Users
-    String cID;
+    //ID des Users, Angebotes. Titel des Objekts.
+    String uID, cID, titel;
 
     //Ort des Angebotes
-    double longitude;
-    double latitude;
+    double longitude = -200;
+    double latitude = -200;
 
     //Zeit Von Bis an Wochentagen
-    Date timeFromWorkday;
-    Date timeToWorkday;
+    Date timeFromWorkday = null;
+    Date timeToWorkday = null;
     //Zeit Von Bis am Wochenende
-    Date timeFromWeekend;
-    Date timeToWeekend;
+    Date timeFromWeekend = null;
+    Date timeToWeekend = null;
 
     //Zeitpunkt zum abholen
-    Date timeToGet;
+    Date timeToGet = null;
 
     //Distanz vom letzten Punkt zu diesem in Meter
-    long distanceToMeFromLast;
+    long distanceToMeFromLast = -1;
     //Zeit vom letzten Punkt zu diesem in Sekunden
-    long timeToMeFromLast;
+    long timeToMeFromLast = -1;
 
     public myTransaktion(String userID, String clothingID){
         uID = userID;
         cID = clothingID;
-        longitude = -1;
-        latitude = -1;
-        timeFromWorkday = null;
-        timeToWorkday = null;
-        timeFromWeekend = null;
-        timeToWeekend = null;
-        timeToGet = null;
-        distanceToMeFromLast = -1;
-        timeToMeFromLast = -1;
+    }
+
+    public String getTitel() {
+        return titel;
+    }
+
+    public void setTitel(String titel) {
+        this.titel = titel;
     }
 
     public String getuID(){
@@ -83,7 +80,7 @@ public class myTransaktion {
     }
 
     public String getTimeFromWorkdayString(){
-        String hours="00",minutes="00";
+        String hours="99",minutes="99";
         if(timeFromWorkday!=null) {
             hours = checkHoursMinutes(timeFromWorkday.getHours() + "");
             minutes = checkHoursMinutes(timeFromWorkday.getMinutes() + "");
@@ -100,7 +97,7 @@ public class myTransaktion {
     }
 
     public String getTimeToWorkdayString(){
-        String hours="00",minutes="00";
+        String hours="99",minutes="99";
         if(timeToWorkday!=null) {
             hours = checkHoursMinutes(timeToWorkday.getHours() + "");
             minutes = checkHoursMinutes(timeToWorkday.getMinutes() + "");
@@ -117,7 +114,7 @@ public class myTransaktion {
     }
 
     public String getTimeFromWeekendString(){
-        String hours="00",minutes="00";
+        String hours="99",minutes="99";
         if(timeFromWeekend!=null) {
             hours = checkHoursMinutes(timeFromWeekend.getHours() + "");
             minutes = checkHoursMinutes(timeFromWeekend.getMinutes() + "");
@@ -134,7 +131,7 @@ public class myTransaktion {
     }
 
     public String getTimeToWeekendString(){
-        String hours="00",minutes="00";
+        String hours="99",minutes="99";
         if(timeToWeekend!=null) {
             hours = checkHoursMinutes(timeToWeekend.getHours() + "");
             minutes = checkHoursMinutes(timeToWeekend.getMinutes() + "");
@@ -151,7 +148,7 @@ public class myTransaktion {
     }
 
     public String getTimeToGetString(){
-        String hours="Kein",minutes="Termin";
+        String hours="",minutes="";
         if(timeToGet!=null) {
             hours = checkHoursMinutes(timeToGet.getHours() + "");
             minutes = checkHoursMinutes(timeToGet.getMinutes() + "");

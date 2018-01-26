@@ -31,7 +31,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Created by Frank on 25.12.2017.
+ * Created by Michael on 21.01.2018.
  * */
 
 public class ShowClothing extends AppCompatActivity implements View.OnClickListener{
@@ -179,7 +179,7 @@ public class ShowClothing extends AppCompatActivity implements View.OnClickListe
                         myIntent.putExtra("payload", request.toString());
                         myIntent.putExtra("method", "POST");
                         myIntent.putExtra("from", "NEWREQUEST");
-                        myIntent.putExtra("url", getString(R.string.DOMAIN) + "/clothing/" + clothingJson.getString("id"));
+                        myIntent.putExtra("url", getString(R.string.DOMAIN) + "/clothing/" + clothingID);
                         startService(myIntent);
                     }
                 } catch (JSONException e) {

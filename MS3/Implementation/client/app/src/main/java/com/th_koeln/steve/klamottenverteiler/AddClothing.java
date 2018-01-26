@@ -5,15 +5,15 @@ package com.th_koeln.steve.klamottenverteiler;
  * Hierfür werden zuerst Werte, die für die einzelnen Attribute vom Server geladen und anschließend
  * innerhalb des User Interfaces dargestellt.
  *
- * Die Lokalität, an dem ein Kleidungsstück abgeholt werden kann,
- * wird über Google Place Picker eingetragen. Nachdem der Benutzer eine Lokation gewählt hat,
- * wird die exakte Position verschleiert, indem lediglich ein zufälliger Punkt, der in der Straße des Benutzers
+ * Die Lokalitaet, an dem ein Kleidungsstueck abgeholt werden kann,
+ * wird über Google Place Picker eingetragen. Nachdem der Benutzer eine Lokation gewaehlt hat,
+ * wird die exakte Position verschleiert, indem lediglich ein zufaelliger Punkt, der in der Strasse des Benutzers
  * liegt, gespeichert wird.
  *
- * Das Bild des jeweiligen Kleidungsstück wird per "Get Content"-Methode geladen und anschließend
+ * Das Bild des jeweiligen Kleidungsstueck wird per "Get Content"-Methode geladen und anschließend
  * für den Transport mithilfe von Base64 kodiert.
  *
- * Created by steve on 31.10.17.
+ * Created by Michael on 20.01.18.
  */
 
 import android.app.AlertDialog;
@@ -131,7 +131,7 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
         filter.addAction("clothingOptions");
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, filter);
 
-        String idToken = FirebaseInstanceId.getInstance().getToken();
+        //String idToken = FirebaseInstanceId.getInstance().getToken();
 
         Intent optionsIntent = new Intent(getApplicationContext(), HttpsService.class);
         optionsIntent.putExtra("method","GET");
@@ -238,30 +238,6 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
                     TextView selectionTextView = (TextView) tmpView.findViewById(R.id.selectionTextView);
                     selectionTextView.setText(StringResult);
                     selectionTextView.setVisibility(View.VISIBLE);
-
-                    /*
-                    if(choosenArea.equals("Art")) {
-
-                        switch (area) {
-                            case "Kopfbedeckung":
-
-                                break;
-
-                            case "Oberbekleidung":
-                                break;
-
-                            case "Unterbekleidung":
-                                break;
-
-                            case "Fußbekleidung":
-                                break;
-
-                            case "Accessoires":
-
-                                break;
-                        }
-                    }
-                    */
                 }
             }
 
@@ -310,7 +286,7 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
                             art = tmpSelection;
                             break;
                         case "Gender":
-                            if(tmpSelection != "" && !size.isEmpty()){
+                            if(tmpSelection != "" && !tmpSelection.isEmpty()){
                                 switch(tmpSelection){
                                     case "Männlich Erwachsen":
                                     case "Männlich Kind":
@@ -438,7 +414,7 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
                     break;
                 case "CLOTHINGOPTIONSFAIL":
                     progress.dismiss();
-                        showDialog("Error", "Could not get data from server!");
+                    showDialog("Error", "Could not get data from server!");
 
                     break;
 
@@ -467,7 +443,7 @@ public class AddClothing extends AppCompatActivity implements View.OnClickListen
                     }
                 });
         if (!isFinishing())
-        alertDialog.show();
+            alertDialog.show();
     }
 
     public View getViewByPosition(int pos, ListView listView) {

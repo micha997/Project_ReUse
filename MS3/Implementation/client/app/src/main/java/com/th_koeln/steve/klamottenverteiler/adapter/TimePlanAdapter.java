@@ -48,16 +48,23 @@ public class TimePlanAdapter extends BaseAdapter {
     public View getView(int i, View view, ViewGroup viewGroup) {
 
         View v = mInflater.inflate(R.layout.time_plan_detail, null);
+        TextView titelTextView = (TextView) v.findViewById(R.id.titelTextView);
         TextView idTextView = (TextView) v.findViewById(R.id.idTextView);
         TextView availableTextView = (TextView) v.findViewById(R.id.availableTextView);
         TextView dateTextView = (TextView) v.findViewById(R.id.dateTextView);
 
         checkWeekdayWeekend();
 
+        String title = ListItems.get(i).getTitel();
         String id = ListItems.get(i).getcID();
-        String available = "";
-        String getFrom="",getTo="";
-        String date = "Termin: " + ListItems.get(i).getTimeToGetString();
+        String available = "",getFrom="",getTo="",date="";
+        String tmpDate = ListItems.get(i).getTimeToGetString();
+
+        if(tmpDate.equals(":")){
+            date = "Kein Termin";
+        }else {
+            date = "Termin: " + tmpDate;
+        }
 
         if(weekend){
             getFrom = ListItems.get(i).getTimeFromWeekendString();
@@ -67,8 +74,13 @@ public class TimePlanAdapter extends BaseAdapter {
             getTo = ListItems.get(i).getTimeToWorkdayString();
         }
 
-        available = "Verfügbar: " + getFrom+" - "+getTo;
+        if(getFrom.equals("99:99") && getTo.equals("99:99")){
+            available = "Keine Uhrzeiten gegeben";
+        }else{
+            available = "Verfügbar: " + getFrom+" - "+getTo;
+        }
 
+        titelTextView.setText(title);
         idTextView.setText(id);
         availableTextView.setText(available);
         dateTextView.setText(date);

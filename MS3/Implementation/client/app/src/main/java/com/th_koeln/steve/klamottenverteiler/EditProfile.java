@@ -158,7 +158,6 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
                     txtWeekendTimeEnd = showHour+":"+showMinute;
                     break;
             }
-            //Toast.makeText(EditProfile.this, showHour+":"+showMinute, Toast.LENGTH_LONG).show();
         }
     };
 
@@ -174,7 +173,7 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
                 showDialog("Error","Could not get your profile.");
 
             } else if (from.equals("SEARCHPROFILE")) {
-
+                progressDialog.dismiss();
 
                 String profile = intent.getStringExtra("profile");
                 try {
@@ -203,14 +202,15 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
                                 break;
                         }
                     }
-                    progressDialog.dismiss();
+
                     if(profileJson.has("uId")){textViewMyID.setText(profileJson.getString("uId"));}
 
                 } catch (JSONException e) {
                     showDialog("Error","Profile data is not valid..");
                 }
-            } else if (from.equals("PUTPROFILE")) {
-                showDialog("Success","Successfully edited clothing.");
+            } else if (from.equals("PUTPROFILE")){
+                if (!isFinishing())
+                    showDialog("Success","Updated profile data");
             }
 
         }
@@ -218,7 +218,6 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
 
     @Override
     public void onClick(View view) {
-        Intent myIntent;
         switch (view.getId()) {
 
             case R.id.btnSendData:
@@ -238,21 +237,24 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
                             break;
                     }
 
-                    //Die Uhrzeiten
-                    JSONObject time = new JSONObject();
-                    time.put("txtWeekTimeBegin", txtWeekTimeBegin);
-                    time.put("txtWeekTimeEnd", txtWeekTimeEnd);
-                    time.put("txtWeekendTimeBegin", txtWeekendTimeBegin);
-                    time.put("txtWeekendTimeEnd", txtWeekendTimeEnd);
-                    profile.put("time",time);
+                    if(!txtWeekendTimeBegin.equals(txtWeekendTimeEnd) &&
+                            !txtWeekTimeBegin.equals(txtWeekTimeEnd)) {
+                        //Die Uhrzeiten
+                        JSONObject time = new JSONObject();
+                        time.put("txtWeekTimeBegin", txtWeekTimeBegin);
+                        time.put("txtWeekTimeEnd", txtWeekTimeEnd);
+                        time.put("txtWeekendTimeBegin", txtWeekendTimeBegin);
+                        time.put("txtWeekendTimeEnd", txtWeekendTimeEnd);
+                        profile.put("time", time);
+                    }
 
                     // Sende Attribute zum HTTPSService
-                    myIntent = new Intent(getApplicationContext(), HttpsService.class);
-                    myIntent.putExtra("payload",profile.toString());
-                    myIntent.putExtra("method","PUT");
-                    myIntent.putExtra("from","PUTPROFILE");
-                    myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId);
-                    startService(myIntent);
+                    Intent upIntent = new Intent(getApplicationContext(), HttpsService.class);
+                    upIntent.putExtra("payload",profile.toString());
+                    upIntent.putExtra("method","PUT");
+                    upIntent.putExtra("from","PUTPROFILE");
+                    upIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId);
+                    startService(upIntent);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -292,6 +294,12 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
                     }
                 });
         if (!isFinishing())
-        alertDialog.show();
+            alertDialog.show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
     }
 }

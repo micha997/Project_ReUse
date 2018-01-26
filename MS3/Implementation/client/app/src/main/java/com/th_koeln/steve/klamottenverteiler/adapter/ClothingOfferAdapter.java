@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,7 +58,16 @@ public class ClothingOfferAdapter extends RecyclerView.Adapter<ClothingOfferAdap
             holder.textViewTitle.setText(clothingoffer.getArt());
         }
         holder.textViewSize.setText(clothingoffer.getSize());
-        holder.textViewTime.setText(String.valueOf((int)clothingoffer.getDistance())+" KM entfernt");
+
+        //Entweder wir die Distanz oder der Stoff angezeigt
+        //Somit ist dieser Adapter mehrfach nutzbar, da die Distanz nicht immer gegeben ist
+        if(clothingoffer.getDistance()>-100){
+            holder.textViewTime.setText(String.valueOf((int)clothingoffer.getDistance())+" KM entfernt");
+        }else if(clothingoffer.getDistance()>-300){
+            holder.textViewTime.setText(clothingoffer.getFabric());
+        }else if(clothingoffer.getDistance()>-400){
+            holder.textViewTime.setText(clothingoffer.getArt());
+        }
 
         String getFromPath = clothingoffer.getImagePath();
         if(getFromPath!="" && !getFromPath.isEmpty()) {

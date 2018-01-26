@@ -321,7 +321,7 @@ public class ShowOutfit extends AppCompatActivity implements View.OnClickListene
                     tmpOffer = new ClothingOffer(request.getString("id"),request.getString("uId"),
                             request.getString("art"),request.getString("size"),request.getString("style"),
                             request.getString("gender"),"",request.getString("fabric"), request.getString("notes"),
-                            request.getString("brand"),absPath,80085);
+                            request.getString("brand"),absPath,-200);
 
                 } catch (JSONException e) {
                     showDialog("Error", "Could not process clothing data!");
