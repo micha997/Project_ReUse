@@ -1,6 +1,6 @@
 'use strict';
 
-/* Die Funktion calcOutfit bietet die Möglichkeit aus einzelnen Kleidungsstücken sinnvolle Outfits zusammenzustellen und darüber hinaus
+/** Die Funktion calcOutfit bietet die Möglichkeit aus einzelnen Kleidungsstücken sinnvolle Outfits zusammenzustellen und darüber hinaus
 * eine Möglichkeit Kleidungsstücke daraufhin zu prüfen, für welchen Nutzungskontext sie zu gebrauchen sind.
 * Fest definierte Modelle, die sich jeweils auf die Bekleidung von bestimmten Bereichen des Körpers beziehen,
 * enthalten hierbei Restriktionen, die sich auf die verwendete Art von Stoff beziehen.
@@ -13,12 +13,18 @@
 *
 * @param {String} context - Definiert den gewünschen Nutzungskontext eines Outfits.
 * @param {Object} clothing - Enhält die Kleidungsstücke, die bei der Berechnung berücksichtigt werden sollen.
-* @param (Boolean) single - Unterscheidet zwischen Outfitsuche und Zuordnung von einem Kleidungsstück zu Nutzungskontexten
+* @param {Boolean} single - Unterscheidet zwischen Outfitsuche und Zuordnung von einem Kleidungsstück zu Nutzungskontexten
+* @param {String} gender - Bestimmt das Geschlecht für welches Kleidungsstücke gesucht werden sollen
+* @param {String} hSize - Bestimmt Größe für head-Schicht
+* @param {String} tSize - Bestimmt Größe für Oberkörper-Schicht
+* @param {String} bSize - Bestimmt Größe für Bottom-Schicht
+* @param {String} sSize - Bestimmt Größe für "Shoes"
+*
 */
 
 
 
-const calcOutfit = function(context, clothing, single) {
+const calcOutfit = function(context, clothing, single, gender, hSize, tSize, bSize, sSize, callback) {
 
 /* Models enthalten Informationen darüber, welche Merkmale ein Kleidungsstück erfüllen muss, um für den angegebenen Kontext gültig zu sein.
 *  Dabei werden jeweils ein "high" und ein "low"-Wert für verschiedene Eigenschaften des Stoffes, der verwendet wird, eingetragen. Stoffe, die innerhalb des Bereichs der Definition liegen, werden
@@ -129,7 +135,8 @@ var wintermodel = {
             layer3: 0,
             bottom: 0,
             shoes: 0,
-            layers: ["head", "layer1", "layer2", "layer3", "bottom", "shoes"]
+            layers: ["head", "layer1", "layer2", "layer3", "bottom", "shoes"],
+            layerArt: ["head","layer","layer","layer","bottom","shoes"]
             }
 
 
@@ -240,47 +247,45 @@ var wintermodel = {
       // Berechne passende Kleidungsstücke für einen bestimmten Layer eines Modells
       winteroutfit.head = calcLayerClothing(wintermodel["wintermodel_head"], clothing, charac, false);
       // Wenn kein Kleidungsstück gefunden wurde
-      if (winteroutfit.head == 0) {
-          console.log("There is no clothing for head winter!");
-      }
-
       winteroutfit.layer1 = calcLayerClothing(wintermodel["wintermodel_layer1"], clothing, charac, false);
             // Wenn kein Kleidungsstück gefunden wurde
       if (winteroutfit.layer1 == 0) {
           // Suche erneut mit Alternativem Modell für die jeweilige Schicht
           winteroutfit.layer1 = calcLayerClothing(wintermodel["wintermodel_layer1_alternative"], clothing, charac, false);
-          if (winteroutfit.layer1 == 0) {
-              console.log("There is no clothing for layer 1 winter!");
-          }
       }
       winteroutfit.layer2 = calcLayerClothing(wintermodel["wintermodel_layer2"], clothing, charac, false);
       if (winteroutfit.layer2 == 0) {
           winteroutfit.layer2 = calcLayerClothing(wintermodel["wintermodel_layer2_alternative"], clothing, charac, false);
-          if (winteroutfit.layer2 == 0) {
-              console.log("There is no clothing for layer 3 winter!");
-          }
+
       }
       winteroutfit.layer3 = calcLayerClothing(wintermodel["wintermodel_layer3"], clothing, charac, false);
       if (winteroutfit.layer3 == 0) {
           winteroutfit.layer3 = calcLayerClothing(wintermodel["wintermodel_layer3_alternative"], clothing, charac, false);
-          if (winteroutfit.layer3 == 0) {
-              console.log("There is no clothing for layer 3 winter!");
-          }
+
       }
       winteroutfit.bottom = calcLayerClothing(wintermodel["wintermodel_bottom"], clothing, charac, false);
-      if (winteroutfit.bottom == 0) {
-          console.log("There is no clothing for bottom winter!");
-      }
-      winteroutfit.shoes = calcLayerClothing(wintermodel["wintermodel_shoes"], clothing, charac, false);
-      if (winteroutfit.shoes == 0) {
 
-          console.log("There is no clothing for shoes winter!");
-      }
+      winteroutfit.shoes = calcLayerClothing(wintermodel["wintermodel_shoes"], clothing, charac, false);
+      winteroutfit= filterClothing(wintermodel, winteroutfit, gender, hSize, tSize, bSize, sSize);
           // Gib das komplette Outfit zurück
-          return winteroutfit;
+
+          callback(winteroutfit);
     }
 
+
+   /** calcLayerClothing berecnet für eine Menge von Kleidungsstücken, ob diese die Bedingungen, die sich aus dem Modell ergeben
+   * erfüllen oder für welche Schichten ein Kleidungsstück gültig ist.
+   *
+   * @param {String} context - Definiert den gewünschen Nutzungskontext eines Outfits.
+   * @param {Object} clothing - Enhält die Kleidungsstücke, die bei der Berechnung berücksichtigt werden sollen.
+   * @param {Boolean} charac - Enthält Informationen über die verschiedenen Stoffarten
+   * @param {Boolean} single - Unterscheidet zwischen Outfitsuche und Zuordnung von einem Kleidungsstück zu Nutzungskontexten
+   *
+   */
+
     function calcLayerClothing(model, clothing, charac, single) {
+
+    // Zwischenspeicher für gültige Kleidungsstücke bzw. Modelle die gültig für ein Kleidungsstück sind
     var result = [];
 
     // Durchlauf der einzelnen Stoffarten
@@ -310,7 +315,7 @@ var wintermodel = {
                                     // Wenn die Art und der Stoff des Kleidungsstück passend ist
                                     if (clothing[single_clothing].art == model.art[art] && clothing[single_clothing].fabric == charac[single_charac].name) {
                                         // Füge passende Kleidungsstücke "result" hinzu
-                                        result.push(clothing[single_clothing].id);
+                                        result.push(clothing[single_clothing]);
 
                                     }
                                 }
@@ -324,5 +329,60 @@ var wintermodel = {
             return result;
         }
     };
+
+    /** filterClothing überprüft die einzelnen Kleidungsstücke eines Outfits, ob diese, den
+    * vom Benutzer definierten Anforderungen (im genauen Geschlecht und Größen) entsprechen.
+    *
+    * @param {String} context - Definiert den gewünschen Nutzungskontext eines Outfits.
+    * @param {Object} clothing - Enhält die Kleidungsstücke, die bei der Berechnung berücksichtigt werden sollen.
+    * @param {Boolean} charac - Enthält Informationen über die verschiedenen Stoffarten
+    * @param {Boolean} single - Unterscheidet zwischen Outfitsuche und Zuordnung von einem Kleidungsstück zu Nutzungskontexten
+    *
+    */
+
+    function filterClothing(model, outfit, gender, hSize, tSize, bSize, sSize) {
+      console.log(sSize);
+      //Kopiere aktuelles Outfit
+      var new_outfit = JSON.parse(JSON.stringify(outfit));;
+      var i=0;
+      var keys = Object.keys(new_outfit);
+      // Lösche bereits vorhandene Kleidungsstücke aus "new_outfit"
+      for (var single_layer in new_outfit) {
+        // Modelldaten nicht löschen!
+        if (i > 0  && i < keys.length - 2) {
+          new_outfit[single_layer]= [];
+        }
+        i++;
+      }
+
+      var art;
+      // Durchlaufe allgemeine Arten
+      for (var single_layerArt in outfit.layerArt) {
+        // Durchlaufe spezielle Arten
+        for (var single_layer in outfit.layers) {
+          // Durchlaufe Kleidungsstücke
+          for (var single_clothing in outfit[outfit.layers[single_layer]]) {
+          // Überprüfe ob Kleidungsstück richtige Art, richtige Größe und für das richtige Geschlecht ist
+          if (outfit.layerArt[single_layerArt] == "head" && outfit[outfit.layers[single_layer]][single_clothing].size == hSize && outfit[outfit.layers[single_layer]][single_clothing].gender == gender  ) {
+              // Füge gültiges Kleidungsstück zum Outfit hinzu
+              new_outfit[outfit.layers[single_layer]].push(outfit[outfit.layers[single_layer]][single_clothing].id);
+          }
+          if (outfit.layerArt[single_layerArt] == "layer" && outfit[outfit.layers[single_layer]][single_clothing].size == tSize && outfit[outfit.layers[single_layer]][single_clothing].gender == gender  ) {
+              new_outfit[outfit.layers[single_layer]].push(outfit[outfit.layers[single_layer]][single_clothing].id);
+          }
+          if (outfit.layerArt[single_layerArt] == "bottom" && outfit[outfit.layers[single_layer]][single_clothing].size == bSize && outfit[outfit.layers[single_layer]][single_clothing].gender == gender  ) {
+              new_outfit[outfit.layers[single_layer]].push(outfit[outfit.layers[single_layer]][single_clothing].id);
+          }
+          if (outfit.layerArt[single_layerArt] == "shoes" && outfit[outfit.layers[single_layer]][single_clothing].size == sSize && outfit[outfit.layers[single_layer]][single_clothing].gender == gender   ) {
+              new_outfit[outfit.layers[single_layer]].push(outfit[outfit.layers[single_layer]][single_clothing].id);;
+          }
+        }
+
+      }
+
+  }
+      // Gebe neues Outfit zurück
+     return new_outfit;
+  }
 
     module.exports = calcOutfit;

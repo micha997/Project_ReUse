@@ -26,7 +26,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * "EditClothing" bietet dem Benutzer die Möglichkeit Kleidungsstücke auch nach dem Einstellen weiter zu bearbeiten.
+ * "EditClothing" bietet dem Benutzer die Möglichkeit, Kleidungsstücke auch nach dem Einstellen weiter zu bearbeiten.
  * Die bereits verfügbaren Kleidunsstücke werden zu Beginn vom Server geladen passend dargestellt und es wird eine
  *  Möglichkeit geboten die jeweiligen Werte zu ändern.
  *

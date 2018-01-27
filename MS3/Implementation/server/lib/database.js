@@ -467,24 +467,55 @@ const database = {
             throw new Error('choise is missing.');
             callback(err);
         }
-        // find all elements
-        this.mappings.find({
-            type: "clothing"
-        }).toArray((err, mappings) => {
-            if (err) {
+
+        async.waterfall([
+            async.apply(findClothing, this.mappings),
+            async.apply(calcDistance, params),
+            async.apply(calcNewOutfit, params)
+        ], function(err, result) {
+            if (err == "1") {
                 return callback(err);
+            } else {
+                callback(null, result);
             }
-            //send results back to handler
-            if (choise == "true") {
+        });
 
-                var mappings = calcClothingDistance(mappings, params.latitude, params.longitude, params.vicinity);
+        function findClothing(mappings, callback) {
+          mappings.find({
+              type: "clothing"
+          }).toArray((err, clothing) => {
+            if (err) {
+              callback("1", null);
+            }  else {
 
-            }
-            var clothing = calcOutfit("winter", mappings, false);
+              callback(null,clothing);
+            }})
+        }
 
-            // search for elements in vicinity + add distance
-            callback(null, clothing);
-        })
+        function calcDistance(params, mappings, callback) {
+
+              function queryCollection(mappings ,params, callback) {
+                calcClothingDistance(mappings, params.latitude, params.longitude, params.vicinity, function(mappings_new) {
+                    callback(mappings_new);
+                });
+              }
+
+              queryCollection(mappings, params, function(mappings_new) {
+                callback(null, mappings_new);
+              });
+        }
+
+        function calcNewOutfit(params, mappings, callback) {
+              function queryCollection(mappings, callback) {
+                calcOutfit("winter", mappings, false, params.gender, params.hSize, params.tSize, params.bSize, params.sSize, function(mappings_new) {
+                    callback(mappings_new);
+                });
+              }
+
+              queryCollection(mappings, function(mappings_new) {
+                callback(null, mappings_new);
+              });
+        }
     },
     getAllClothingLocation(latitude, longitude, vicinity, callback) {
         if (!callback) {
@@ -583,7 +614,7 @@ const database = {
         }
 
         function searchFits(mappings, mapping, callback) {
-            var fits = calcOutfit(null, mapping, true);
+            var fits = calcOutfit(null, mapping, true, null);
             callback(null, mapping, fits);
         }
 
@@ -899,7 +930,7 @@ const database = {
                 if (err) {
                     callback("1");
                 } else {
-                    callback(null)
+                    callback(null);
                 }
             })
 
@@ -1123,7 +1154,7 @@ const database = {
 
 };
 
-function calcClothingDistance(mappings, latitude, longitude, vicinity) {
+function calcClothingDistance(mappings, latitude, longitude, vicinity, callback) {
     var mappings_new = [];
     for (var i = 0; i < mappings.length; i++) {
         // calc distance
@@ -1134,7 +1165,8 @@ function calcClothingDistance(mappings, latitude, longitude, vicinity) {
             mappings_new.push(mappings[i]);
         }
     }
-    return mappings_new;
+    callback(mappings_new);
+    //return mappings_new;
 }
 
 

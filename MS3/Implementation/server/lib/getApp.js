@@ -55,8 +55,8 @@ const getApp = function(database, firebase) {
 
 
     // define routes
-    //app.get('/outfit/:art/:gender/:hSize/:tSize/:bSize/:sSize/:longitude/:latitude/:vicinity', routes.getOutfit(database, "false"));
-    app.get('/outfit/:art', routes.getOutfit(database, "false"));
+    app.get('/outfit/:art/:gender/:hSize/:tSize/:bSize/:sSize/:longitude/:latitude/:vicinity', routes.getOutfit(database, "false"));
+    //app.get('/outfit/:art/:longitude/:latitude/:vicinity', routes.getOutfit(database, "false"));
     app.post('/user/:uId/search', routes.postUserSearch(database));
 
     app.post('/users/:id/token/:token', routes.postUserToken(database));
