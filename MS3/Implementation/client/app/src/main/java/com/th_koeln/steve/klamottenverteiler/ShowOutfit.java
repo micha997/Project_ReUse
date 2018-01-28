@@ -23,7 +23,9 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.SeekBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.th_koeln.steve.klamottenverteiler.adapter.ClothingOfferAdapter;
@@ -45,24 +47,44 @@ import java.util.ArrayList;
 
 public class ShowOutfit extends AppCompatActivity implements View.OnClickListener {
 
+    //Elemente aus dem Layout
     private RecyclerView headRecycler, layer1Recycler,
             layer2Recycler, layer3Recycler,
             bottomRecycler, shoesRecycler;
     private Spinner spinnerMissingClothing;
-
-    private ArrayList<ClothingOffer> HeadForAdapter = new ArrayList<>(), Layer1ForAdapter = new ArrayList(),
-            Layer2ForAdapter = new ArrayList(), Layer3ForAdapter = new ArrayList(),
-            BottomForAdapter = new ArrayList(), ShoesForAdapter = new ArrayList();
-
-    private ArrayList<String> miss = new ArrayList();
-    private ArrayAdapter<String> missingAdapter;
-
     private Toolbar addOutfitTB;
     private Button btnSendClothingRequest;
     private Button btnSubscribeMissingClothing;
 
+    //Speichert die erhaltenen Ergebnisse der Outfitzusammenstellung fuer jeden Bereich in einer Liste
+    private ArrayList<ClothingOffer> HeadForAdapter = new ArrayList<>(), Layer1ForAdapter = new ArrayList(),
+            Layer2ForAdapter = new ArrayList(), Layer3ForAdapter = new ArrayList(),
+            BottomForAdapter = new ArrayList(), ShoesForAdapter = new ArrayList();
+
+    /*Alles bis zum naechsten "//" ist fuer den Filter.
+    Da der Filter ziemlich schnell geschrieben werden musste,
+    ist vieles nicht elegant geworden*/
+    private String[] genderArr = new String[]{"Geschlecht wählen","Weiblich","Männlich"};
+    private ArrayList<String> headSize = new ArrayList<>()
+            , topSize = new ArrayList<>(), bottomSize = new ArrayList<>()
+            , shoesSizeWomen = new ArrayList<>(), shoesSizeMen = new ArrayList<>();
+    private String selGender = "0",selHead = "0",selTop = "0",selBottom = "0", selShoes = "0";
+    private int selGenderIn = 0, selHeadIn = 0, selTopIn = 0,
+            selBottomIn = 0, selShoesIn = 0, vicinity = 100;
+    /*Default Koordinaten ist die Koelner Innenstadt.
+    Nicht ideal, aber falls persoenliche Koordinaten nicht
+    abgerufen werden koennen soll dennoch ein Ergebniss erscheinen*/
+    private double latitude = 50.935534250455916;
+    private double longitude = 6.960927844047546;
+    //
+
+    //Falls Bereiche keine Ergebnisse liefern werden in dieser
+    //Liste die fehlenden Objekte gespeichert
+    private ArrayList<String> miss = new ArrayList();
+    private ArrayAdapter<String> missingAdapter;
+
     private ProgressDialog progressDialog;
-    private String model;
+    private String model, selected;
     private int index = 0;
     private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private final String uId = firebaseAuth.getCurrentUser().getUid();
@@ -114,7 +136,6 @@ public class ShowOutfit extends AppCompatActivity implements View.OnClickListene
         SnapHelper helper5 = new PagerSnapHelper();
         helper5.attachToRecyclerView(shoesRecycler);
 
-
         spinnerMissingClothing = (Spinner) findViewById(R.id.spinnerMissingClothing);
 
         btnSendClothingRequest = (Button) findViewById(R.id.btnSendClothingRequest);
@@ -128,7 +149,10 @@ public class ShowOutfit extends AppCompatActivity implements View.OnClickListene
         IntentFilter filter = new IntentFilter();
         filter.addAction("getClothingDetail2");
         filter.addAction("showoutfit");
+        filter.addAction("clothingOptions");
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,filter);
+
+        getClothingOption();
     }
 
     public void getDetailedData(String outfit){
@@ -284,12 +308,25 @@ public class ShowOutfit extends AppCompatActivity implements View.OnClickListene
             Intent myIntent = new Intent(getApplicationContext(), HttpsService.class);
             myIntent.putExtra("method", "GET");
             myIntent.putExtra("from", "SEARCHOUTFIT");
-            myIntent.putExtra("url", getString(R.string.DOMAIN) + "/outfit/" + "winter");
+            myIntent.putExtra("url", getString(R.string.DOMAIN) + "/outfit/" + "winter/"
+                    + selGender +"/"+ selHead +"/"+ selTop +"/"+ selBottom +"/"+ selShoes
+                    +"/"+ longitude +"/"+ latitude +"/"+ vicinity);
             startService(myIntent);
             progressDialog = new ProgressDialog(ShowOutfit.this);
             progressDialog.setMessage("Trying to get outfit..");
             progressDialog.show();
         }
+    }
+
+    private void getClothingOption(){
+        Intent optionsIntent = new Intent(getApplicationContext(), HttpsService.class);
+        optionsIntent.putExtra("method","GET");
+        optionsIntent.putExtra("from","CLOTHINGOPTIONS");
+        optionsIntent.putExtra("url",getString(R.string.DOMAIN) + "/clothingOptions");
+        startService(optionsIntent);
+        progressDialog = new ProgressDialog(ShowOutfit.this);
+        progressDialog.setMessage("Getting Information..");
+        progressDialog.show();
     }
 
     private void fillView(ArrayList<ClothingOffer> options, RecyclerView putRecyc) {
@@ -370,6 +407,65 @@ public class ShowOutfit extends AppCompatActivity implements View.OnClickListene
                 String outfit = intent.getStringExtra("clothing");
                 getDetailedData(outfit);
             }
+            if(intent.getStringExtra("from").equals("CLOTHINGOPTIONS")){
+                String rawData = intent.getStringExtra("optionsData");
+                /*Die Daten zum Filtern sollen nun extrahier werden.
+                 *Sehr unschoene Loesung, aber eine schnelle Loesung war von noeten
+                 */
+                try {
+                    JSONArray clothingOptions = new JSONArray(rawData);
+                    for(int j = 0;clothingOptions.length()>j;j++){
+                        JSONObject tmpOBJ = clothingOptions.getJSONObject(j);
+                        if(tmpOBJ.getString("topic").equals("Size")){
+                            JSONArray sizeOptions1 = tmpOBJ.getJSONArray("options");
+                            for(int k=0;sizeOptions1.length()>k;k++){
+                                JSONObject sizeTopic = sizeOptions1.getJSONObject(k);
+                                switch (sizeTopic.getString("topic")){
+                                    case "Kopfbedeckung Größe":
+                                        headSize.add(sizeTopic.getString("topic"));
+                                        JSONArray sizeOptions2 = sizeTopic.getJSONArray("options");
+                                        for(int h=0;sizeOptions2.length()>h;h++){
+                                            headSize.add(sizeOptions2.getString(h));
+                                        }
+                                        break;
+                                    case "Oberbekleidung Größe":
+                                        topSize.add(sizeTopic.getString("topic"));
+                                        JSONArray sizeOptions3 = sizeTopic.getJSONArray("options");
+                                        for(int h=0;sizeOptions3.length()>h;h++){
+                                            topSize.add(sizeOptions3.getString(h));
+                                        }
+                                        break;
+                                    case "Unterbekleidung Größe":
+                                        bottomSize.add(sizeTopic.getString("topic"));
+                                        JSONArray sizeOptions4 = sizeTopic.getJSONArray("options");
+                                        for(int h=0;sizeOptions4.length()>h;h++){
+                                            bottomSize.add(sizeOptions4.getString(h));
+                                        }
+                                        break;
+                                    case "Fußbekleidung Größe (Herren)":
+                                        shoesSizeMen.add(sizeTopic.getString("topic"));
+                                        JSONArray sizeOptions5 = sizeTopic.getJSONArray("options");
+                                        for(int h=0;sizeOptions5.length()>h;h++){
+                                            shoesSizeMen.add(sizeOptions5.getString(h));
+                                        }
+                                        break;
+                                    case "Fußbekleidung Größe (Frauen)":
+                                        shoesSizeWomen.add(sizeTopic.getString("topic"));
+                                        JSONArray sizeOptions6 = sizeTopic.getJSONArray("options");
+                                        for(int h=0;sizeOptions6.length()>h;h++){
+                                            shoesSizeWomen.add(sizeOptions6.getString(h));
+                                        }
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                }catch(JSONException e){
+                    progressDialog.dismiss();
+                    showDialog("Error", "Could not process request data!");
+                }
+                progressDialog.dismiss();
+            }
         }
     };
 
@@ -395,24 +491,119 @@ public class ShowOutfit extends AppCompatActivity implements View.OnClickListene
             final String[] tmpString = new String[]{"Winter", "Sommer", "Winter-Sport", "Herbst"};
             builder.setTitle("Choose context")
                     .setSingleChoiceItems(tmpString,0, null)
-            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    ListView lw = ((AlertDialog)dialogInterface).getListView();
-                    String selected = (String) lw.getAdapter().getItem(lw.getCheckedItemPosition());
-                    sendOutfitRequest(selected);
-                    dialogInterface.dismiss();
-                }
-            })
-            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    dialogInterface.dismiss();
-                }
-            })
-            .create()
-            .show();
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            ListView lw = ((AlertDialog)dialogInterface).getListView();
+                            selected = (String) lw.getAdapter().getItem(lw.getCheckedItemPosition());
+                            sendOutfitRequest(selected);
+                            dialogInterface.dismiss();
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    })
+                    .create()
+                    .show();
         }
+
+        /*Filter Button
+        Sehr unschoene, aber eine schnelle Loesung war noetig
+        */
+        if(actionID == R.id.action_filt){
+            AlertDialog.Builder builder = new AlertDialog.Builder(ShowOutfit.this);
+            View mView = getLayoutInflater().inflate(R.layout.outfit_filter_layout, null);
+            builder.setTitle("Filter");
+            //
+            final Spinner spinnerGender = (Spinner) mView.findViewById(R.id.spinnerGender);
+            spinnerGender.setAdapter(new ArrayAdapter<String>(this,
+                    android.R.layout.simple_list_item_1, genderArr));
+            spinnerGender.setSelection(selGenderIn);
+            //
+            final Spinner spinnerHead = (Spinner) mView.findViewById(R.id.spinnerHead);
+            spinnerHead.setAdapter(new ArrayAdapter<String>(this,
+                    android.R.layout.simple_list_item_1, headSize));
+            spinnerHead.setSelection(selHeadIn);
+            //
+            final Spinner spinnerTop = (Spinner) mView.findViewById(R.id.spinnerTop);
+            spinnerTop.setAdapter(new ArrayAdapter<String>(this,
+                    android.R.layout.simple_list_item_1, topSize));
+            spinnerTop.setSelection(selTopIn);
+            //
+            final Spinner spinnerBottom = (Spinner) mView.findViewById(R.id.spinnerBottom);
+            spinnerBottom.setAdapter(new ArrayAdapter<String>(this,
+                    android.R.layout.simple_list_item_1, bottomSize));
+            spinnerBottom.setSelection(selBottomIn);
+            //
+            final Spinner spinnerShoesWomen = (Spinner) mView.findViewById(R.id.spinnerShoesWomen);
+            spinnerShoesWomen.setAdapter(new ArrayAdapter<String>(this,
+                    android.R.layout.simple_list_item_1, shoesSizeWomen));
+            spinnerShoesWomen.setSelection(selShoesIn);
+            //
+            final Spinner spinnerShoesMen = (Spinner) mView.findViewById(R.id.spinnerShoesMen);
+            spinnerShoesMen.setAdapter(new ArrayAdapter<String>(this,
+                    android.R.layout.simple_list_item_1, shoesSizeMen));
+            spinnerShoesMen.setSelection(selShoesIn);
+            //
+            final TextView textViewProgress = (TextView) mView.findViewById(R.id.textViewProgress);
+            SeekBar seekBarDistance = (SeekBar) mView.findViewById(R.id.seekBarDistance);
+            seekBarDistance.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                    textViewProgress.setText("Entfernung in KM: " + i);
+                    vicinity = i;
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+
+                }
+            });
+            seekBarDistance.setProgress(vicinity);
+            textViewProgress.setText("Entfernung in KM: "+vicinity);
+
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    //Die Ausgewaehlten Daten muessen nun gespeichert werden
+                    switch(spinnerGender.getSelectedItemPosition()){
+                        case 1:selGender = "W";selGenderIn = 1;break;
+                        case 2:selGender = "M";selGenderIn = 2;break;
+                        case 0:selGender = "0";selGenderIn = 0;break;
+                    }
+                    if((selHeadIn = spinnerHead.getSelectedItemPosition())>0){selHead = spinnerHead.getSelectedItem().toString();}
+                    else{selHead = "0";selHeadIn = 0;}
+                    if((selTopIn = spinnerTop.getSelectedItemPosition())>0){selTop = spinnerTop.getSelectedItem().toString();}
+                    else{selTop = "0";selTopIn = 0;}
+                    if((selBottomIn = spinnerBottom.getSelectedItemPosition())>0){selBottom = spinnerBottom.getSelectedItem().toString();}
+                    else{selBottom = "0";selBottomIn = 0;}
+                    if((selShoesIn = spinnerShoesMen.getSelectedItemPosition())>0){
+                        selShoes = spinnerShoesMen.getSelectedItem().toString();
+                    }else if((selShoesIn = spinnerShoesWomen.getSelectedItemPosition())>0) {
+                        selShoes = spinnerShoesWomen.getSelectedItem().toString();
+                    }else{selShoes = "0";selShoesIn = 0;}
+                    dialogInterface.dismiss();
+                }
+            });
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                }
+            });
+            builder.setView(mView);
+            builder.create();
+            builder.show();
+        }
+
         return super.onOptionsItemSelected(item);
     }
 

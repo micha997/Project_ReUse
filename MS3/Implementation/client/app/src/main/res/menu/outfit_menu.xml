@@ -10,4 +10,10 @@
         android:title="action_add"
         app:showAsAction="ifRoom" />
 
+    <item
+        android:id="@+id/action_filt"
+        android:icon="@drawable/ic_action_filter"
+        android:title="action_filt"
+        app:showAsAction="ifRoom" />
+
 </menu>
