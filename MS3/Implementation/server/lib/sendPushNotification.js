@@ -1,10 +1,6 @@
 'use strict';
 const uuidv4 = require('uuid/v4');
-
-
 var request = require('request');
-
-
 
 
 const sendPushNotification = function(token, cId, payload, fits, from, firebase) {

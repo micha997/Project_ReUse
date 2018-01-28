@@ -18,28 +18,29 @@
         android:layout_centerVertical="true">
 
         <TextView
-            android:text="Registrieren:"
+            android:id="@+id/tvRegister"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_above="@+id/linearLayout"
             android:layout_centerHorizontal="true"
-            android:id="@+id/tvRegister"
+            android:text="Registration:"
             android:textSize="36sp" />
+
         <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:id="@+id/etEmailRegistration"
-            android:inputType="textEmailAddress"
-            android:text="dominosk@gmx.de"
-            android:hint="Bitte Email-Adresse eingeben:"
-            android:layout_margin="20dp"/>
-        <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:hint="Please enter username"
+            android:inputType="none|textEmailAddress" />
+
+        <EditText
             android:id="@+id/etPasswordRegister"
-            android:inputType="textPassword"
-            android:hint="Bitte Passwort eingeben:"
-            android:layout_margin="20dp"/>
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:hint="Please enter password"
+            android:inputType="textPassword" />
 
 
 
@@ -49,13 +50,14 @@
             android:layout_height="wrap_content"
             android:text="Register"
             android:id="@+id/btnRegister"/>
+
         <TextView
-            android:textAlignment="center"
+            android:id="@+id/tvGoLogin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/tvGoLogin"
             android:clickable="true"
-            android:text="Bereits registriert? Hier geht es zum LogIn."/>
+            android:text="Already registered? Login here!"
+            android:textAlignment="center" />
 
     </LinearLayout>
 </RelativeLayout>

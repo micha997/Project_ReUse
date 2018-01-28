@@ -28,21 +28,20 @@
             android:textSize="36sp" />
 
         <EditText
+            android:id="@+id/etEmailLogin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/etEmailLogin"
-            android:inputType="textEmailAddress"
-            android:hint="Bitte Email-Adresse eingeben:"
             android:layout_margin="20dp"
-            android:text="dominosk@gmx.de" />
+            android:hint="Please enter username"
+            android:inputType="textEmailAddress" />
 
         <EditText
+            android:id="@+id/etPasswordLogin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/etPasswordLogin"
-            android:inputType="textPassword"
-            android:hint="Bitte Passwort eingeben:"
-            android:layout_margin="20dp"/>
+            android:layout_margin="20dp"
+            android:hint="Please enter password"
+            android:inputType="textPassword" />
 
 
         <Button
@@ -51,12 +50,13 @@
             android:layout_height="wrap_content"
             android:text="Login"
             android:id="@+id/btnLogin"/>
+
         <TextView
-            android:textAlignment="center"
+            android:id="@+id/tvLogin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/tvLogin"
-            android:text="Kein Account? Registrierung hier!"/>
+            android:text="No Account? Register here!"
+            android:textAlignment="center" />
 
     </LinearLayout>
 

@@ -359,8 +359,8 @@ var wintermodel = {
       for (var single_layerArt in outfit.layerArt) {
         // Durchlaufe spezielle Arten
         for (var single_layer in outfit.layers) {
+            // Durchlaufe einzelne Kleidungsstücke
             for (var single_clothing in outfit[outfit.layers[single_layer]]) {
-
           // Überprüfe ob Kleidungsstück richtige Art & richtige Größe hat und für das richtige Geschlecht iist
           if (outfit.layerArt[single_layerArt] == "head" && (outfit[outfit.layers[single_layer]][single_clothing].size == hSize || hSize==0) && (outfit[outfit.layers[single_layer]][single_clothing].gender == gender || gender==0 ) && outfit.layers[single_layer] == outfit.layers[single_layerArt]) {
               new_outfit[outfit.layers[single_layer]].push(outfit[outfit.layers[single_layer]][single_clothing].id);
@@ -380,6 +380,7 @@ var wintermodel = {
 
   }
       // Gebe neues Outfit zurück
+      console.log(new_outfit);
      return new_outfit;
   }
 
