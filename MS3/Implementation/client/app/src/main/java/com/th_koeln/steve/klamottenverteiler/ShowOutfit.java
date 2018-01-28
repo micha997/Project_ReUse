@@ -7,8 +7,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -45,7 +51,7 @@ import java.util.ArrayList;
  * Created by Steffen Owtschinnikow on 02.01.2018.
  */
 
-public class ShowOutfit extends AppCompatActivity implements View.OnClickListener {
+public class ShowOutfit extends AppCompatActivity implements View.OnClickListener, LocationListener {
 
     //Elemente aus dem Layout
     private RecyclerView headRecycler, layer1Recycler,
@@ -74,6 +80,7 @@ public class ShowOutfit extends AppCompatActivity implements View.OnClickListene
     /*Default Koordinaten ist die Koelner Innenstadt.
     Nicht ideal, aber falls persoenliche Koordinaten nicht
     abgerufen werden koennen soll dennoch ein Ergebniss erscheinen*/
+    private LocationManager locationManager;
     private double latitude = 50.935534250455916;
     private double longitude = 6.960927844047546;
     //
@@ -93,6 +100,11 @@ public class ShowOutfit extends AppCompatActivity implements View.OnClickListene
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_outfit_2);
+
+        //Permission Check
+        checkGPSPermission();
+        //Holt die Location
+        getLocation();
 
         //RecyclerView fuer die Kopfbedeckungen
         headRecycler = (RecyclerView) findViewById(R.id.headRecycler);
@@ -618,5 +630,46 @@ public class ShowOutfit extends AppCompatActivity implements View.OnClickListene
                     }
                 });
         if (!isFinishing()) alertDialog.show();
+    }
+
+    //Prueft ob die Berechtigung vorhanden ist GPS zu nutzen
+    private void checkGPSPermission(){
+        if(ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,
+                    android.Manifest.permission.ACCESS_COARSE_LOCATION}, 101);
+        }
+    }
+
+    //Holt die aktuelle Position
+    private void getLocation(){
+        try{
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 5, this);
+        }catch(SecurityException e){
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        longitude = location.getLongitude();
+        latitude = location.getLatitude();
+    }
+
+    @Override
+    public void onStatusChanged(String s, int i, Bundle bundle) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String s) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String s) {
+
     }
 }
