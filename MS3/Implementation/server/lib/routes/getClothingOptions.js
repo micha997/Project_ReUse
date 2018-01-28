@@ -2,8 +2,8 @@
 var data = require('../clothingOptionsData');
 
 
-const getClothingOptions = function(){
-  
+const getClothingOptions = function() {
+
     if (data == null) {
         throw new Error('Database is missing.');
         console.log("error");

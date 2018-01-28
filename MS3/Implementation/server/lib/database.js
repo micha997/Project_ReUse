@@ -82,7 +82,7 @@ const database = {
             }
             // Filter Kleidungsstücke nach Distanz
             calcClothingDistance(mappings, latitude, longitude, vicinity, function(mappings_new) {
-                callback(null,mappings_new);
+                callback(null, mappings_new);
             });
 
         })
@@ -180,15 +180,15 @@ const database = {
         });
 
         function findOwnRequests(mappings, uId, callback) {
-          if (!callback) {
-              throw new Error('callback is missing.');
-          }
-          if (!mappings) {
-              return callback("1", null);
-          }
-          if (!uId) {
-              return callback("1", null);
-          }
+            if (!callback) {
+                throw new Error('callback is missing.');
+            }
+            if (!mappings) {
+                return callback("1", null);
+            }
+            if (!uId) {
+                return callback("1", null);
+            }
             mappings.find({
                 type: "userprofile",
                 "requests.ouId": uId
@@ -202,20 +202,20 @@ const database = {
         }
 
         function findOtherRequests(mappings, mapping, callback) {
-          if (!callback) {
-              throw new Error('callback is missing.');
-          }
-          if (!mapping) {
-              return callback("1", null);
-          }
-          if (!mappings) {
-              return callback("1", null);
-          }
+            if (!callback) {
+                throw new Error('callback is missing.');
+            }
+            if (!mapping) {
+                return callback("1", null);
+            }
+            if (!mappings) {
+                return callback("1", null);
+            }
             var requests = [];
 
             /** IDs des Requests wird vertauscht, damit eine homogene Datenstruktur für die Requests erhalten bleibt.
-            * Das neue Element "from" enthält anschließend die Information, ob es sich um einen Fremden oder einen
-            * eigenen Request handelt */
+             * Das neue Element "from" enthält anschließend die Information, ob es sich um einen Fremden oder einen
+             * eigenen Request handelt */
 
             for (var single_map in mapping) {
                 var obj = mapping[single_map].requests;
@@ -235,38 +235,38 @@ const database = {
                 }
                 // Löscht Bilder aus den Datensätzen, da diese nicht gebraucht werden
                 for (var single_profile in mappings) {
-                  delete mappings.image;
+                    delete mappings.image;
                 }
                 /** Das neue Element "from" enthält anschließend die Information, ob es sich um einen Fremden oder einen
-                * eigenen Request handelt */
+                 * eigenen Request handelt */
                 if (mappings !== null) {
-                for (var single_ownReq in mappings.requests) {
-                    mappings.requests[single_ownReq].from = "own";
-                    requests.push(mappings.requests[single_ownReq]);
+                    for (var single_ownReq in mappings.requests) {
+                        mappings.requests[single_ownReq].from = "own";
+                        requests.push(mappings.requests[single_ownReq]);
+                    }
                 }
-              }
                 //send results back to handler
                 callback(null, requests);
             })
         }
 
         function searchClothing(mappings, requests, callback) {
-          if (!callback) {
-              return callback("1", null);
-          }
-          if (!mappings) {
-              return callback("1", null);
-          }
-          if (!requests) {
-              return callback("1", null);
-          }
+            if (!callback) {
+                return callback("1", null);
+            }
+            if (!mappings) {
+                return callback("1", null);
+            }
+            if (!requests) {
+                return callback("1", null);
+            }
             mappings.find({
                 type: "clothing",
             }).toArray((err, mapping) => {
                 if (err) {
                     callback("1", null);
                 }
-                var results= [];
+                var results = [];
                 // Durchlaufe die einzelnen Requests
                 for (var single_req in requests) {
                     // Durchlaufe die einzelnen Kleidungsstücke
@@ -275,11 +275,11 @@ const database = {
                         if (mapping[single_clothing].id == requests[single_req].cId) {
 
                             delete mapping[single_clothing].uId;
-                        delete mapping[single_clothing].id;
-                        delete mapping[single_clothing].uId;
+                            delete mapping[single_clothing].id;
+                            delete mapping[single_clothing].uId;
 
-                        var obj = Object.assign(requests[single_req], mapping[single_clothing]);
-                        results.push(obj);
+                            var obj = Object.assign(requests[single_req], mapping[single_clothing]);
+                            results.push(obj);
 
                         }
                     }
@@ -313,13 +313,13 @@ const database = {
         }, {
             $set: put
         }, (err) => {
-          if (err) {
-              callback(err);
-          } else {
-          callback(null);
-          }
+            if (err) {
+                callback(err);
+            } else {
+                callback(null);
+            }
         })
-      },
+    },
 
     // Anpassung von Bewertungen
     putUserRating(uId, id, put, callback) {
@@ -392,18 +392,18 @@ const database = {
         });
 
         function findRequest(mappings, id, body, callback) {
-          if (!body) {
-              return callback("1", null);
-          }
-          if (!mappings) {
-              return callback("1", null);
-          }
-          if (!id) {
-              return callback("1", null);
-          }
-          if (!callback) {
-              throw new Error('callback is missing.');
-          }
+            if (!body) {
+                return callback("1", null);
+            }
+            if (!mappings) {
+                return callback("1", null);
+            }
+            if (!id) {
+                return callback("1", null);
+            }
+            if (!callback) {
+                throw new Error('callback is missing.');
+            }
             mappings.update({
                 type: "userprofile",
                 "requests.id": id,
@@ -426,30 +426,30 @@ const database = {
         }
 
         function sendPush(mappings, body, firebase, callback) {
-          if (!body) {
-              return callback("1", null);
-          }
-          if (!mappings) {
-              return callback("1", null);
-          }
-          if (!firebase) {
-              return callback("1", null);
-          }
-          if (!callback) {
-              throw new Error('callback is missing.');
-          }
-                mappings.findOne({
-                    uId: body.uId,
-                    type: "token"
-                }, (err, mappings) => {
-                    if (err) {
-                        callback(null);
-                    } else {
-                        sendPushNotification(mappings.token, body.uId, mappings, "", body.status, firebase);
-                        callback(null);
-                    }
+            if (!body) {
+                return callback("1", null);
+            }
+            if (!mappings) {
+                return callback("1", null);
+            }
+            if (!firebase) {
+                return callback("1", null);
+            }
+            if (!callback) {
+                throw new Error('callback is missing.');
+            }
+            mappings.findOne({
+                uId: body.uId,
+                type: "token"
+            }, (err, mappings) => {
+                if (err) {
+                    callback(null);
+                } else {
+                    sendPushNotification(mappings.token, body.uId, mappings, "", body.status, firebase);
+                    callback(null);
+                }
 
-                })
+            })
         }
     },
 
@@ -500,7 +500,7 @@ const database = {
             }
             // Lösche Bilder aus dem Kleidungsdatensatz
             for (var single_mappings in mappings)
-            delete mappings[single_mappings].image;
+                delete mappings[single_mappings].image;
 
             callback(null, mappings);
         })
@@ -576,70 +576,72 @@ const database = {
         });
 
         function findClothing(mappings, callback) {
-          if (!callback) {
-              throw new Error('Callback is missing.');
-          }
-          if (!mappings) {
-              return callback("1", null);
-          }
-          mappings.find({
-              type: "clothing"
-          }).toArray((err, clothing) => {
-            if (err) {
-              callback("1", null);
-            }  else {
+            if (!callback) {
+                throw new Error('Callback is missing.');
+            }
+            if (!mappings) {
+                return callback("1", null);
+            }
+            mappings.find({
+                type: "clothing"
+            }).toArray((err, clothing) => {
+                if (err) {
+                    callback("1", null);
+                } else {
 
-              callback(null,clothing);
-            }})
+                    callback(null, clothing);
+                }
+            })
         }
 
         function calcDistance(params, mappings, callback) {
-          if (!callback) {
-              throw new Error('Callback is missing.');
-          }
-          if (!mappings) {
-              return callback("1", null);
-          }
-          if (!params) {
-              return callback("1", null);
-          }
+            if (!callback) {
+                throw new Error('Callback is missing.');
+            }
+            if (!mappings) {
+                return callback("1", null);
+            }
+            if (!params) {
+                return callback("1", null);
+            }
 
-              function queryCollection(mappings ,params, callback) {
+            function queryCollection(mappings, params, callback) {
                 calcClothingDistance(mappings, params.latitude, params.longitude, params.vicinity, function(mappings_new) {
                     callback(mappings_new);
                 });
-              }
+            }
 
-              queryCollection(mappings, params, function(mappings_new) {
+            queryCollection(mappings, params, function(mappings_new) {
                 if (mappings_new == "1") {
-                              callback("1");
-                            } else {
+                    callback("1");
+                } else {
 
 
-                callback(null, mappings_new);
+                    callback(null, mappings_new);
                 }
-              });
+            });
         }
 
         function calcNewOutfit(params, mappings, callback) {
-          if (!callback) {
-              throw new Error('Callback is missing.');
-          }
-          if (!mappings) {
-              return callback("1", null);
-          }
-          if (!params) {
-              return callback("1", null);
-          }
-              function queryCollection(mappings, callback) {
+            if (!callback) {
+                throw new Error('Callback is missing.');
+            }
+            if (!mappings) {
+                return callback("1", null);
+            }
+            if (!params) {
+                return callback("1", null);
+            }
+
+            function queryCollection(mappings, callback) {
                 calcOutfit("winter", mappings, false, params.gender, params.hSize, params.tSize, params.bSize, params.sSize, function(mappings_new) {
                     callback(mappings_new);
                 });
-              }
+            }
 
-              queryCollection(mappings, function(mappings_new) {
+            queryCollection(mappings, function(mappings_new) {
                 callback(null, mappings_new);
-              });
+            });
         }
     },
     // Kleidungssuche mit Distanzfilter
@@ -700,143 +702,144 @@ const database = {
             callback(err);
         }
 
-            try {
-                // Wandelt übergebene Attribute des Kleidungsstück in JSON und speichert die einzelnen Werte anschließend als JavaScript Object
-                clothing = JSON.parse(clothing);
-                const mapping = {
-                    id: uuidv4(),
-                    longitude: clothing["longitude"],
-                    latitude: clothing["latitude"],
-                    size: clothing["size"],
-                    art: clothing["art"],
-                    color: clothing["colour"],
-                    style: clothing["style"],
-                    gender: clothing["gender"],
-                    fabric: clothing["fabric"],
-                    notes: clothing["notes"],
-                    brand: clothing["brand"],
-                    date: Date.now(),
-                    postalCode: clothing["postalCode"],
-                    city: clothing["city"],
-                    uId: clothing["uId"],
-                    type: "clothing",
-                    image: clothing["image"]
-                };
+        try {
+            // Wandelt übergebene Attribute des Kleidungsstück in JSON und speichert die einzelnen Werte anschließend als JavaScript Object
+            clothing = JSON.parse(clothing);
+            const mapping = {
+                id: uuidv4(),
+                longitude: clothing["longitude"],
+                latitude: clothing["latitude"],
+                size: clothing["size"],
+                art: clothing["art"],
+                color: clothing["colour"],
+                style: clothing["style"],
+                gender: clothing["gender"],
+                fabric: clothing["fabric"],
+                notes: clothing["notes"],
+                brand: clothing["brand"],
+                date: Date.now(),
+                postalCode: clothing["postalCode"],
+                city: clothing["city"],
+                uId: clothing["uId"],
+                type: "clothing",
+                image: clothing["image"]
+            };
 
-                async.waterfall([
-                    // Füge Kleidung zur Datenbank hinzu
-                    async.apply(insertClothing, this.mappings),
-                    // Suche nach Modellen, für die das Kleidungsstück infrage kommt
-                    searchFits,
-                    // Suche Benutzer, die das Kleidungsstück gebrauchen könnten
-                    async.apply(findUsers, this.mappings),
-                    // Sende Suchenden Benutzern eine Nachricht
-                    async.apply(sendPush, this.mappings, firebase),
-                ], function(err) {
-                    /* Wenn "err" eine "2" enthält, ist bei der Suche nach Personen, die das Kleidungsstück gebrauchen können etwas schief gelaufen,
-                    * oder es wurde kein Benutzer gefunden, der das Kleidungsstück gebrauchen kann. Da das Kleidungsstück trotzdem erfolgreich eingetragen wurde,
-                    * wird in diesem Fall dennoch eine positive Rückantwort gesendet*/
-                    if (err == "1") {
-                        return callback(err);
+            async.waterfall([
+                // Füge Kleidung zur Datenbank hinzu
+                async.apply(insertClothing, this.mappings),
+                // Suche nach Modellen, für die das Kleidungsstück infrage kommt
+                searchFits,
+                // Suche Benutzer, die das Kleidungsstück gebrauchen könnten
+                async.apply(findUsers, this.mappings),
+                // Sende Suchenden Benutzern eine Nachricht
+                async.apply(sendPush, this.mappings, firebase),
+            ], function(err) {
+                /* Wenn "err" eine "2" enthält, ist bei der Suche nach Personen, die das Kleidungsstück gebrauchen können etwas schief gelaufen,
+                 * oder es wurde kein Benutzer gefunden, der das Kleidungsstück gebrauchen kann. Da das Kleidungsstück trotzdem erfolgreich eingetragen wurde,
+                 * wird in diesem Fall dennoch eine positive Rückantwort gesendet*/
+                if (err == "1") {
+                    return callback(err);
+                } else {
+                    callback(null);
+                }
+            });
+
+            function insertClothing(mappings, callback) {
+                if (!callback) {
+                    throw new Error('Callback is missing.');
+                }
+                if (!mappings) {
+                    callback("1", null);
+                }
+
+                mappings.insertOne(mapping, err => {
+                    if (err) {
+                        callback("1");
                     } else {
-                        callback(null);
+
+                        callback(null, mappings, mapping);
                     }
-                });
+                })
 
-                function insertClothing(mappings, callback) {
-                  if (!callback) {
-                      throw new Error('Callback is missing.');
-                  }
-                  if (!mappings) {
-                      callback("1", null);
-                  }
+            }
 
-                    mappings.insertOne(mapping, err => {
+            function searchFits(mappings, mapping, callback) {
+                if (!callback) {
+                    throw new Error('Callback is missing.');
+                }
+                if (!mappings) {
+                    callback("1", null);
+                }
+                if (!mapping) {
+                    callback("1", null);
+                }
+                // Suche nach Modellen, dessen Restriktionen vom neu erstellen Kleidungsstück erfüllt werden
+                var fits = calcOutfit(null, mapping, true, null);
+                callback(null, mapping, fits);
+            }
+
+            function findUsers(mappings, mapping, fits, callback) {
+                if (!callback) {
+                    throw new Error('Callback is missing.');
+                }
+                if (!mappings) {
+                    callback("2", null);
+                }
+                if (!mapping) {
+                    callback("2", null);
+                }
+                if (!fits) {
+                    callback("2", null);
+                }
+
+                function queryCollection(mappings, callback) {
+                    mappings.find({
+                        type: "userprofile"
+                    }).toArray(function(err, users) {
                         if (err) {
-                            callback("1");
-                        } else {
-
-                            callback(null, mappings, mapping);
+                            callback("2");
+                        } else if (users.length > 0) {
+                            callback(users);
                         }
-                    })
-
-                }
-
-                function searchFits(mappings, mapping, callback) {
-                  if (!callback) {
-                      throw new Error('Callback is missing.');
-                  }
-                  if (!mappings) {
-                      callback("1", null);
-                  }
-                  if (!mapping) {
-                      callback("1", null);
-                  }
-                    // Suche nach Modellen, dessen Restriktionen vom neu erstellen Kleidungsstück erfüllt werden
-                    var fits = calcOutfit(null, mapping, true, null);
-                    callback(null, mapping, fits);
-                }
-
-                function findUsers(mappings, mapping, fits, callback) {
-                  if (!callback) {
-                      throw new Error('Callback is missing.');
-                  }
-                  if (!mappings) {
-                      callback("2", null);
-                  }
-                  if (!mapping) {
-                      callback("2", null);
-                  }
-                  if (!fits) {
-                      callback("2", null);
-                  }
-                    function queryCollection(mappings, callback) {
-                        mappings.find({
-                            type: "userprofile"
-                        }).toArray(function(err, users) {
-                            if (err) {
-                                callback("2");
-                            } else if (users.length > 0) {
-                                callback(users);
-                            }
-                        });
-                    }
-
-                    queryCollection(mappings, function(users) {
-                        callback(null, mapping, fits, users);
                     });
                 }
 
-                function sendPush(mappings, firebase, mapping, fits, users, callback) {
-                  if (!callback) {
-                      throw new Error('Callback is missing.');
-                  }
-                  if (!mappings) {
-                      callback("2", null);
-                  }
-                  if (!firebase) {
-                      callback("2", null);
-                  }
-                  if (!mapping) {
-                      callback("2", null);
-                  }
-                  if (!users) {
-                      callback("2", null);
-                  }
-                  if (!fits) {
-                      callback("2", null);
-                  }
+                queryCollection(mappings, function(users) {
+                    callback(null, mapping, fits, users);
+                });
+            }
 
-                    try {
-                        // Durchlaufe die einzelnen Benutzerprofile
-                        for (var single_mapping in users) {
-                          // Wenn der Benutzer Suchanfragen erstellt hat
-                            if (users[single_mapping].subscription != null) {
-                                // Durchlaufe die einzelnen Suchanfragen
-                                for (var single_subscription in users[single_mapping].subscription) {
-                                  var i = 0;
-                                  // Durchlaufe Modelle, für die das Kleidungsstück sinnvoll ist
-                                  for (var single_fit in fits) {
+            function sendPush(mappings, firebase, mapping, fits, users, callback) {
+                if (!callback) {
+                    throw new Error('Callback is missing.');
+                }
+                if (!mappings) {
+                    callback("2", null);
+                }
+                if (!firebase) {
+                    callback("2", null);
+                }
+                if (!mapping) {
+                    callback("2", null);
+                }
+                if (!users) {
+                    callback("2", null);
+                }
+                if (!fits) {
+                    callback("2", null);
+                }
+
+                try {
+                    // Durchlaufe die einzelnen Benutzerprofile
+                    for (var single_mapping in users) {
+                        // Wenn der Benutzer Suchanfragen erstellt hat
+                        if (users[single_mapping].subscription != null) {
+                            // Durchlaufe die einzelnen Suchanfragen
+                            for (var single_subscription in users[single_mapping].subscription) {
+                                var i = 0;
+                                // Durchlaufe Modelle, für die das Kleidungsstück sinnvoll ist
+                                for (var single_fit in fits) {
                                     // Wenn der Benutzer eine für das Kleidungsstück gültiges Modell sucht
                                     if (fits[single_fit].model == users[single_mapping].subscription[single_subscription].type + "_" + users[single_mapping].subscription[single_subscription].missing) {
                                         // Suche nach Usertoken um PushNotification zu senden
@@ -853,20 +856,20 @@ const database = {
 
                                     }
                                 }
-                                }
                             }
-
                         }
 
-                        callback(null);
-                    } catch (e) {
-                        callback("2");
                     }
 
+                    callback(null);
+                } catch (e) {
+                    callback("2");
                 }
-              } catch(e) {
-        callback(err);
-    }
+
+            }
+        } catch (e) {
+            callback(err);
+        }
 
 
 
@@ -897,7 +900,7 @@ const database = {
             status: "open",
             confirmed: "0",
             closed: "0",
-            finished:"0"
+            finished: "0"
         };
         //write mapping to Database
 
@@ -919,72 +922,72 @@ const database = {
 
         function findRequest(mappings, mapping, callback) {
 
-          if (!callback) {
-              throw new Error('Callback is missing.');
-          }
-          if (!mappings) {
-              callback("1", null);
-          }
-          if (!mapping) {
-              callback("1", null);
-          }
-                    var flag="0";
+            if (!callback) {
+                throw new Error('Callback is missing.');
+            }
+            if (!mappings) {
+                callback("1", null);
+            }
+            if (!mapping) {
+                callback("1", null);
+            }
+            var flag = "0";
             mappings.findOne({
                 uId: mapping.uId,
                 type: "userprofile",
-              }, (err, userprofile) => {
-                    if (err) {
-                        callback("1", null);
-                    } else {
+            }, (err, userprofile) => {
+                if (err) {
+                    callback("1", null);
+                } else {
                     // Durchlaufe einzelne Requests des Benutzers wenn requests vorhanden sind
 
                     if (typeof userprofile.requests !== 'undefined') {
-                      for ( var single_req in userprofile.requests) {
-                        // Wenn bereits ein Request auf dieses Kleidungsstück existiert
-                          if (userprofile.requests[single_req].cId == mapping.cId && userprofile.requests[single_req]["ouId"] == mapping.ouId) {
-                              // Kennzeichne, das passender request gefunden wurde
-                              flag="1";
-                          }
-
-                        }
-                      }
-                      // Führe Operation fort oder beende sie, je nachdem, ob Requests gefunden wurden
-                      if (flag=="0") {
-                        callback(null);
-                      } else {
-                        callback("1",null);
-                      }
-                      }
-                    })
-                  }
-
-            function findUserProfile(mappings, mapping, callback) {
-              if (!callback) {
-                  throw new Error('Callback is missing.');
-              }
-              if (!mappings) {
-                  callback("1", null);
-              }
-              if (!mapping) {
-                  callback("1", null);
-              }
-                          mappings.update({
-                              type: "userprofile",
-                              uId: mapping.uId
-                          }, {
-                              $push: {
-                                  requests: mapping
-                              }
-                          }, (err) => {
-                            if (err) {
-                                callback("1", null);
-                            } else {
-                            callback(null);
+                        for (var single_req in userprofile.requests) {
+                            // Wenn bereits ein Request auf dieses Kleidungsstück existiert
+                            if (userprofile.requests[single_req].cId == mapping.cId && userprofile.requests[single_req]["ouId"] == mapping.ouId) {
+                                // Kennzeichne, das passender request gefunden wurde
+                                flag = "1";
                             }
-                          })
-                        }
 
-          function sendMessage(mappings, uId, cId ,callback) {
+                        }
+                    }
+                    // Führe Operation fort oder beende sie, je nachdem, ob Requests gefunden wurden
+                    if (flag == "0") {
+                        callback(null);
+                    } else {
+                        callback("1", null);
+                    }
+                }
+            })
+        }
+
+        function findUserProfile(mappings, mapping, callback) {
+            if (!callback) {
+                throw new Error('Callback is missing.');
+            }
+            if (!mappings) {
+                callback("1", null);
+            }
+            if (!mapping) {
+                callback("1", null);
+            }
+            mappings.update({
+                type: "userprofile",
+                uId: mapping.uId
+            }, {
+                $push: {
+                    requests: mapping
+                }
+            }, (err) => {
+                if (err) {
+                    callback("1", null);
+                } else {
+                    callback(null);
+                }
+            })
+        }
+
+        function sendMessage(mappings, uId, cId, callback) {
             if (!callback) {
                 throw new Error('Callback is missing.');
             }
@@ -1007,13 +1010,13 @@ const database = {
                 sendPushNotification(mappings.token, cId, uId, "", "postRequest", firebase);
                 callback(null);
             });
-          }
+        }
 
 
 
 
-          },
-        // Speichert neuen Usertoken der Benutzer
+    },
+    // Speichert neuen Usertoken der Benutzer
     postUserToken(id, token, callback) {
         if (!id) {
             throw new Error('id is missing.');
@@ -1309,21 +1312,21 @@ const database = {
     },
     // Suche Benutzer dem ein bestimmter Token(token) gehört
     getUserToken(token, callback) {
-if (!callback) {
-    throw new Error('Callback is missing.');
-}
-// find all elements
-this.mappings.findOne({
-    token: token,
-    type: "token"
-}, (err, mappings) => {
-    if (err) {
-        return callback(err);
-    }
-    //send results back to handler
-    callback(null, mappings);
-})
-},
+        if (!callback) {
+            throw new Error('Callback is missing.');
+        }
+        // find all elements
+        this.mappings.findOne({
+            token: token,
+            type: "token"
+        }, (err, mappings) => {
+            if (err) {
+                return callback(err);
+            }
+            //send results back to handler
+            callback(null, mappings);
+        })
+    },
 
     // Suche nach Konversationen zwischen zwei Benutzern (uId,ouId)
     getConversation(uId, ouId, rId, callback) {
@@ -1359,15 +1362,15 @@ this.mappings.findOne({
         });
 
         function findOwnMessages(mappings, uId, callback) {
-          if (!callback) {
-              throw new Error('Callback is missing.');
-          }
-          if (!uId) {
-            callback("1", null);
-          }
-          if (!mappings) {
-            callback("1", null);
-          }
+            if (!callback) {
+                throw new Error('Callback is missing.');
+            }
+            if (!uId) {
+                callback("1", null);
+            }
+            if (!mappings) {
+                callback("1", null);
+            }
             mappings.findOne({
                 type: "userprofile",
                 uId: uId,
@@ -1381,24 +1384,24 @@ this.mappings.findOne({
         }
 
         function findOtherMessages(mappings, uId, ouId, rId, ownMessages, callback) {
-          if (!callback) {
-              throw new Error('Callback is missing.');
-          }
-          if (!uId) {
-            callback("1", null);
-          }
-          if (!mappings) {
-            callback("1", null);
-          }
-          if (!ouId) {
-            callback("1", null);
-          }
-          if (!ownMessages) {
-            callback("1", null);
-          }
-          if (!rId) {
-            callback("1", null);
-          }
+            if (!callback) {
+                throw new Error('Callback is missing.');
+            }
+            if (!uId) {
+                callback("1", null);
+            }
+            if (!mappings) {
+                callback("1", null);
+            }
+            if (!ouId) {
+                callback("1", null);
+            }
+            if (!ownMessages) {
+                callback("1", null);
+            }
+            if (!rId) {
+                callback("1", null);
+            }
             mappings.find({
                 type: "userprofile",
                 "messages.from": ouId,
@@ -1413,7 +1416,7 @@ this.mappings.findOne({
                     // Durchlaufe einzelne Nachrichten
                     for (var one_message in mapping[single_mapping].messages) {
                         // Suche nach Nachrichten die für den jeweiligen Benutzer(uId) gelten
-                        if (mapping[single_mapping].messages[one_message].to == uId && mapping[single_mapping].messages[one_message].rId == rId ) {
+                        if (mapping[single_mapping].messages[one_message].to == uId && mapping[single_mapping].messages[one_message].rId == rId) {
                             // Trage Nachrichten in die Liste(allMessages) ein
                             allMessages.push(mapping[single_mapping].messages[one_message]);
                         }
@@ -1422,9 +1425,9 @@ this.mappings.findOne({
                 }
                 // durchlaufe die Eigenen Nachrichten
                 for (var single_Messages in ownMessages.messages) {
-                  // Füge gesendete Nachrichten zur Liste hinzu
-                  if (ownMessages.messages[single_Messages].rId == rId)
-                    allMessages.push(ownMessages.messages[single_Messages]);
+                    // Füge gesendete Nachrichten zur Liste hinzu
+                    if (ownMessages.messages[single_Messages].rId == rId)
+                        allMessages.push(ownMessages.messages[single_Messages]);
                 }
                 //send results back to handler
                 callback(null, allMessages);

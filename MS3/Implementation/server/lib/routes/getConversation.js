@@ -12,15 +12,16 @@ const getConversation = function(database) {
             if (err) {
                 return res.status(500).end();
             } else {
-              mappings.sort(function(a, b) {
-                return parseFloat(a.time) - parseFloat(b.time);
-              })
-            return res.status(200).send(mappings);
+                // Sortiere Datensatz nach Wert des "time" Elements
+                mappings.sort(function(a, b) {
+                    return parseFloat(a.time) - parseFloat(b.time);
+                })
+                return res.status(200).send(mappings);
             }
-          })
+        })
 
-        }
-    };
+    }
+};
 
 
 module.exports = getConversation;

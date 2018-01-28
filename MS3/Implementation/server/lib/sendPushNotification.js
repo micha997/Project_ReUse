@@ -40,17 +40,17 @@ const sendPushNotification = function(token, cId, payload, fits, from, firebase)
             }
             break;
 
-            case "confirmed":
-                var message = {
-                    data: {
-                        sender: from,
-                    },
-                    notification: {
-                        title: "Check your requests!",
-                        body: "Someone confirmed successfully transaction."
-                    }
+        case "confirmed":
+            var message = {
+                data: {
+                    sender: from,
+                },
+                notification: {
+                    title: "Check your requests!",
+                    body: "Someone confirmed successfully transaction."
                 }
-                break;
+            }
+            break;
 
         case "waiting":
             var message = {

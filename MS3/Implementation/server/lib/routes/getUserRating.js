@@ -7,14 +7,13 @@ const getUserRating = function(database) {
 
     return function(req, res) {
 
-        // call database
         database.getUserRating(req.params.uId, (err, mappings) => {
             res.setHeader("Content-Type", "application/json");
             if (err) {
                 return res.status(500).end();
             } else {
 
-              return res.status(200).send(mappings["rating"]);
+                return res.status(200).send(mappings["rating"]);
             }
         })
     };

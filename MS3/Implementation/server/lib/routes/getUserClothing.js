@@ -6,16 +6,19 @@ const getUserClothing = function(database) {
     }
 
     return function(req, res) {
-        // call database
         database.getUserClothing(req.params.uId, (err, mappings) => {
             res.setHeader("Content-Type", "application/json");
             if (err) {
                 return res.status(500).end();
             } else {
-
-              var profile = { href: "/user/" + req.params.uId};
-              mappings.push = { _links : profile };
-              return res.status(200).send(mappings);
+                // Füge Hypermedialinks hinzu
+                var profile = {
+                    href: "/user/" + req.params.uId
+                };
+                mappings.push = {
+                    _links: profile
+                };
+                return res.status(200).send(mappings);
             }
         })
 

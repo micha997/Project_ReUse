@@ -9,8 +9,8 @@ const deleteConversation = function(database) {
                 console.log("Failed to delete conversation!");
                 return res.status(500).send("conversation could not be deleted from database!");
             } else {
-              console.log("Successfully deleted conversation!");
-              return res.sendStatus(201);
+                console.log("Successfully deleted conversation!");
+                return res.sendStatus(201);
             }
         });
 

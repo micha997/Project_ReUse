@@ -28,29 +28,29 @@ const getApp = function(database, firebase) {
         limit: '5mb'
     }));
 
-    var logIn = function (req, res, next) {
-      async.waterfall([
-          async.apply(callrequireAuthentication, database, req.params.token)
-      ], function(err, result) {
-          if (err == "1") {
-              return res.status(401).end();
+    var logIn = function(req, res, next) {
+        async.waterfall([
+            async.apply(callrequireAuthentication, database, req.params.token)
+        ], function(err, result) {
+            if (err == "1") {
+                return res.status(401).end();
 
-          } else {
-            login=result;
-            next();
-          }
-      });
+            } else {
+                login = result;
+                next();
+            }
+        });
 
-      function callrequireAuthentication(database, token, callback) {
-        requireAuthentication(database, req.params.token, next, (err, mappings, next) => {
-              console.log(mappings);
-              if (mappings == true) {
-                return callback(null, true);
-              } else {
-                callback("1",null);
-              }
-        })
-      }
+        function callrequireAuthentication(database, token, callback) {
+            requireAuthentication(database, req.params.token, next, (err, mappings, next) => {
+                console.log(mappings);
+                if (mappings == true) {
+                    return callback(null, true);
+                } else {
+                    callback("1", null);
+                }
+            })
+        }
     }
 
 
@@ -60,7 +60,7 @@ const getApp = function(database, firebase) {
     app.post('/user/:uId/search', routes.postUserSearch(database));
 
     app.post('/users/:id/token/:token', routes.postUserToken(database));
-    app.post('/user/:uId/messages', routes.postMessage(database,firebase));
+    app.post('/user/:uId/messages', routes.postMessage(database, firebase));
     app.get('/user/:uId/messages/:ouId/:rId', routes.getConversation(database));
     app.delete('/user/:uId/messages/:ouId', routes.deleteConversation(database));
     app.get('/user/:uId/clothing/', routes.getUserClothing(database));
@@ -69,31 +69,31 @@ const getApp = function(database, firebase) {
     app.delete('/user/:uId', routes.deleteUserProfile(database));
     app.delete('/user/:uId/clothing', routes.deleteUserClothing(database, firebase));
     //app.use('/user/:uId/:token/requests/', logIn);
-    app.get('/user/:uId/:token/requests/', routes.getUserRequests(database,firebase));
+    app.get('/user/:uId/:token/requests/', routes.getUserRequests(database, firebase));
     app.delete('/user/:uId/requests/:id', routes.deleteUserRequest(database));
     app.get('/clothing/:brand/:style/:color/:art/:size/:latitude/:longitude/:vicinity', routes.getCustomeClothing(database));
 
 
-    app.put('/user/:uId/:token/requests/:id', routes.putRequest(database,firebase));
+    app.put('/user/:uId/:token/requests/:id', routes.putRequest(database, firebase));
     app.post('/user/:uId/rating', routes.postUserRating(database));
     app.get('/user/:uId/rating', routes.getUserRating(database));
     app.put('/user/:uId/rating/:id', routes.putUserRating(database));
-    app.get('/user/:uId/outfits',routes.getUserOutfit(database));
-    app.get('/user/:uId/outfits/:oId',routes.getUserOutfitClothing(database));
+    app.get('/user/:uId/outfits', routes.getUserOutfit(database));
+    app.get('/user/:uId/outfits/:oId', routes.getUserOutfitClothing(database));
     app.post('/users', routes.postUser(database));
 
     app.put('/user/:uId/clothing', routes.putClothing(database));
     app.get('/clothing/:cId', routes.getClothing(database));
-	  app.get('/clothingOptions', routes.getClothingOptions());
+    app.get('/clothingOptions', routes.getClothingOptions());
     app.put('/clothing/:cId', routes.putClothing(database));
-    app.post('/clothing/:cId', routes.postRequest(database,firebase));
+    app.post('/clothing/:cId', routes.postRequest(database, firebase));
     app.delete('/clothing/:cId', routes.deleteClothing(database));
 
-    app.post('/klamotten', routes.postKlamotten(database,firebase));
+    app.post('/klamotten', routes.postKlamotten(database, firebase));
     app.get('/klamotten/:latitude/:longitude/:vicinity/:uId', routes.getAllClothingLocation(database));
 
 
-    app.get('/outfit/:art/:latitude/:longitude/:vicinity',routes.getOutfit(database,"true"));
+    app.get('/outfit/:art/:latitude/:longitude/:vicinity', routes.getOutfit(database, "true"));
     app.get('/all', routes.getAll(database));
 
     app.get('/', routes.getIndex());

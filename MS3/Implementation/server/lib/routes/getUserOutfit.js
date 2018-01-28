@@ -6,9 +6,6 @@ const getUserOutfit = function(database, choise) {
     }
 
     return function(req, res) {
-        //console.log(req.params.latitude);
-
-        // call database
 
         database.getUserOutfit(req.params.uId, (err, mappings) => {
             res.setHeader("Content-Type", "application/json");

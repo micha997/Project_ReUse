@@ -36,8 +36,8 @@ var wintermodel = {
         wintermodel_head: {
           respiratory_activity_low: 0,
           respiratory_activity_high: 0,
-          warmth_low: 7,
-          warmth_high: 10,
+          warmth_low: 0,
+          warmth_high: 0,
           moisture_pickup_low: 0,
           moisture_pickup_high: 0,
           art: ["Wollmütze","Mütze","Beanie"],
@@ -341,7 +341,6 @@ var wintermodel = {
     */
 
     function filterClothing(model, outfit, gender, hSize, tSize, bSize, sSize) {
-      console.log(sSize);
       //Kopiere aktuelles Outfit
       var new_outfit = JSON.parse(JSON.stringify(outfit));;
       var i=0;
@@ -354,7 +353,7 @@ var wintermodel = {
         }
         i++;
       }
-
+      console.log(outfit);
       var art;
       // Durchlaufe allgemeine Arten
       for (var single_layerArt in outfit.layerArt) {
@@ -363,17 +362,17 @@ var wintermodel = {
           // Durchlaufe Kleidungsstücke
           for (var single_clothing in outfit[outfit.layers[single_layer]]) {
           // Überprüfe ob Kleidungsstück richtige Art, richtige Größe und für das richtige Geschlecht ist
-          if (outfit.layerArt[single_layerArt] == "head" && outfit[outfit.layers[single_layer]][single_clothing].size == hSize && outfit[outfit.layers[single_layer]][single_clothing].gender == gender  ) {
+          if (outfit.layerArt[single_layerArt] == "head" && (outfit[outfit.layers[single_layer]][single_clothing].size == hSize || hSize==0) && (outfit[outfit.layers[single_layer]][single_clothing].gender == gender || gender==0 )) {
               // Füge gültiges Kleidungsstück zum Outfit hinzu
               new_outfit[outfit.layers[single_layer]].push(outfit[outfit.layers[single_layer]][single_clothing].id);
           }
-          if (outfit.layerArt[single_layerArt] == "layer" && outfit[outfit.layers[single_layer]][single_clothing].size == tSize && outfit[outfit.layers[single_layer]][single_clothing].gender == gender  ) {
+          if (outfit.layerArt[single_layerArt] == "layer" && (outfit[outfit.layers[single_layer]][single_clothing].size == tSize || tSize==0)  && (outfit[outfit.layers[single_layer]][single_clothing].gender == gender || gender==0 )) {
               new_outfit[outfit.layers[single_layer]].push(outfit[outfit.layers[single_layer]][single_clothing].id);
           }
-          if (outfit.layerArt[single_layerArt] == "bottom" && outfit[outfit.layers[single_layer]][single_clothing].size == bSize && outfit[outfit.layers[single_layer]][single_clothing].gender == gender  ) {
+          if (outfit.layerArt[single_layerArt] == "bottom" && (outfit[outfit.layers[single_layer]][single_clothing].size == bSize || bSize==0) && (outfit[outfit.layers[single_layer]][single_clothing].gender == gender || gender==0 )) {
               new_outfit[outfit.layers[single_layer]].push(outfit[outfit.layers[single_layer]][single_clothing].id);
           }
-          if (outfit.layerArt[single_layerArt] == "shoes" && outfit[outfit.layers[single_layer]][single_clothing].size == sSize && outfit[outfit.layers[single_layer]][single_clothing].gender == gender   ) {
+          if (outfit.layerArt[single_layerArt] == "shoes" && (outfit[outfit.layers[single_layer]][single_clothing].size == sSize || sSize==0) && (outfit[outfit.layers[single_layer]][single_clothing].gender == gender || gender==0 )) {
               new_outfit[outfit.layers[single_layer]].push(outfit[outfit.layers[single_layer]][single_clothing].id);;
           }
         }
@@ -382,6 +381,7 @@ var wintermodel = {
 
   }
       // Gebe neues Outfit zurück
+      console.log(new_outfit);
      return new_outfit;
   }
 

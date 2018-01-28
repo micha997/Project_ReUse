@@ -15,7 +15,6 @@ const calcDistance = function(la1, lo1, la2, lo2) {
     // Distance in km
     var km = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     var distance = R * km;
-    //console.log("Distance: " + distance + "\n");
     return distance;
 };
 

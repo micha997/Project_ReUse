@@ -6,14 +6,13 @@ const getUserOutfitClothing = function(database, choise) {
     }
 
     return function(req, res) {
-        // call database
 
         database.getUserOutfitClothing(req.params.uId, req.params.oId, (err, mappings) => {
             res.setHeader("Content-Type", "application/json");
             if (err) {
                 return res.status(500).end();
             } else {
-              return res.status(200).send(mappings);
+                return res.status(200).send(mappings);
             }
         })
     };

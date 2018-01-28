@@ -12,7 +12,7 @@ const getUserRequests = function(database, firebase) {
             if (err) {
                 return res.status(500).end();
             } else {
-              return res.status(200).send(mappings);
+                return res.status(200).send(mappings);
             }
 
 
