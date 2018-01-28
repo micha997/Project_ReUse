@@ -114,6 +114,7 @@ public class SearchClothing extends AppCompatActivity
         //BroadcastReceiver zum erhalten von Responses bei gesendeten Requests
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver,
                 new IntentFilter("clothing"));
+        searchTheClothing("0","0","0","0","0",longitude,latitude);
     }
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -321,7 +322,7 @@ public class SearchClothing extends AppCompatActivity
         latitude = location.getLatitude();
         if(!gotGPSDATA) {
             gotGPSDATA = true;
-            searchTheClothing("0","0","0","0","0",longitude,latitude);
+            //searchTheClothing("0","0","0","0","0",longitude,latitude);
         }
     }
 
