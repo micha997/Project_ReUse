@@ -43,7 +43,6 @@ const getApp = function(database, firebase) {
 
         function callrequireAuthentication(database, token, callback) {
             requireAuthentication(database, req.params.token, next, (err, mappings, next) => {
-                console.log(mappings);
                 if (mappings == true) {
                     return callback(null, true);
                 } else {
@@ -54,11 +53,13 @@ const getApp = function(database, firebase) {
     }
 
 
-    // define routes
-    app.get('/outfit/:art/:gender/:hSize/:tSize/:bSize/:sSize/:longitude/:latitude/:vicinity', routes.getOutfit(database, "false"));
-    //app.get('/outfit/:art/:longitude/:latitude/:vicinity', routes.getOutfit(database, "false"));
-    app.post('/user/:uId/search', routes.postUserSearch(database));
+    // Pfade die durch die Verifizierung(login()) eines Tokens gesichert werden
+    app.use('/user/:uId/:token/requests/', logIn);
+    //...
 
+    // Routen definition
+    app.get('/outfit/:art/:gender/:hSize/:tSize/:bSize/:sSize/:longitude/:latitude/:vicinity', routes.getOutfit(database, "false"));
+    app.post('/user/:uId/search', routes.postUserSearch(database));
     app.post('/users/:id/token/:token', routes.postUserToken(database));
     app.post('/user/:uId/messages', routes.postMessage(database, firebase));
     app.get('/user/:uId/messages/:ouId/:rId', routes.getConversation(database));
@@ -68,12 +69,10 @@ const getApp = function(database, firebase) {
     app.put('/user/:uId', routes.putUserProfile(database));
     app.delete('/user/:uId', routes.deleteUserProfile(database));
     app.delete('/user/:uId/clothing', routes.deleteUserClothing(database, firebase));
-    //app.use('/user/:uId/:token/requests/', logIn);
+
     app.get('/user/:uId/:token/requests/', routes.getUserRequests(database, firebase));
     app.delete('/user/:uId/requests/:id', routes.deleteUserRequest(database));
     app.get('/clothing/:brand/:style/:color/:art/:size/:latitude/:longitude/:vicinity', routes.getCustomeClothing(database));
-
-
     app.put('/user/:uId/:token/requests/:id', routes.putRequest(database, firebase));
     app.post('/user/:uId/rating', routes.postUserRating(database));
     app.get('/user/:uId/rating', routes.getUserRating(database));
