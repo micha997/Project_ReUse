@@ -6,7 +6,7 @@ const putRequest = function(database, firebase) {
     }
 
     return function(req, res) {
-
+        console.log("HI");
         database.putRequest(req.body, req.params.uId, req.params.id, firebase, err => {
             if (err) {
                 console.log("Failed to edit request!");

@@ -17,7 +17,6 @@ const getCustomeClothing = function(database) {
 
         Object.keys(search).forEach(function(key) {
             if (search[key]==0) {
-              console.log(search[key]);
               delete search[key];
             }
         });

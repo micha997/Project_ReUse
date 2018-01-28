@@ -4,7 +4,6 @@ const getClothing = function(database) {
     if (!database) {
         throw new Error('Database is missing.');
     }
-
     return function(req, res) {
         // call database
         database.getClothing(req.params.cId, (err, mappings) => {

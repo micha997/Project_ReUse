@@ -84,7 +84,7 @@ public class Chat extends AppCompatActivity {
         // Nachrichtenverlauf abrufen
         myIntent.putExtra("method","GET");
         myIntent.putExtra("from","GETCONVERSATION");
-        myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId + "/messages/" + getIntent().getStringExtra("to"));
+        myIntent.putExtra("url",getString(R.string.DOMAIN) + "/user/" + uId + "/messages/" + getIntent().getStringExtra("to") + "/" + rId);
         startService(myIntent);
 
         btnSendMessages.setOnClickListener(new View.OnClickListener() {

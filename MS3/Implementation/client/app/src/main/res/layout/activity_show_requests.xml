@@ -52,7 +52,7 @@
         android:fillViewport="true">
 
         <ListView
-            android:id="@+id/requestsListView"
+            android:id="@+id/lvShowRequests"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 

@@ -6,8 +6,8 @@ const getConversation = function(database) {
     }
 
     return function(req, res) {
-        // call database
-        database.getConversation(req.params.uId, req.params.ouId, (err, mappings) => {
+
+        database.getConversation(req.params.uId, req.params.ouId, req.params.rId, (err, mappings) => {
             res.setHeader("Content-Type", "application/json");
             if (err) {
                 return res.status(500).end();

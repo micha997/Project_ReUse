@@ -31,7 +31,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Created by Steffen Owtschinnikow on 25.12.2017.
+ * Created by Frank on 25.12.2017.
  * */
 
 public class ShowClothing extends AppCompatActivity implements View.OnClickListener{
@@ -179,7 +179,7 @@ public class ShowClothing extends AppCompatActivity implements View.OnClickListe
                         myIntent.putExtra("payload", request.toString());
                         myIntent.putExtra("method", "POST");
                         myIntent.putExtra("from", "NEWREQUEST");
-                        myIntent.putExtra("url", getString(R.string.DOMAIN) + "/clothing/" + clothingID);
+                        myIntent.putExtra("url", getString(R.string.DOMAIN) + "/clothing/" + clothingJson.getString("id"));
                         startService(myIntent);
                     }
                 } catch (JSONException e) {
@@ -200,7 +200,7 @@ public class ShowClothing extends AppCompatActivity implements View.OnClickListe
                     }
                 });
         if (!isFinishing())
-        alertDialog.show();
+            alertDialog.show();
     }
 
 }

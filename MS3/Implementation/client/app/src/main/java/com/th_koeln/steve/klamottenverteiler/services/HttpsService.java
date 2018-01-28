@@ -96,9 +96,10 @@ public class HttpsService extends IntentService {
             // Einstellungen für HTTPS-Verbindungen vornehmen
                 url = new URL(uri);
                 connection = (HttpsURLConnection) url.openConnection();
-                // define HTTPs Method
+                // definiere HTTP Methode
                 connection.setRequestMethod(method);
-                connection.setConnectTimeout(5000);
+                // setze Timeout für die Operation fest
+                connection.setConnectTimeout(10000);
 
                 if (method.equals("POST") || method.equals("PUT")) {
                     // http request mit Payload
@@ -193,12 +194,6 @@ public class HttpsService extends IntentService {
                             intent = new Intent("prefer");
                             intent.putExtra("prefer", stringBuilder.toString());
                             intent.putExtra("from", "SEARCHPREFER");
-                            break;
-
-                        case "SEARCHPREFCLOTHING":
-                            intent = new Intent("clothing");
-                            intent.putExtra("clothing", stringBuilder.toString());
-                            intent.putExtra("from", "SEARCHPREFCLOTHING");
                             break;
 
                         case "SHOWDETAILS":

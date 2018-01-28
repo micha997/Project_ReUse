@@ -12,7 +12,7 @@ const putClothing = function(database) {
                 console.log("Failed to edit request!");
                 return res.status(500).send("request could not be edited!");
             }
-            console.log("Successfully edited resquest!");
+            console.log("Successfully edited clothing!");
         });
         return res.sendStatus(201);
     };

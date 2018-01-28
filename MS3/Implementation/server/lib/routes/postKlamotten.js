@@ -3,7 +3,6 @@
 const postKlamotten = function(database, firebase) {
 
     return function(req, res) {
-        // call database
         database.addClothing(JSON.stringify(req.body),firebase, err => {
             if (err) {
                 console.log("Failed to add clothing!");
