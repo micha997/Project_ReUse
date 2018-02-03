@@ -620,7 +620,7 @@ const database = {
             });
         }
 
-        function calcNewOutfit(params, mappings, callback) {dd
+        function calcNewOutfit(params, mappings, callback) {
             if (!callback) {
                 throw new Error('Callback is missing.');
             }
