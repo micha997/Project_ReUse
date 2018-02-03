@@ -38,8 +38,8 @@ public class HttpsService extends IntentService {
     private String method;
     private String from;
     private String layer;
-
-    HttpsURLConnection connection = null;
+    HttpURLConnection connection = null;
+    //HttpsURLConnection connection = null;
     Handler mHandler;
 
     public void onCreate() {
@@ -80,7 +80,7 @@ public class HttpsService extends IntentService {
         try {
             sc = SSLContext.getInstance("SSL");
             sc.init(null, trustAllCerts, new java.security.SecureRandom());
-            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+           // HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 
             // Create all-trusting host name verifier
             HostnameVerifier allHostsValid = new HostnameVerifier() {
@@ -89,7 +89,7 @@ public class HttpsService extends IntentService {
                 }
             };
             // Install the all-trusting host verifier
-            HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+            //HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
 
             URL url = null;
 

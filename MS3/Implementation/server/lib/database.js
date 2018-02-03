@@ -615,14 +615,12 @@ const database = {
                 if (mappings_new == "1") {
                     callback("1");
                 } else {
-
-
                     callback(null, mappings_new);
                 }
             });
         }
 
-        function calcNewOutfit(params, mappings, callback) {
+        function calcNewOutfit(params, mappings, callback) {dd
             if (!callback) {
                 throw new Error('Callback is missing.');
             }

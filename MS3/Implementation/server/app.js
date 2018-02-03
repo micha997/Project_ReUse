@@ -1,6 +1,7 @@
 'use strict';
 
-const https = require('https');
+//const https = require('https');
+const http = require('http');
 const fs = require('fs');
 const getApp = require('./lib/getApp');
 const database = require('./lib/database');
@@ -26,8 +27,9 @@ const options = {
     cert: fs.readFileSync(__dirname + '/keys/server.crt', 'utf8')
 };
 
+const server = http.createServer(app);
 // define server
-const server = https.createServer(options, app);
+//const server = https.createServer(options, app);
 
 // server port
 const port = process.env.PORT || 50262;
